@@ -1,0 +1,8 @@
+node_modules
+.next
+dist
+coverage
+pnpm-lock.yaml
+packages/dex/data/*.json
+playwright-report
+test-results
