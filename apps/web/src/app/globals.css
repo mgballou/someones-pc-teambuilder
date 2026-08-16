@@ -1,0 +1,281 @@
+@import 'tailwindcss';
+
+/**
+ * Tokens.
+ *
+ * Semantic names only. Nothing outside this file may write a raw color, and
+ * nothing outside a type badge, the coverage grid or the Tera indicator may
+ * touch the eighteen type hues. See ui-sensibility.md §4.
+ *
+ * The surface stack is a real stack: page < panel < raised < well is not a
+ * lightness ramp in one direction, because a well is *recessed*. An empty slot
+ * has to read as a hole the filled slot sits in. That is the whole aesthetic.
+ */
+
+@layer base {
+  :root {
+    color-scheme: light;
+
+    --page: oklch(95.5% 0.004 90);
+    --panel: oklch(98.5% 0.003 90);
+    --raised: oklch(100% 0 0);
+    --well: oklch(92.2% 0.005 90);
+
+    --line: oklch(87% 0.006 90);
+    --line-strong: oklch(73% 0.008 90);
+
+    --text: oklch(24% 0.008 90);
+    --text-dim: oklch(52% 0.008 90);
+    --text-faint: oklch(66% 0.007 90);
+
+    --accent: oklch(62% 0.155 52);
+    --accent-ink: oklch(100% 0 0);
+    --accent-soft: oklch(62% 0.155 52 / 0.12);
+
+    --danger: oklch(55% 0.185 25);
+    --danger-soft: oklch(55% 0.185 25 / 0.12);
+    --warn: oklch(62% 0.115 82);
+    --warn-soft: oklch(62% 0.115 82 / 0.14);
+    --ok: oklch(56% 0.115 155);
+    --ok-soft: oklch(56% 0.115 155 / 0.14);
+
+    /* Effectiveness scale. Diverging, and never the type hues. */
+    --eff-immune: oklch(50% 0.01 90);
+    --eff-quarter: oklch(45% 0.09 240);
+    --eff-half: oklch(55% 0.06 240);
+    --eff-neutral: oklch(70% 0.004 90);
+    --eff-double: oklch(56% 0.14 35);
+    --eff-quad: oklch(46% 0.19 28);
+
+    --type-normal: oklch(58% 0.012 90);
+    --type-fire: oklch(60% 0.175 44);
+    --type-water: oklch(56% 0.135 250);
+    --type-electric: oklch(66% 0.145 92);
+    --type-grass: oklch(58% 0.135 143);
+    --type-ice: oklch(62% 0.085 210);
+    --type-fighting: oklch(52% 0.145 32);
+    --type-poison: oklch(50% 0.145 318);
+    --type-ground: oklch(60% 0.105 78);
+    --type-flying: oklch(62% 0.095 275);
+    --type-psychic: oklch(60% 0.165 358);
+    --type-bug: oklch(57% 0.115 122);
+    --type-rock: oklch(56% 0.065 82);
+    --type-ghost: oklch(48% 0.115 300);
+    --type-dragon: oklch(50% 0.165 282);
+    --type-dark: oklch(42% 0.045 55);
+    --type-steel: oklch(58% 0.035 235);
+    --type-fairy: oklch(66% 0.125 340);
+
+    --radius: 0.25rem;
+    --radius-panel: 0.375rem;
+    --slot-size: 4.5rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      color-scheme: dark;
+
+      --page: oklch(17.5% 0.006 264);
+      --panel: oklch(21.5% 0.007 264);
+      --raised: oklch(26% 0.008 264);
+      --well: oklch(14.5% 0.006 264);
+
+      --line: oklch(31% 0.009 264);
+      --line-strong: oklch(44% 0.011 264);
+
+      --text: oklch(93% 0.004 264);
+      --text-dim: oklch(70% 0.008 264);
+      --text-faint: oklch(55% 0.008 264);
+
+      --accent: oklch(72% 0.155 58);
+      --accent-ink: oklch(18% 0.01 60);
+      --accent-soft: oklch(72% 0.155 58 / 0.16);
+
+      --danger: oklch(68% 0.165 27);
+      --danger-soft: oklch(68% 0.165 27 / 0.16);
+      --warn: oklch(76% 0.125 85);
+      --warn-soft: oklch(76% 0.125 85 / 0.16);
+      --ok: oklch(72% 0.125 158);
+      --ok-soft: oklch(72% 0.125 158 / 0.16);
+
+      --eff-immune: oklch(52% 0.008 264);
+      --eff-quarter: oklch(62% 0.095 240);
+      --eff-half: oklch(70% 0.065 240);
+      --eff-neutral: oklch(45% 0.006 264);
+      --eff-double: oklch(70% 0.135 38);
+      --eff-quad: oklch(76% 0.175 32);
+
+      --type-normal: oklch(72% 0.012 90);
+      --type-fire: oklch(73% 0.155 46);
+      --type-water: oklch(70% 0.115 248);
+      --type-electric: oklch(82% 0.135 94);
+      --type-grass: oklch(74% 0.125 143);
+      --type-ice: oklch(80% 0.075 205);
+      --type-fighting: oklch(68% 0.135 33);
+      --type-poison: oklch(70% 0.135 318);
+      --type-ground: oklch(76% 0.095 80);
+      --type-flying: oklch(78% 0.085 275);
+      --type-psychic: oklch(74% 0.135 358);
+      --type-bug: oklch(74% 0.115 122);
+      --type-rock: oklch(72% 0.055 84);
+      --type-ghost: oklch(68% 0.115 300);
+      --type-dragon: oklch(70% 0.135 282);
+      --type-dark: oklch(64% 0.045 58);
+      --type-steel: oklch(75% 0.035 235);
+      --type-fairy: oklch(80% 0.105 340);
+    }
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+
+    --page: oklch(17.5% 0.006 264);
+    --panel: oklch(21.5% 0.007 264);
+    --raised: oklch(26% 0.008 264);
+    --well: oklch(14.5% 0.006 264);
+
+    --line: oklch(31% 0.009 264);
+    --line-strong: oklch(44% 0.011 264);
+
+    --text: oklch(93% 0.004 264);
+    --text-dim: oklch(70% 0.008 264);
+    --text-faint: oklch(55% 0.008 264);
+
+    --accent: oklch(72% 0.155 58);
+    --accent-ink: oklch(18% 0.01 60);
+    --accent-soft: oklch(72% 0.155 58 / 0.16);
+
+    --danger: oklch(68% 0.165 27);
+    --danger-soft: oklch(68% 0.165 27 / 0.16);
+    --warn: oklch(76% 0.125 85);
+    --warn-soft: oklch(76% 0.125 85 / 0.16);
+    --ok: oklch(72% 0.125 158);
+    --ok-soft: oklch(72% 0.125 158 / 0.16);
+
+    --eff-immune: oklch(52% 0.008 264);
+    --eff-quarter: oklch(62% 0.095 240);
+    --eff-half: oklch(70% 0.065 240);
+    --eff-neutral: oklch(45% 0.006 264);
+    --eff-double: oklch(70% 0.135 38);
+    --eff-quad: oklch(76% 0.175 32);
+
+    --type-normal: oklch(72% 0.012 90);
+    --type-fire: oklch(73% 0.155 46);
+    --type-water: oklch(70% 0.115 248);
+    --type-electric: oklch(82% 0.135 94);
+    --type-grass: oklch(74% 0.125 143);
+    --type-ice: oklch(80% 0.075 205);
+    --type-fighting: oklch(68% 0.135 33);
+    --type-poison: oklch(70% 0.135 318);
+    --type-ground: oklch(76% 0.095 80);
+    --type-flying: oklch(78% 0.085 275);
+    --type-psychic: oklch(74% 0.135 358);
+    --type-bug: oklch(74% 0.115 122);
+    --type-rock: oklch(72% 0.055 84);
+    --type-ghost: oklch(68% 0.115 300);
+    --type-dragon: oklch(70% 0.135 282);
+    --type-dark: oklch(64% 0.045 58);
+    --type-steel: oklch(75% 0.035 235);
+    --type-fairy: oklch(80% 0.105 340);
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-well: var(--well);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-text-dim: var(--text-dim);
+  --color-text-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+
+  --radius-box: var(--radius);
+  --radius-panel: var(--radius-panel);
+
+  --font-mono:
+    ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  body {
+    background-color: var(--page);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /**
+   * Every number in this app is tabular. Stats, EVs, damage rolls and speed
+   * values are read as columns, and proportional digits make a column of
+   * numbers unreadable. ui-sensibility.md §6.1.
+   */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion is designed, not stripped. ui-sensibility.md §9. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /**
+   * The box chrome. A panel is a face with an edge; a well is a recess cut
+   * into it. Depth is a line plus one surface step, never a soft shadow —
+   * shadows are reserved for things that genuinely float.
+   */
+  .panel {
+    background-color: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+  }
+
+  .raised {
+    background-color: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .well {
+    background-color: var(--well);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: inset 0 1px 2px oklch(0% 0 0 / 0.08);
+  }
+}
