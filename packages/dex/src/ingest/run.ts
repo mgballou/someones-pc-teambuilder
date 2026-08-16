@@ -8,25 +8,23 @@
  */
 
 import { fileURLToPath } from 'node:url'
-import { LivePokeApiClient } from '../pokeapi/client.js'
-import { ingest } from './pipeline.js'
-import { writeDataset } from './write.js'
+import { LivePokeApiClient } from '../pokeapi/client'
+import { ingest } from './pipeline'
+import { writeDataset } from './write'
 
 const DEFAULT_CONCURRENCY = 8
 
 async function main(): Promise<void> {
-  const concurrency = Number.parseInt(process.env['DEX_INGEST_CONCURRENCY'] ?? '', 10)
+  const requested = Number.parseInt(process.env['DEX_INGEST_CONCURRENCY'] ?? '', 10)
+  const concurrency = Number.isNaN(requested) ? DEFAULT_CONCURRENCY : requested
   const cacheDir = fileURLToPath(new URL('../../.cache/', import.meta.url))
   const dataDir = fileURLToPath(new URL('../../data/', import.meta.url))
 
-  const client = LivePokeApiClient.create({
-    cacheDir,
-    concurrency: Number.isNaN(concurrency) ? DEFAULT_CONCURRENCY : concurrency,
-  })
+  const client = LivePokeApiClient.create({ cacheDir, concurrency })
 
   const started = Date.now()
   const result = await ingest(client, {
-    concurrency: Number.isNaN(concurrency) ? DEFAULT_CONCURRENCY : concurrency,
+    concurrency,
     onProgress: ({ stage, done, total }) => {
       process.stdout.write(`\r${stage.padEnd(16)} ${String(done).padStart(5)} / ${total}   `)
       if (done === total) process.stdout.write('\n')
@@ -39,7 +37,9 @@ async function main(): Promise<void> {
   process.stdout.write(`\nWrote ${dataDir} in ${seconds}s\n`)
   for (const file of written) {
     const kb = Math.round(file.bytes / 1024)
-    process.stdout.write(`  ${file.file.padEnd(16)} ${String(file.records).padStart(5)} records  ${kb} KB\n`)
+    process.stdout.write(
+      `  ${file.file.padEnd(16)} ${String(file.records).padStart(5)} records  ${kb} KB\n`,
+    )
   }
 }
 

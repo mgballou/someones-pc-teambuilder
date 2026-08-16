@@ -1,4 +1,4 @@
-import type { KoChance } from './types.js'
+import type { KoChance } from './types'
 
 export type KoInput = {
   /** The sixteen rolls, ascending. */

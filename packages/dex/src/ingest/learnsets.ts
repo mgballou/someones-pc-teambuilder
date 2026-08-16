@@ -15,7 +15,7 @@
 
 import type { MoveId } from '@spc/core'
 import { moveId } from '@spc/core'
-import type { PokemonResponse } from '../pokeapi/schema.js'
+import type { PokemonResponse } from '../pokeapi/schema'
 
 /**
  * The Scarlet and Violet family.
@@ -29,6 +29,14 @@ export const GEN_9_VERSION_GROUPS: ReadonlySet<string> = new Set([
   'scarlet-violet',
   'the-teal-mask',
   'the-indigo-disk',
+  /**
+   * PokéAPI files some SV-legal moves only under `champions`. Kingambit's
+   * Sucker Punch is the case that caught this: it is a standard OU set, and
+   * without this entry the legality panel called a real team illegal. Falsely
+   * accusing a legal team is a worse failure than being slightly permissive,
+   * so the line is drawn here.
+   */
+  'champions',
 ])
 
 export function learnsetOf(

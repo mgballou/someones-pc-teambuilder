@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { fixtureDex } from '../fixtures/dex.js'
-import { EMPTY_EVS, newSet, PERFECT_IVS, speciesId } from '../../src/index.js'
-import { defaultLevelFor, serialize } from '../../src/showdown/index.js'
-import { NICKNAMED_SET, VARIED_SETS } from './fixtures.js'
+import { fixtureDex } from '../fixtures/dex'
+import { EMPTY_EVS, newSet, PERFECT_IVS, speciesId } from '../../src/index'
+import { defaultLevelFor, serialize } from '../../src/showdown/index'
+import { NICKNAMED_SET, VARIED_SETS } from './fixtures'
 
 const CANONICAL = [
   'Sharkbait (Garchomp) (M) @ Choice Band',

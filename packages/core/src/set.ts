@@ -1,7 +1,7 @@
-import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from './ids.js'
-import type { TeraType } from './pokemon-type.js'
-import type { Nature, StatSpread } from './stats.js'
-import { EMPTY_EVS, PERFECT_IVS, DEFAULT_LEVEL } from './stats.js'
+import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from './ids'
+import type { TeraType } from './pokemon-type'
+import type { Nature, StatSpread } from './stats'
+import { EMPTY_EVS, PERFECT_IVS, DEFAULT_LEVEL } from './stats'
 
 export const MAX_MOVES = 4
 

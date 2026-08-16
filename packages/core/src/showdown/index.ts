@@ -14,7 +14,7 @@
  *   as `null`. Both mean "no gender to show"; only one of them round-trips.
  */
 
-export * from './parse.js'
-export * from './problems.js'
-export * from './resolve.js'
-export * from './serialize.js'
+export * from './parse'
+export * from './problems'
+export * from './resolve'
+export * from './serialize'

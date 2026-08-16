@@ -1,6 +1,6 @@
 import type { PokemonSet, SetId, Team, TeamId } from '@spc/core'
 import { abilityId, EMPTY_EVS, formatId, itemId, PERFECT_IVS, speciesId } from '@spc/core'
-import type { PokemonSetRow, TeamRow } from '../db/schema.js'
+import type { PokemonSetRow, TeamRow } from '../db/schema'
 
 /**
  * The row/domain boundary.

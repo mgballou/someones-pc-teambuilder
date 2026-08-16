@@ -24,11 +24,11 @@ export function Panel({
   return (
     <section className={`panel overflow-hidden ${className}`}>
       {title !== undefined && (
-        <header className="flex items-center gap-3 border-b border-line bg-well/50 px-3 py-2">
+        <header className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b border-line bg-well/50 px-3 py-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-text-dim">{title}</h2>
-          {subtitle !== undefined && (
-            <span className="truncate text-xs text-text-faint">{subtitle}</span>
-          )}
+          {/* Wraps rather than truncates. A subtitle cut off mid-sentence is
+              worse than a two-line header, and these carry real information. */}
+          {subtitle !== undefined && <span className="text-xs text-text-faint">{subtitle}</span>}
           {action !== undefined && <div className="ml-auto">{action}</div>}
         </header>
       )}

@@ -1,6 +1,6 @@
-import type { MoveId } from './ids.js'
-import type { PokemonType } from './pokemon-type.js'
-import type { BoostableStat } from './stats.js'
+import type { MoveId } from './ids'
+import type { PokemonType } from './pokemon-type'
+import type { BoostableStat } from './stats'
 
 export const MOVE_CATEGORIES = ['physical', 'special', 'status'] as const
 export type MoveCategory = (typeof MOVE_CATEGORIES)[number]

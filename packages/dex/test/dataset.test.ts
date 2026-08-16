@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { abilityId, formatId, itemId, moveId, speciesId } from '@spc/core'
-import { buildDex, loadDataset } from '../src/dataset.js'
-import { curatedFormats } from '../src/formats.js'
-import { FakePokeApiClient } from '../src/pokeapi/client.js'
-import { SAMPLE_PAYLOADS } from '../src/pokeapi/fixtures/index.js'
-import { ingest } from '../src/ingest/pipeline.js'
+import { abilityId, formatId, itemId, moveId, SHIPPED_FORMATS, speciesId } from '@spc/core'
+import { buildDex } from '../src/dataset'
+import { loadDataset } from '../src/disk'
+import { FakePokeApiClient } from '../src/pokeapi/client'
+import { SAMPLE_PAYLOADS } from '../src/pokeapi/fixtures/index'
+import { ingest } from '../src/ingest/pipeline'
 
 const result = await ingest(FakePokeApiClient.of(SAMPLE_PAYLOADS), { concurrency: 2 })
-const dex = buildDex({ ...result, formats: curatedFormats(result.species) })
+const dex = buildDex({ ...result, formats: SHIPPED_FORMATS })
 
 describe('lookups', () => {
   it('finds a species by id', () => {

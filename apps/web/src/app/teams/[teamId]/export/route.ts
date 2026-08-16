@@ -1,6 +1,6 @@
 import { defaultLevelFor, serializeTeam } from '@spc/core'
-import { loadTeam } from '../../../../lib/team-view.js'
-import { dex } from '../../../../lib/dex.js'
+import { loadTeam } from '../../../../lib/team-view'
+import { dex } from '../../../../lib/dex'
 
 /**
  * Teams leave as a Showdown paste, which is how this ecosystem already shares.

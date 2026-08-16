@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { deleteBoxSetAction, pullFromBoxAction } from '../actions/teams.js'
+import { deleteBoxSetAction, pullFromBoxAction } from '../actions/teams'
 
 export function BoxEntryActions({
   setId,

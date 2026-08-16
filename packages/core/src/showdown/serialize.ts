@@ -8,16 +8,16 @@
  * own name would not survive that trip, the id is printed instead.
  */
 
-import type { Dex } from '../dex.js'
-import type { Format } from '../format.js'
-import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids.js'
-import type { TeraType } from '../pokemon-type.js'
-import type { Gender, PokemonSet } from '../set.js'
-import { displayName } from '../species.js'
-import type { Nature, Stat, StatSpread } from '../stats.js'
-import { DEFAULT_LEVEL, MAX_IV, STAT_LABEL, STATS } from '../stats.js'
-import type { Team } from '../team.js'
-import { labelFromSlug, labelResolvesTo } from './resolve.js'
+import type { Dex } from '../dex'
+import type { Format } from '../format'
+import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids'
+import type { TeraType } from '../pokemon-type'
+import type { Gender, PokemonSet } from '../set'
+import { displayName } from '../species'
+import type { Nature, Stat, StatSpread } from '../stats'
+import { DEFAULT_LEVEL, MAX_IV, STAT_LABEL, STATS } from '../stats'
+import type { Team } from '../team'
+import { labelFromSlug, labelResolvesTo } from './resolve'
 
 export type SerializeInput = {
   readonly set: PokemonSet

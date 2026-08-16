@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { speciesId } from '@spc/core'
 import type { Ability, Item, Move, Species } from '@spc/core'
-import { dex } from '../../../lib/dex.js'
-import type { DexPayload } from '../../../lib/mini-dex.js'
+import { dex } from '../../../lib/dex'
+import type { DexPayload } from '../../../lib/mini-dex'
 
 /**
  * The records one calculation can touch, and no more.

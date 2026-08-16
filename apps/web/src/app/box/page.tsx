@@ -1,13 +1,13 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
-import { currentUser } from '../../auth/session.js'
-import { listBoxSets, listTeams } from '../../data/teams.js'
-import { dex, displayNameOf } from '../../lib/dex.js'
-import { spriteUrl } from '../../lib/sprites.js'
-import { Panel, EmptyState } from '../../components/panel.js'
-import { TypeBadge } from '../../components/type-badge.js'
-import { formatEvLine } from '../../lib/format.js'
-import { BoxEntryActions } from '../../components/box-entry-actions.js'
+import { currentUser } from '../../auth/session'
+import { listBoxSets, listTeams } from '../../data/teams'
+import { dex, displayNameOf } from '../../lib/dex'
+import { spriteUrl } from '../../lib/sprites'
+import { Panel, EmptyState } from '../../components/panel'
+import { TypeBadge } from '../../components/type-badge'
+import { formatEvLine } from '../../lib/format'
+import { BoxEntryActions } from '../../components/box-entry-actions'
 
 /**
  * The Box is a library of saved sets — the thing every builder ends up

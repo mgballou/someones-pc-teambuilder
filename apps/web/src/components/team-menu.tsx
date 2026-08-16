@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { cloneTeamAction, deleteTeamAction, renameTeamAction } from '../actions/teams.js'
-import { Button } from './button.js'
+import { cloneTeamAction, deleteTeamAction, renameTeamAction } from '../actions/teams'
+import { Button } from './button'
 
 /**
  * Deleting a team is the one irreversible act in the app, so it confirms once

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { moveId } from '@spc/core'
-import { FakePokeApiClient } from '../../src/pokeapi/client.js'
-import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index.js'
-import { learnsetOf } from '../../src/ingest/learnsets.js'
-import { buildLearnsetTable } from '../../src/ingest/pipeline.js'
+import { FakePokeApiClient } from '../../src/pokeapi/client'
+import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index'
+import { learnsetOf } from '../../src/ingest/learnsets'
+import { buildLearnsetTable } from '../../src/ingest/pipeline'
 
 const client = FakePokeApiClient.of(SAMPLE_PAYLOADS)
 

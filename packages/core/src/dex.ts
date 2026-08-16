@@ -1,8 +1,8 @@
-import type { AbilityId, FormatId, ItemId, MoveId, SpeciesId } from './ids.js'
-import type { Ability, Item } from './item.js'
-import type { Format } from './format.js'
-import type { Move } from './move.js'
-import type { Species } from './species.js'
+import type { AbilityId, FormatId, ItemId, MoveId, SpeciesId } from './ids'
+import type { Ability, Item } from './item'
+import type { Format } from './format'
+import type { Move } from './move'
+import type { Species } from './species'
 
 /**
  * The data seam.

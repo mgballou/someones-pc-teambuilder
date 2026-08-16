@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { importPasteAction, type ImportResult } from '../actions/import.js'
-import { Button } from './button.js'
+import { importPasteAction, type ImportResult } from '../actions/import'
+import { Button } from './button'
 
 export function PasteImport({
   teamId,

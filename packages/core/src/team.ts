@@ -1,6 +1,6 @@
-import type { FormatId, SetId, TeamId } from './ids.js'
-import type { PokemonSet } from './set.js'
-import { cloneSet } from './set.js'
+import type { FormatId, SetId, TeamId } from './ids'
+import type { PokemonSet } from './set'
+import { cloneSet } from './set'
 
 /**
  * A team is an ordered arrangement of sets under one format.

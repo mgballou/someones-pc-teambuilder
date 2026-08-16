@@ -1,5 +1,5 @@
-import type { AbilityId, ItemId, SpeciesId } from './ids.js'
-import type { PokemonType } from './pokemon-type.js'
+import type { AbilityId, ItemId, SpeciesId } from './ids'
+import type { PokemonType } from './pokemon-type'
 
 /**
  * Items, tagged by the role they play in a calculation.

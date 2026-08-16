@@ -1,12 +1,12 @@
-import type { BattleStyle } from '../format.js'
-import type { AbilityId } from '../ids.js'
-import type { Item } from '../item.js'
-import type { Move, MoveCategory } from '../move.js'
-import type { PokemonType, TeraType } from '../pokemon-type.js'
-import type { PokemonSet } from '../set.js'
-import type { Species } from '../species.js'
-import type { BoostableStat, BoostSpread, StatSpread } from '../stats.js'
-import { ZERO_BOOSTS } from '../stats.js'
+import type { BattleStyle } from '../format'
+import type { AbilityId } from '../ids'
+import type { Item } from '../item'
+import type { Move, MoveCategory } from '../move'
+import type { PokemonType, TeraType } from '../pokemon-type'
+import type { PokemonSet } from '../set'
+import type { Species } from '../species'
+import type { BoostableStat, BoostSpread, StatSpread } from '../stats'
+import { ZERO_BOOSTS } from '../stats'
 
 export const WEATHERS = ['none', 'sun', 'rain', 'sand', 'snow'] as const
 export type Weather = (typeof WEATHERS)[number]

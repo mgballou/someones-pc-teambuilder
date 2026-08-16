@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import type { SetId, TeamId } from '@spc/core'
 import { newSet, speciesId } from '@spc/core'
-import { requireUser } from '../auth/session.js'
-import * as repo from '../data/teams.js'
+import { requireUser } from '../auth/session'
+import * as repo from '../data/teams'
 
 /**
  * Server actions are thin shells.

@@ -14,18 +14,18 @@
  * team can never change its verdict or even the shape of its report.
  */
 
-import type { Dex } from '../dex.js'
-import type { Format, FormatSource, Gimmick, LevelRule } from '../format.js'
-import { allowsTera, hasClause } from '../format.js'
-import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from '../ids.js'
-import type { TeraType } from '../pokemon-type.js'
-import type { PokemonSet } from '../set.js'
-import { filledMoves } from '../set.js'
-import type { Species, SpeciesClassification } from '../species.js'
-import { displayName } from '../species.js'
-import type { Stat } from '../stats.js'
-import { MAX_EV_PER_STAT, MAX_EV_TOTAL, STATS, totalEvs } from '../stats.js'
-import type { Team } from '../team.js'
+import type { Dex } from '../dex'
+import type { Format, FormatSource, Gimmick, LevelRule } from '../format'
+import { allowsTera, hasClause } from '../format'
+import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from '../ids'
+import type { TeraType } from '../pokemon-type'
+import type { PokemonSet } from '../set'
+import { filledMoves } from '../set'
+import type { Species, SpeciesClassification } from '../species'
+import { displayName } from '../species'
+import type { Stat } from '../stats'
+import { MAX_EV_PER_STAT, MAX_EV_TOTAL, STATS, totalEvs } from '../stats'
+import type { Team } from '../team'
 
 /* ------------------------------------------------------------------ rules */
 

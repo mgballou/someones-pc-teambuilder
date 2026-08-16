@@ -14,17 +14,17 @@
 
 import type { AbilityId, PokemonType, Species, SpeciesClassification, StatSpread } from '@spc/core'
 import { abilityId, isPokemonType, speciesId } from '@spc/core'
-import { IngestError } from '../errors.js'
-import type { PokemonResponse, PokemonSpeciesResponse } from '../pokeapi/schema.js'
-import { englishName } from '../pokeapi/schema.js'
+import { IngestError } from '../errors'
+import type { PokemonResponse, PokemonSpeciesResponse } from '../pokeapi/schema'
+import { englishName } from '../pokeapi/schema'
 import {
   PARADOX_SPECIES,
   RESTRICTED_SPECIES,
   SUB_LEGENDARY_SPECIES,
   ULTRA_BEAST_SPECIES,
-} from './curated/classification.js'
-import { NON_EVOLVING_FORMS, NO_TERASTAL_FORMS } from './curated/species-quirks.js'
-import { generationNumber, statKey, titleCase } from './text.js'
+} from './curated/classification'
+import { NON_EVOLVING_FORMS, NO_TERASTAL_FORMS } from './curated/species-quirks'
+import { generationNumber, statKey, titleCase } from './text'
 
 export type NormalizeSpeciesInput = {
   readonly pokemon: PokemonResponse
@@ -189,9 +189,7 @@ function canEvolve({ pokemon, species, form, evolvingSpecies }: CanEvolveInput):
  * into", so the whole species index is inverted once and the answer becomes a
  * set membership test.
  */
-export function evolvingSpeciesFrom(
-  all: readonly PokemonSpeciesResponse[],
-): ReadonlySet<string> {
+export function evolvingSpeciesFrom(all: readonly PokemonSpeciesResponse[]): ReadonlySet<string> {
   const names = new Set<string>()
   for (const species of all) {
     const from = species.evolves_from_species

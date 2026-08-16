@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import type { MoveId, TeraType } from '../../src/index.js'
-import { moveId, ZERO_BOOSTS } from '../../src/index.js'
-import type { Field } from '../../src/damage/index.js'
-import { calculate, DEFAULT_FIELD, newAttacker, newDefender } from '../../src/damage/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
-import { buildSet, dexWithItem, makeItem } from './helpers.js'
+import type { MoveId, TeraType } from '../../src/index'
+import { moveId, ZERO_BOOSTS } from '../../src/index'
+import type { Field } from '../../src/damage/index'
+import { calculate, DEFAULT_FIELD, newAttacker, newDefender } from '../../src/damage/index'
+import { fixtureDex } from '../fixtures/dex'
+import { buildSet, dexWithItem, makeItem } from './helpers'
 
 const EARTHQUAKE = moveId('earthquake')
 const DRAGON_CLAW = moveId('dragon-claw')

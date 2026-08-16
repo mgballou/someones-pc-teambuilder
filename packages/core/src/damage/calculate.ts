@@ -1,21 +1,21 @@
-import type { Dex } from '../dex.js'
-import { requireMove, requireSpecies } from '../dex.js'
-import type { AbilityId, MoveId } from '../ids.js'
-import { abilityId } from '../ids.js'
-import type { Item } from '../item.js'
-import { isSpreadMove } from '../move.js'
-import type { PokemonType, TeraType } from '../pokemon-type.js'
-import { effectivenessAgainst, effectivenessOf } from '../pokemon-type.js'
-import type { PokemonSet } from '../set.js'
-import type { Species } from '../species.js'
-import { displayName } from '../species.js'
-import type { BoostableStat, StatSpread } from '../stats.js'
-import { applyBoost, computeSpread, STAT_LABEL } from '../stats.js'
-import type { AbilityEntry } from './abilities.js'
-import { abilityEntry } from './abilities.js'
-import { UncalculableMove, ImpossibleState } from './errors.js'
-import type { ItemHandler, ItemHook, ItemRole } from './items.js'
-import { ITEM_REGISTRY } from './items.js'
+import type { Dex } from '../dex'
+import { requireMove, requireSpecies } from '../dex'
+import type { AbilityId, MoveId } from '../ids'
+import { abilityId } from '../ids'
+import type { Item } from '../item'
+import { isSpreadMove } from '../move'
+import type { PokemonType, TeraType } from '../pokemon-type'
+import { effectivenessAgainst, effectivenessOf } from '../pokemon-type'
+import type { PokemonSet } from '../set'
+import type { Species } from '../species'
+import { displayName } from '../species'
+import type { BoostableStat, StatSpread } from '../stats'
+import { applyBoost, computeSpread, STAT_LABEL } from '../stats'
+import type { AbilityEntry } from './abilities'
+import { abilityEntry } from './abilities'
+import { UncalculableMove, ImpossibleState } from './errors'
+import type { ItemHandler, ItemHook, ItemRole } from './items'
+import { ITEM_REGISTRY } from './items'
 import {
   applyModifier,
   chainModifiers,
@@ -23,10 +23,10 @@ import {
   MOD_ONE,
   MOD_ONE_AND_A_HALF,
   MOD_THREE_QUARTERS,
-} from './modifier.js'
-import { moveOverride } from './moves.js'
-import { koChance } from './ko.js'
-import { stabModifier } from './stab.js'
+} from './modifier'
+import { moveOverride } from './moves'
+import { koChance } from './ko'
+import { stabModifier } from './stab'
 import type {
   Attacker,
   DamageResult,
@@ -36,8 +36,8 @@ import type {
   SideView,
   Terrain,
   Weather,
-} from './types.js'
-import { resolvePower } from './variable-power.js'
+} from './types'
+import { resolvePower } from './variable-power'
 
 /** The sixteen damage rolls, as percentages of the unrandomized damage. */
 const RANDOM_FACTORS = [85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100] as const

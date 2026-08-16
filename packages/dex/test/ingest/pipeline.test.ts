@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { itemId, moveId, speciesId } from '@spc/core'
-import { FakePokeApiClient } from '../../src/pokeapi/client.js'
-import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index.js'
-import { ingest } from '../../src/ingest/pipeline.js'
+import { FakePokeApiClient } from '../../src/pokeapi/client'
+import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index'
+import { ingest } from '../../src/ingest/pipeline'
 
 const client = FakePokeApiClient.of(SAMPLE_PAYLOADS)
 const result = await ingest(client, { concurrency: 2 })

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import type { PokemonSet, SetId, Team } from '../src/index.js'
+import type { PokemonSet, SetId, Team } from '../src/index'
 import {
   addMember,
   cloneSet,
@@ -16,7 +16,7 @@ import {
   setId,
   speciesId,
   teamId,
-} from '../src/index.js'
+} from '../src/index'
 
 function member(id: string, species: string): PokemonSet {
   return newSet({ id: setId(id), species: speciesId(species) })
@@ -146,7 +146,7 @@ describe('moving between teams', () => {
 
   test('copying leaves the original in place', () => {
     const from = team('from', [chomp])
-    const to = copyMemberTo(from, team('to', []), setId('a'), setId('a2'))
+    copyMemberTo(from, team('to', []), setId('a'), setId('a2'))
     expect(from.members).toHaveLength(1)
   })
 

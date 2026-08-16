@@ -1,6 +1,6 @@
-import type { AbilityId, SpeciesId } from './ids.js'
-import type { PokemonType } from './pokemon-type.js'
-import type { StatSpread } from './stats.js'
+import type { AbilityId, SpeciesId } from './ids'
+import type { PokemonType } from './pokemon-type'
+import type { StatSpread } from './stats'
 
 /**
  * A species as the builder needs it — which is a *form*, not a national-dex

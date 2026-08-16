@@ -11,16 +11,16 @@
 
 import type { Item, ItemEffect, SpeciesId } from '@spc/core'
 import { itemId, speciesId } from '@spc/core'
-import type { ItemResponse } from '../pokeapi/schema.js'
-import { englishEffect } from '../pokeapi/schema.js'
+import type { ItemResponse } from '../pokeapi/schema'
+import { englishEffect } from '../pokeapi/schema'
 import {
   CURATED_ITEM_EFFECTS,
   MEGA_STONES,
   RESIST_BERRY_ITEMS,
   SIGNATURE_ITEMS,
   TYPE_BOOST_ITEMS,
-} from './curated/items.js'
-import { oneSentence, titleWords } from './text.js'
+} from './curated/items'
+import { oneSentence, titleWords } from './text'
 
 /** Every 1.2x type item is the same multiplier; only the type differs. */
 const TYPE_BOOST_MULTIPLIER = 1.2

@@ -5,13 +5,13 @@
  * past it into a file here.
  */
 
-export * from './types.js'
-export * from './errors.js'
-export * from './modifier.js'
-export * from './stab.js'
-export * from './ko.js'
-export * from './moves.js'
-export * from './variable-power.js'
-export * from './abilities.js'
-export * from './items.js'
-export * from './calculate.js'
+export * from './types'
+export * from './errors'
+export * from './modifier'
+export * from './stab'
+export * from './ko'
+export * from './moves'
+export * from './variable-power'
+export * from './abilities'
+export * from './items'
+export * from './calculate'

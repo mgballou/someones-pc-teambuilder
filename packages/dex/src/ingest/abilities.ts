@@ -8,10 +8,10 @@
 
 import type { Ability } from '@spc/core'
 import { abilityId } from '@spc/core'
-import type { AbilityResponse } from '../pokeapi/schema.js'
-import { englishEffect } from '../pokeapi/schema.js'
-import { UNSUPPRESSABLE_ABILITIES } from './curated/abilities.js'
-import { oneSentence, titleWords } from './text.js'
+import type { AbilityResponse } from '../pokeapi/schema'
+import { englishEffect } from '../pokeapi/schema'
+import { UNSUPPRESSABLE_ABILITIES } from './curated/abilities'
+import { oneSentence, titleWords } from './text'
 
 export function normalizeAbility(response: AbilityResponse): Ability {
   return {

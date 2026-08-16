@@ -17,19 +17,19 @@
  *   it would be lying about the other five.
  */
 
-import type { Dex } from '../dex.js'
-import type { MoveId, SetId, SpeciesId } from '../ids.js'
-import { isDamaging } from '../move.js'
-import type { PokemonType } from '../pokemon-type.js'
+import type { Dex } from '../dex'
+import type { MoveId, SetId, SpeciesId } from '../ids'
+import { isDamaging } from '../move'
+import type { PokemonType } from '../pokemon-type'
 import {
   effectivenessAgainst,
   effectivenessOf,
   isPokemonType,
   POKEMON_TYPES,
-} from '../pokemon-type.js'
-import type { PokemonSet } from '../set.js'
-import { filledMoves } from '../set.js'
-import type { Team } from '../team.js'
+} from '../pokemon-type'
+import type { PokemonSet } from '../set'
+import { filledMoves } from '../set'
+import type { Team } from '../team'
 
 /** A reading per attacking type. Eighteen entries, always all eighteen. */
 export type TypeTable<T> = Readonly<Record<PokemonType, T>>

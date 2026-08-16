@@ -10,10 +10,10 @@
  * the interface shows it next to every verdict.
  */
 
-import { EMPTY_LEGALITY, type Format, type FormatSource } from '../format.js'
-import { abilityId, formatId, itemId, moveId, speciesId } from '../ids.js'
-import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids.js'
-import { VERIFIED_ON } from './vgc.js'
+import { EMPTY_LEGALITY, type Format, type FormatSource } from '../format'
+import { abilityId, formatId, itemId, moveId, speciesId } from '../ids'
+import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids'
+import { VERIFIED_ON } from './vgc'
 
 /**
  * Banned by the Evasion Items Clause in every Smogon singles tier. Modelled as

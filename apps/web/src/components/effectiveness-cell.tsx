@@ -1,4 +1,4 @@
-import { formatEffectiveness } from '../lib/format.js'
+import { formatEffectiveness } from '../lib/format'
 
 /**
  * A diverging scale that is never the type hues and never the accent, and that

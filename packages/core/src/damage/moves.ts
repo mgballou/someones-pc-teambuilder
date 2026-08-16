@@ -1,4 +1,4 @@
-import type { BoostableStat } from '../stats.js'
+import type { BoostableStat } from '../stats'
 
 /**
  * The handful of moves whose place in the formula is not read off the dataset.

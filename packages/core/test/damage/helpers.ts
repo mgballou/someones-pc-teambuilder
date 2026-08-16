@@ -1,6 +1,6 @@
-import type { Dex, Item, Nature, PokemonSet, StatSpread, TeraType } from '../../src/index.js'
-import { abilityId, EMPTY_EVS, itemId, newSet, setId, speciesId } from '../../src/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
+import type { Dex, Item, Nature, PokemonSet, StatSpread, TeraType } from '../../src/index'
+import { abilityId, EMPTY_EVS, itemId, newSet, setId, speciesId } from '../../src/index'
+import { fixtureDex } from '../fixtures/dex'
 
 export type SetOptions = {
   readonly species: string

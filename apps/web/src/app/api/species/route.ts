@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { dex, displayNameOf } from '../../../lib/dex.js'
+import { dex, displayNameOf } from '../../../lib/dex'
 
 /**
  * Species search runs on the server.

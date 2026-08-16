@@ -14,7 +14,7 @@ import {
   naturesLowering,
   naturesRaising,
   totalEvs,
-} from '../src/index.js'
+} from '../src/index'
 
 /**
  * Every number here is checked against the games. A stat that is one point

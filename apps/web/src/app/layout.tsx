@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import './globals.css'
-import { AppShell } from '../components/app-shell.js'
-import { currentUser } from '../auth/session.js'
+import { AppShell } from '../components/app-shell'
+import { currentUser } from '../auth/session'
 
 export const metadata: Metadata = {
   title: "Someone's PC",

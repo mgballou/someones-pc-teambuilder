@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { validateTeam } from '../../src/analysis/index.js'
-import type { Violation } from '../../src/analysis/index.js'
+import { validateTeam } from '../../src/analysis/index'
+import type { Violation } from '../../src/analysis/index'
 import {
   gen9Ou,
   regulationG,
   regulationH,
   regulationI,
   unrestricted,
-} from '../../src/formats/index.js'
-import { reorderMember } from '../../src/index.js'
-import type { Format, SetId, Team } from '../../src/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
-import { CLEAN_SIX, makeTeam } from './support.js'
+} from '../../src/formats/index'
+import { reorderMember } from '../../src/index'
+import type { Format, SetId, Team } from '../../src/index'
+import { fixtureDex } from '../fixtures/dex'
+import { CLEAN_SIX, makeTeam } from './support'
 
 function violationsOfKind<K extends Violation['kind']>(
   team: Team,

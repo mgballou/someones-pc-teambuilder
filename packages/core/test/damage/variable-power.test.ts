@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { Move, VariablePower } from '../../src/index.js'
-import { moveId } from '../../src/index.js'
-import { resolvePower } from '../../src/damage/index.js'
+import type { Move, VariablePower } from '../../src/index'
+import { moveId } from '../../src/index'
+import { resolvePower } from '../../src/damage/index'
 
 function move(rule: VariablePower | null, basePower = 60): Move {
   return {

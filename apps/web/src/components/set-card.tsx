@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import type { SetView } from '../lib/view.js'
-import { TeraBadge, TypeBadge } from './type-badge.js'
-import { formatEvLine } from '../lib/format.js'
-import { spriteUrl } from '../lib/sprites.js'
+import type { SetView } from '../lib/view'
+import { TeraBadge, TypeBadge } from './type-badge'
+import { formatEvLine } from '../lib/format'
+import { spriteUrl } from '../lib/sprites'
 
 /**
  * The app's signature component.

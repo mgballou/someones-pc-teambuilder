@@ -11,9 +11,9 @@
  * doubles maths should use a VGC regulation.
  */
 
-import { EMPTY_LEGALITY, type Format } from '../format.js'
-import { formatId } from '../ids.js'
-import { VERIFIED_ON } from './vgc.js'
+import { EMPTY_LEGALITY, type Format } from '../format'
+import { formatId } from '../ids'
+import { VERIFIED_ON } from './vgc'
 
 export const unrestricted: Format = {
   id: formatId('unrestricted'),

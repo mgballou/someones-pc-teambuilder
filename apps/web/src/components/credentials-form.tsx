@@ -2,8 +2,8 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
-import { signInAction, signUpAction, type AuthState } from '../actions/auth.js'
-import { Button } from './button.js'
+import { signInAction, signUpAction, type AuthState } from '../actions/auth'
+import { Button } from './button'
 
 const INITIAL: AuthState = { error: null }
 

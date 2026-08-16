@@ -2,8 +2,8 @@
 
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { DATASET_FILES } from '../dataset.js'
-import type { IngestResult } from './pipeline.js'
+import { DATASET_FILES } from '../dataset'
+import type { IngestResult } from './pipeline'
 
 export type WrittenFile = {
   readonly file: string

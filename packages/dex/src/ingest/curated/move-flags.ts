@@ -14,6 +14,7 @@
 
 const set = (...names: readonly string[]): ReadonlySet<string> => new Set(names)
 
+// prettier-ignore
 export const CONTACT_MOVES = set(
   'accelerock', 'acrobatics', 'aerial-ace', 'aqua-jet', 'aqua-step', 'aqua-tail', 'arm-thrust',
   'assurance', 'astonish', 'avalanche', 'axe-kick', 'aura-wheel', 'behemoth-bash',
@@ -58,6 +59,7 @@ export const CONTACT_MOVES = set(
   'wring-out', 'x-scissor', 'zen-headbutt', 'zing-zap',
 )
 
+// prettier-ignore
 export const SOUND_MOVES = set(
   'alluring-voice', 'boomburst', 'bug-buzz', 'chatter', 'clanging-scales', 'clangorous-soul',
   'confide', 'disarming-voice', 'echoed-voice', 'eerie-spell', 'grass-whistle', 'growl',
@@ -66,6 +68,7 @@ export const SOUND_MOVES = set(
   'snore', 'sparkling-aria', 'supersonic', 'torch-song', 'uproar',
 )
 
+// prettier-ignore
 export const PUNCH_MOVES = set(
   'bullet-punch', 'comet-punch', 'dizzy-punch', 'double-iron-bash', 'drain-punch',
   'dynamic-punch', 'fire-punch', 'focus-punch', 'hammer-arm', 'ice-hammer', 'ice-punch',
@@ -74,11 +77,13 @@ export const PUNCH_MOVES = set(
   'wicked-blow',
 )
 
+// prettier-ignore
 export const BITE_MOVES = set(
   'bite', 'bug-bite', 'crunch', 'fire-fang', 'fishious-rend', 'hyper-fang', 'ice-fang',
   'jaw-lock', 'poison-fang', 'psychic-fangs', 'thunder-fang',
 )
 
+// prettier-ignore
 export const SLICING_MOVES = set(
   'aerial-ace', 'air-cutter', 'air-slash', 'aqua-cutter', 'behemoth-blade', 'bitter-blade',
   'ceaseless-edge', 'cross-poison', 'cut', 'fury-cutter', 'kowtow-cleave', 'leaf-blade',
@@ -87,6 +92,7 @@ export const SLICING_MOVES = set(
   'x-scissor',
 )
 
+// prettier-ignore
 export const BULLET_MOVES = set(
   'acid-spray', 'aura-sphere', 'barrage', 'beak-blast', 'bullet-seed', 'egg-bomb',
   'electro-ball', 'energy-ball', 'focus-blast', 'gyro-ball', 'ice-ball', 'magnet-bomb',
@@ -95,17 +101,20 @@ export const BULLET_MOVES = set(
   'weather-ball', 'zap-cannon',
 )
 
+// prettier-ignore
 export const WIND_MOVES = set(
   'air-cutter', 'bleakwind-storm', 'blizzard', 'fairy-wind', 'gust', 'heat-wave', 'hurricane',
   'icy-wind', 'petal-blizzard', 'sandsear-storm', 'sandstorm', 'springtide-storm', 'tailwind',
   'twister', 'whirlwind', 'wildbolt-storm',
 )
 
+// prettier-ignore
 export const POWDER_MOVES = set(
   'cotton-spore', 'magic-powder', 'poison-powder', 'powder', 'rage-powder', 'sleep-powder',
   'spore', 'stun-spore',
 )
 
+// prettier-ignore
 export const PULSE_MOVES = set(
   'aura-sphere', 'dark-pulse', 'dragon-pulse', 'heal-pulse', 'origin-pulse', 'terrain-pulse',
   'water-pulse',
@@ -114,6 +123,7 @@ export const PULSE_MOVES = set(
 /**
  * Moves that go through a Substitute. Every sound move does, plus this list.
  */
+// prettier-ignore
 export const BYPASS_SUBSTITUTE_MOVES = set(
   'after-you', 'aromatic-mist', 'attract', 'coaching', 'conversion-2', 'copycat', 'curse',
   'decorate', 'doom-desire', 'encore', 'entrainment', 'fairy-lock', 'flower-shield',
@@ -133,6 +143,7 @@ export const IGNORES_DEFENSE_BOOSTS_MOVES = set('chip-away', 'darkest-lariat', '
  * Everything else is derived: a move aimed at a foe is protectable, a move
  * aimed at the user or at a side of the field is not.
  */
+// prettier-ignore
 export const UNPROTECTABLE_MOVES = set(
   'acupressure', 'after-you', 'confide', 'conversion-2', 'curse', 'doom-desire', 'feint',
   'future-sight', 'hyperspace-fury', 'hyperspace-hole', 'me-first', 'perish-song',

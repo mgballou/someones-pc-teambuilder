@@ -1,4 +1,4 @@
-import type { MoveId } from '../ids.js'
+import type { MoveId } from '../ids'
 
 /**
  * A move the damage formula cannot be run on at all.

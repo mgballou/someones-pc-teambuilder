@@ -1,5 +1,5 @@
-import type { PokemonType, TeraType } from '../pokemon-type.js'
-import { MOD_DOUBLE, MOD_ONE, MOD_ONE_AND_A_HALF } from './modifier.js'
+import type { PokemonType, TeraType } from '../pokemon-type'
+import { MOD_DOUBLE, MOD_ONE, MOD_ONE_AND_A_HALF } from './modifier'
 
 /** 2.25x — Adaptability on a Tera type that was already one of the originals. */
 const MOD_ADAPTABLE_TERA = 9216

@@ -3,10 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import type { SetId, TeamId } from '@spc/core'
 import { defaultLevelFor, describeProblem, parse, problemsOf, setsOf } from '@spc/core'
-import { requireUser } from '../auth/session.js'
-import { addSetToTeam } from '../data/teams.js'
-import { dex } from '../lib/dex.js'
-import { formatOf } from '../lib/dex.js'
+import { requireUser } from '../auth/session'
+import { addSetToTeam } from '../data/teams'
+import { dex } from '../lib/dex'
+import { formatOf } from '../lib/dex'
 import { formatId } from '@spc/core'
 
 export type ImportResult = {
