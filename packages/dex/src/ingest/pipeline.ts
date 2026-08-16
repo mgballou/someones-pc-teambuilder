@@ -14,16 +14,16 @@
  */
 
 import type { Ability, Item, Move, MoveId, Species } from '@spc/core'
-import type { LearnsetTable } from '../dataset.js'
-import type { PokeApiClient } from '../pokeapi/client.js'
-import { mapWithConcurrency } from '../pokeapi/client.js'
-import type { PokemonSpeciesResponse } from '../pokeapi/schema.js'
-import { IngestError } from '../errors.js'
-import { normalizeAbility } from './abilities.js'
-import { megaStonesByHolder, normalizeItem } from './items.js'
-import { learnsetOf } from './learnsets.js'
-import { isMainSeriesMove, normalizeMove } from './moves.js'
-import { evolvingSpeciesFrom, normalizeSpecies } from './species.js'
+import type { LearnsetTable } from '../dataset'
+import type { PokeApiClient } from '../pokeapi/client'
+import { mapWithConcurrency } from '../pokeapi/client'
+import type { PokemonSpeciesResponse } from '../pokeapi/schema'
+import { IngestError } from '../errors'
+import { normalizeAbility } from './abilities'
+import { megaStonesByHolder, normalizeItem } from './items'
+import { learnsetOf } from './learnsets'
+import { isMainSeriesMove, normalizeMove } from './moves'
+import { evolvingSpeciesFrom, normalizeSpecies } from './species'
 
 export type IngestResult = {
   readonly species: readonly Species[]

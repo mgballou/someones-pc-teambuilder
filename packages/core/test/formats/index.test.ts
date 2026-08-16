@@ -10,9 +10,9 @@ import {
   unrestricted,
   VERIFIED_ON,
   VGC_RESTRICTED_SPECIES,
-} from '../../src/formats/index.js'
-import { abilityId, itemId } from '../../src/index.js'
-import type { FormatId } from '../../src/index.js'
+} from '../../src/formats/index'
+import { abilityId, itemId } from '../../src/index'
+import type { FormatId } from '../../src/index'
 
 describe('the shipped registry', () => {
   it('holds every format in the design table', () => {

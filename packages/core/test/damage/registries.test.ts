@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import type { MoveId, Nature, StatSpread } from '../../src/index.js'
-import { moveId, ZERO_BOOSTS } from '../../src/index.js'
-import type { DamageResult, Field, Terrain, Weather } from '../../src/damage/index.js'
+import type { MoveId, Nature, StatSpread } from '../../src/index'
+import { moveId, ZERO_BOOSTS } from '../../src/index'
+import type { DamageResult, Field, Terrain, Weather } from '../../src/damage/index'
 import {
   calculate,
   DEFAULT_FIELD,
   newAttacker,
   newDefender,
   OPEN_SIDE,
-} from '../../src/damage/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
-import { buildSet } from './helpers.js'
+} from '../../src/damage/index'
+import { fixtureDex } from '../fixtures/dex'
+import { buildSet } from './helpers'
 
 const EARTHQUAKE = moveId('earthquake')
 const DRAGON_CLAW = moveId('dragon-claw')

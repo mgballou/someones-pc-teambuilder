@@ -28,9 +28,9 @@ import {
   setId as brandSetId,
   speciesId,
 } from '@spc/core'
-import { miniDex, type DexPayload } from '../lib/mini-dex.js'
-import { Panel, SourceNote } from './panel.js'
-import { formatPercentRange } from '../lib/format.js'
+import { miniDex, type DexPayload } from '../lib/mini-dex'
+import { Panel, SourceNote } from './panel'
+import { formatPercentRange } from '../lib/format'
 
 export type AttackerOption = {
   readonly setId: string

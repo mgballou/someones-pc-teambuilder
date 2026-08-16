@@ -1,7 +1,7 @@
 import { validateTeam, LEGALITY_RULES } from '@spc/core'
-import { loadTeam } from '../../../../lib/team-view.js'
-import { dex } from '../../../../lib/dex.js'
-import { Panel, SourceNote } from '../../../../components/panel.js'
+import { loadTeam } from '../../../../lib/team-view'
+import { dex } from '../../../../lib/dex'
+import { Panel, SourceNote } from '../../../../components/panel'
 
 /**
  * Not a badge saying "illegal" — the violated rule, named, with the source of

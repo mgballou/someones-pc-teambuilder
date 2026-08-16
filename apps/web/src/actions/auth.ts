@@ -4,9 +4,9 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { db } from '../db/client.js'
-import { users } from '../db/schema.js'
-import { endSession, hashPassword, startSession, verifyPassword } from '../auth/session.js'
+import { db } from '../db/client'
+import { users } from '../db/schema'
+import { endSession, hashPassword, startSession, verifyPassword } from '../auth/session'
 
 const credentials = z.object({
   email: z.email('Enter a valid email address.'),

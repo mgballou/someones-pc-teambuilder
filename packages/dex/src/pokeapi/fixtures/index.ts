@@ -22,7 +22,7 @@ import items from './items.json'
 import moves from './moves.json'
 import pokemon from './pokemon.json'
 import pokemonSpecies from './pokemon-species.json'
-import type { FakePayloads } from '../client.js'
+import type { FakePayloads } from '../client'
 
 export const SAMPLE_PAYLOADS: FakePayloads = {
   pokemon,

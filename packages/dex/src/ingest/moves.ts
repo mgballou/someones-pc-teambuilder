@@ -20,9 +20,9 @@ import type {
   VariablePower,
 } from '@spc/core'
 import { isPokemonType, moveId } from '@spc/core'
-import { IngestError } from '../errors.js'
-import type { MoveResponse, PokeApiMoveTarget } from '../pokeapi/schema.js'
-import { englishEffect } from '../pokeapi/schema.js'
+import { IngestError } from '../errors'
+import type { MoveResponse, PokeApiMoveTarget } from '../pokeapi/schema'
+import { englishEffect } from '../pokeapi/schema'
 import {
   BITE_MOVES,
   BULLET_MOVES,
@@ -36,10 +36,10 @@ import {
   SOUND_MOVES,
   UNPROTECTABLE_MOVES,
   WIND_MOVES,
-} from './curated/move-flags.js'
-import { CURATED_MOVE_META, SELF_STAT_CHANGE_MOVES } from './curated/move-meta.js'
-import { CURATED_VARIABLE_POWER } from './curated/move-power.js'
-import { boostableStatKey, generationNumber, oneSentence, titleWords } from './text.js'
+} from './curated/move-flags'
+import { CURATED_MOVE_META, SELF_STAT_CHANGE_MOVES } from './curated/move-meta'
+import { CURATED_VARIABLE_POWER } from './curated/move-power'
+import { boostableStatKey, generationNumber, oneSentence, titleWords } from './text'
 
 /**
  * PokéAPI's targets onto core's.

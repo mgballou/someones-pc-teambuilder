@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { loadTeam } from '../../../lib/team-view.js'
-import { TeamHeader } from '../../../components/team-header.js'
+import { loadTeam } from '../../../lib/team-view'
+import { TeamHeader } from '../../../components/team-header'
 
 /**
  * The team header never unmounts. Name, format, member count and the standing

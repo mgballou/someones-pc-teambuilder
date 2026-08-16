@@ -10,10 +10,10 @@ import {
   validateTeam,
   violationSetIds,
 } from '@spc/core'
-import { currentUser } from '../auth/session.js'
-import { getTeam } from '../data/teams.js'
-import { dex, displayNameOf } from './dex.js'
-import type { MoveView, SetView, TeamHeaderView } from './view.js'
+import { currentUser } from '../auth/session'
+import { getTeam } from '../data/teams'
+import { dex, displayNameOf } from './dex'
+import type { MoveView, SetView, TeamHeaderView } from './view'
 
 /**
  * One place that turns "a team id in the URL" into everything the panels need.

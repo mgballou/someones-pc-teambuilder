@@ -1,4 +1,4 @@
-import type { PokemonSet, SetId, Team, TeamId } from '../../src/index.js'
+import type { PokemonSet, SetId, Team, TeamId } from '../../src/index'
 import {
   abilityId,
   EMPTY_EVS,
@@ -9,7 +9,7 @@ import {
   newTeam,
   PERFECT_IVS,
   speciesId,
-} from '../../src/index.js'
+} from '../../src/index'
 
 /** Minting a branded id from a literal is the one thing a type guard cannot do. */
 const asSetId = (value: string): SetId => value as SetId

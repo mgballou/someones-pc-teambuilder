@@ -3,10 +3,10 @@ import 'server-only'
 import { randomBytes } from 'node:crypto'
 import { cookies } from 'next/headers'
 import { and, eq, gt, lt } from 'drizzle-orm'
-import bcrypt from 'bcryptjs'
-import { db } from '../db/client.js'
-import { sessions, users } from '../db/schema.js'
-import type { UserRow } from '../db/schema.js'
+import { db } from '../db/client'
+import { sessions, users } from '../db/schema'
+import { hashPassword, verifyPassword } from './password'
+import type { UserRow } from '../db/schema'
 
 /**
  * Opaque server-side sessions.
@@ -19,7 +19,6 @@ import type { UserRow } from '../db/schema.js'
 
 const COOKIE_NAME = 'spc_session'
 const SESSION_DAYS = 30
-const BCRYPT_ROUNDS = 12
 
 export type SessionUser = {
   readonly id: string
@@ -40,13 +39,7 @@ function expiryFrom(now: Date): Date {
   return new Date(now.getTime() + SESSION_DAYS * 24 * 60 * 60 * 1000)
 }
 
-export async function hashPassword(plain: string): Promise<string> {
-  return bcrypt.hash(plain, BCRYPT_ROUNDS)
-}
-
-export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(plain, hash)
-}
+export { hashPassword, verifyPassword }
 
 /** Issue a session and set the cookie. Called only from a server action. */
 export async function startSession(userId: string, now: Date): Promise<void> {

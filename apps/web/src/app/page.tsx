@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { currentUser } from '../auth/session.js'
+import { currentUser } from '../auth/session'
 
 /**
  * The landing page states what the tool is and who it is for, then gets out of

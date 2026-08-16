@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import type { TeamHeaderView } from '../lib/view.js'
-import { SubNav } from './sub-nav.js'
-import { formatCount } from '../lib/format.js'
-import { TeamMenu } from './team-menu.js'
+import type { TeamHeaderView } from '../lib/view'
+import { SubNav } from './sub-nav'
+import { formatCount } from '../lib/format'
+import { TeamMenu } from './team-menu'
 
 /**
  * The three standing numbers people actually check: how full the team is, how

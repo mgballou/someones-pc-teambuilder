@@ -1,7 +1,7 @@
 import { analyzeSpeed, speedModifierLabel } from '@spc/core'
-import { loadTeam } from '../../../../lib/team-view.js'
-import { dex } from '../../../../lib/dex.js'
-import { Panel, EmptyState, SourceNote } from '../../../../components/panel.js'
+import { loadTeam } from '../../../../lib/team-view'
+import { dex } from '../../../../lib/dex'
+import { Panel, EmptyState, SourceNote } from '../../../../components/panel'
 
 export default async function SpeedPage({
   params,

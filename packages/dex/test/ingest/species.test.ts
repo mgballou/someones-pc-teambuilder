@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { abilityId, speciesId } from '@spc/core'
-import { FakePokeApiClient } from '../../src/pokeapi/client.js'
-import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index.js'
-import { megaStonesByHolder } from '../../src/ingest/items.js'
-import { evolvingSpeciesFrom, normalizeSpecies } from '../../src/ingest/species.js'
-import type { PokemonSpeciesResponse } from '../../src/pokeapi/schema.js'
+import { FakePokeApiClient } from '../../src/pokeapi/client'
+import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index'
+import { megaStonesByHolder } from '../../src/ingest/items'
+import { evolvingSpeciesFrom, normalizeSpecies } from '../../src/ingest/species'
+import type { PokemonSpeciesResponse } from '../../src/pokeapi/schema'
 
 const client = FakePokeApiClient.of(SAMPLE_PAYLOADS)
 

@@ -1,9 +1,9 @@
 import { filledMoves } from '@spc/core'
 import type { Ability, Item, Move, Species } from '@spc/core'
-import { loadTeam } from '../../../../lib/team-view.js'
-import { dex } from '../../../../lib/dex.js'
-import { DamagePanel, type AttackerOption } from '../../../../components/damage-panel.js'
-import type { DexPayload } from '../../../../lib/mini-dex.js'
+import { loadTeam } from '../../../../lib/team-view'
+import { dex } from '../../../../lib/dex'
+import { DamagePanel, type AttackerOption } from '../../../../components/damage-panel'
+import type { DexPayload } from '../../../../lib/mini-dex'
 
 export default async function DamagePage({
   params,

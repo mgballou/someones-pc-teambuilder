@@ -1,8 +1,8 @@
-import type { PokemonType } from '../pokemon-type.js'
-import type { BoostableStat, StatSpread } from '../stats.js'
-import { BOOSTABLE_STATS } from '../stats.js'
-import { MOD_DOUBLE, MOD_HALF, MOD_ONE_AND_A_HALF, MOD_THREE_QUARTERS } from './modifier.js'
-import type { Field, ModifierContext, SideView } from './types.js'
+import type { PokemonType } from '../pokemon-type'
+import type { BoostableStat, StatSpread } from '../stats'
+import { BOOSTABLE_STATS } from '../stats'
+import { MOD_DOUBLE, MOD_HALF, MOD_ONE_AND_A_HALF, MOD_THREE_QUARTERS } from './modifier'
+import type { Field, ModifierContext, SideView } from './types'
 
 /** Returns a 4096-denominator modifier, or `null` for "this hook does nothing here". */
 export type StatHook = (context: ModifierContext) => number | null

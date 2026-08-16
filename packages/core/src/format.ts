@@ -1,5 +1,5 @@
-import type { AbilityId, FormatId, ItemId, MoveId, SpeciesId } from './ids.js'
-import type { SpeciesClassification } from './species.js'
+import type { AbilityId, FormatId, ItemId, MoveId, SpeciesId } from './ids'
+import type { SpeciesClassification } from './species'
 
 /**
  * A format is a first-class domain object, not a filter applied late.

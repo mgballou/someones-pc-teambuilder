@@ -9,7 +9,7 @@ import {
   moveSetAction,
   reorderAction,
   saveToBoxAction,
-} from '../actions/teams.js'
+} from '../actions/teams'
 
 export type OtherTeam = { readonly id: string; readonly name: string }
 

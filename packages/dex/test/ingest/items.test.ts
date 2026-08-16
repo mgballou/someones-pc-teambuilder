@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { itemId, speciesId } from '@spc/core'
-import { FakePokeApiClient } from '../../src/pokeapi/client.js'
-import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index.js'
-import { megaStonesByHolder, normalizeItem } from '../../src/ingest/items.js'
+import { FakePokeApiClient } from '../../src/pokeapi/client'
+import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index'
+import { megaStonesByHolder, normalizeItem } from '../../src/ingest/items'
 
 const client = FakePokeApiClient.of(SAMPLE_PAYLOADS)
 

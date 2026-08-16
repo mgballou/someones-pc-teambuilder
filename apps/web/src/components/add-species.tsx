@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { addSpeciesAction } from '../actions/teams.js'
-import { spriteUrl } from '../lib/sprites.js'
-import { Button } from './button.js'
+import { addSpeciesAction } from '../actions/teams'
+import { spriteUrl } from '../lib/sprites'
+import { Button } from './button'
 
 type Match = {
   readonly id: string

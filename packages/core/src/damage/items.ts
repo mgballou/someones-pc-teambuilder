@@ -1,7 +1,7 @@
-import { abilityId } from '../ids.js'
-import type { Item, ItemEffect } from '../item.js'
-import { MOD_ONE_AND_A_HALF, modifierFromRatio } from './modifier.js'
-import type { ModifierContext } from './types.js'
+import { abilityId } from '../ids'
+import type { Item, ItemEffect } from '../item'
+import { MOD_ONE_AND_A_HALF, modifierFromRatio } from './modifier'
+import type { ModifierContext } from './types'
 
 export type ItemRole = 'attacker' | 'defender'
 

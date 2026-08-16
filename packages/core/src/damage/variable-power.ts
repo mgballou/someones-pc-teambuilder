@@ -1,5 +1,5 @@
-import type { Move } from '../move.js'
-import { ImpossibleState } from './errors.js'
+import type { Move } from '../move'
+import { ImpossibleState } from './errors'
 
 /**
  * What a variable-power rule resolved to.

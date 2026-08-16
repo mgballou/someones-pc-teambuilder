@@ -8,29 +8,29 @@
  */
 
 // Primitives
-export * from './ids.js'
-export * from './pokemon-type.js'
-export * from './stats.js'
+export * from './ids'
+export * from './pokemon-type'
+export * from './stats'
 
 // Domain records
-export * from './species.js'
-export * from './move.js'
-export * from './item.js'
-export * from './set.js'
-export * from './team.js'
-export * from './format.js'
+export * from './species'
+export * from './move'
+export * from './item'
+export * from './set'
+export * from './team'
+export * from './format'
 
 // The data seam
-export * from './dex.js'
+export * from './dex'
 
 // Formats that ship with the app
-export * from './formats/index.js'
+export * from './formats/index'
 
 // The damage calculator
-export * from './damage/index.js'
+export * from './damage/index'
 
 // Analysis
-export * from './analysis/index.js'
+export * from './analysis/index'
 
 // Text interchange
-export * from './showdown/index.js'
+export * from './showdown/index'

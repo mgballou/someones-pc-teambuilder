@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import { NATURES, TERA_TYPES, allowsTera } from '@spc/core'
-import { loadTeam } from '../../../../../lib/team-view.js'
-import { dex } from '../../../../../lib/dex.js'
-import { SetEditor } from '../../../../../components/set-editor.js'
+import { loadTeam } from '../../../../../lib/team-view'
+import { dex } from '../../../../../lib/dex'
+import { SetEditor } from '../../../../../components/set-editor'
 
 export default async function SetEditorPage({
   params,

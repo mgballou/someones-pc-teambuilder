@@ -14,18 +14,18 @@
  * a turn order that is wrong.
  */
 
-import type { Dex } from '../dex.js'
-import type { Format } from '../format.js'
-import { levelFor } from '../format.js'
-import { abilityId, itemId } from '../ids.js'
-import type { AbilityId, ItemId, SetId, SpeciesId } from '../ids.js'
-import type { PokemonSet } from '../set.js'
-import type { Species } from '../species.js'
-import { displayName } from '../species.js'
-import type { Nature } from '../stats.js'
-import { applyBoost, BOOSTABLE_STATS, computeStat, MAX_EV_PER_STAT, MAX_IV } from '../stats.js'
-import type { Team } from '../team.js'
-import { isSpeciesLegal } from './legality.js'
+import type { Dex } from '../dex'
+import type { Format } from '../format'
+import { levelFor } from '../format'
+import { abilityId, itemId } from '../ids'
+import type { AbilityId, ItemId, SetId, SpeciesId } from '../ids'
+import type { PokemonSet } from '../set'
+import type { Species } from '../species'
+import { displayName } from '../species'
+import type { Nature } from '../stats'
+import { applyBoost, BOOSTABLE_STATS, computeStat, MAX_EV_PER_STAT, MAX_IV } from '../stats'
+import type { Team } from '../team'
+import { isSpeciesLegal } from './legality'
 
 /** Abilities that raise the holder's highest stat, Speed included. */
 const BOOST_ABILITIES: readonly AbilityId[] = ['protosynthesis', 'quark-drive'].map(abilityId)

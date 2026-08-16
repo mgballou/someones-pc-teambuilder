@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { fixtureDex } from '../fixtures/dex.js'
-import { parse, serialize, serializeTeam, setsOf } from '../../src/showdown/index.js'
-import { NICKNAMED_SET, SIX_SET_TEAM, VARIED_SETS } from './fixtures.js'
+import { fixtureDex } from '../fixtures/dex'
+import { parse, serialize, serializeTeam, setsOf } from '../../src/showdown/index'
+import { NICKNAMED_SET, SIX_SET_TEAM, VARIED_SETS } from './fixtures'
 
 describe('a set survives a round trip through a paste', () => {
   for (const set of VARIED_SETS) {

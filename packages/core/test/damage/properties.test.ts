@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { Move, Species } from '../../src/index.js'
-import { calculate, DEFAULT_FIELD, newAttacker, newDefender } from '../../src/damage/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
-import { buildSet } from './helpers.js'
+import type { Move, Species } from '../../src/index'
+import { calculate, DEFAULT_FIELD, newAttacker, newDefender } from '../../src/damage/index'
+import { fixtureDex } from '../fixtures/dex'
+import { buildSet } from './helpers'
 
 const SPECIES: readonly Species[] = fixtureDex.allSpecies()
 const DAMAGING: readonly Move[] = fixtureDex

@@ -1,6 +1,6 @@
 /** Small shared conversions used by every normalizer. */
 
-import { IngestError } from '../errors.js'
+import { IngestError } from '../errors'
 
 const GENERATIONS: Readonly<Record<string, number>> = {
   'generation-i': 1,

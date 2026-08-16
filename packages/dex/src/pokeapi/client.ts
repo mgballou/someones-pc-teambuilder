@@ -11,14 +11,14 @@
 import { gunzipSync, gzipSync } from 'node:zlib'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { PokeApiError } from '../errors.js'
+import { PokeApiError } from '../errors'
 import type {
   AbilityResponse,
   ItemResponse,
   MoveResponse,
   PokemonResponse,
   PokemonSpeciesResponse,
-} from './schema.js'
+} from './schema'
 import {
   abilitySchema,
   itemSchema,
@@ -26,7 +26,7 @@ import {
   pokemonSchema,
   pokemonSpeciesSchema,
   resourceListSchema,
-} from './schema.js'
+} from './schema'
 
 export const POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2'
 
@@ -77,9 +77,11 @@ export class LivePokeApiClient implements PokeApiClient {
   private readonly sleep: (ms: number) => Promise<void>
   private readonly gate: Semaphore
 
-  private constructor(options: Required<Omit<LivePokeApiClientOptions, 'cacheDir'>> & {
-    readonly cacheDir: string | null
-  }) {
+  private constructor(
+    options: Required<Omit<LivePokeApiClientOptions, 'cacheDir'>> & {
+      readonly cacheDir: string | null
+    },
+  ) {
     this.baseUrl = options.baseUrl
     this.cacheDir = options.cacheDir
     this.maxAttempts = options.maxAttempts
@@ -311,12 +313,7 @@ export class FakePokeApiClient implements PokeApiClient {
   }
 
   pokemonSpecies(name: string): Promise<PokemonSpeciesResponse> {
-    return this.lookup(
-      'pokemon-species',
-      this.payloads.pokemonSpecies,
-      name,
-      pokemonSpeciesSchema,
-    )
+    return this.lookup('pokemon-species', this.payloads.pokemonSpecies, name, pokemonSpeciesSchema)
   }
 
   move(name: string): Promise<MoveResponse> {

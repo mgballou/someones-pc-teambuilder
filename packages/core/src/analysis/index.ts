@@ -6,6 +6,6 @@
  * server and in the browser.
  */
 
-export * from './legality.js'
-export * from './coverage.js'
-export * from './speed.js'
+export * from './legality'
+export * from './coverage'
+export * from './speed'

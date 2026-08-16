@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { koChance } from '../../src/damage/index.js'
+import { koChance } from '../../src/damage/index'
 
 function flat(damage: number): readonly number[] {
   return Array.from({ length: 16 }, () => damage)

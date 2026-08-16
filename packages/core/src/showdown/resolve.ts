@@ -12,10 +12,10 @@
  * rest of the domain treat a branded id as a promise rather than a hope.
  */
 
-import type { Dex } from '../dex.js'
-import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids.js'
-import { abilityId, itemId, moveId, speciesId, toSlug } from '../ids.js'
-import { displayName } from '../species.js'
+import type { Dex } from '../dex'
+import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids'
+import { abilityId, itemId, moveId, speciesId, toSlug } from '../ids'
+import { displayName } from '../species'
 
 /**
  * The slugs a piece of display text might be keyed under, best guess first.

@@ -7,7 +7,7 @@
  * the caller decides whether to show it, ignore it or refuse the import.
  */
 
-import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids.js'
+import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids'
 
 /** Where a problem was found. */
 export type ProblemLocation = {

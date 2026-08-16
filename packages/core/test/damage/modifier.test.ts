@@ -5,7 +5,7 @@ import {
   MOD_ONE,
   modifierFromRatio,
   pokeRound,
-} from '../../src/damage/index.js'
+} from '../../src/damage/index'
 
 describe('pokeRound', () => {
   it('rounds a half down', () => {

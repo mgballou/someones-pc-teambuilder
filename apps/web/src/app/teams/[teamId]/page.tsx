@@ -1,12 +1,12 @@
-import { loadTeam } from '../../../lib/team-view.js'
-import { listTeams } from '../../../data/teams.js'
-import { currentUser } from '../../../auth/session.js'
+import { loadTeam } from '../../../lib/team-view'
+import { listTeams } from '../../../data/teams'
+import { currentUser } from '../../../auth/session'
 import { redirect } from 'next/navigation'
-import { SetCard, EmptySlot } from '../../../components/set-card.js'
-import { SlotActions } from '../../../components/slot-actions.js'
-import { AddSpecies } from '../../../components/add-species.js'
-import { PasteImport } from '../../../components/paste-import.js'
-import { Panel } from '../../../components/panel.js'
+import { SetCard, EmptySlot } from '../../../components/set-card'
+import { SlotActions } from '../../../components/slot-actions'
+import { AddSpecies } from '../../../components/add-species'
+import { PasteImport } from '../../../components/paste-import'
+import { Panel } from '../../../components/panel'
 
 export default async function BuildPage({
   params,

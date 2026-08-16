@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { FakePokeApiClient } from '../../src/pokeapi/client.js'
-import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index.js'
-import { normalizeMove } from '../../src/ingest/moves.js'
+import { FakePokeApiClient } from '../../src/pokeapi/client'
+import { SAMPLE_PAYLOADS } from '../../src/pokeapi/fixtures/index'
+import { normalizeMove } from '../../src/ingest/moves'
 
 const client = FakePokeApiClient.of(SAMPLE_PAYLOADS)
 

@@ -15,11 +15,11 @@ import {
   moveId,
   STATS,
 } from '@spc/core'
-import { requireUser } from '../auth/session.js'
-import { db } from '../db/client.js'
-import { pokemonSets } from '../db/schema.js'
-import { toDomainSet } from '../data/mappers.js'
-import { saveSet } from '../data/teams.js'
+import { requireUser } from '../auth/session'
+import { db } from '../db/client'
+import { pokemonSets } from '../db/schema'
+import { toDomainSet } from '../data/mappers'
+import { saveSet } from '../data/teams'
 
 /**
  * One action for every edit to a set.

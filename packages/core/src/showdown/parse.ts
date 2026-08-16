@@ -13,24 +13,17 @@
  * already did.
  */
 
-import type { Dex } from '../dex.js'
-import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from '../ids.js'
-import { abilityId, itemId, moveId, speciesId, toSlug } from '../ids.js'
-import type { TeraType } from '../pokemon-type.js'
-import { isTeraType } from '../pokemon-type.js'
-import type { Gender, MoveSlots, PokemonSet } from '../set.js'
-import { MAX_MOVES } from '../set.js'
-import type { Nature, Stat, StatSpread } from '../stats.js'
-import {
-  DEFAULT_LEVEL,
-  EMPTY_EVS,
-  isNature,
-  MAX_EV_TOTAL,
-  PERFECT_IVS,
-  totalEvs,
-} from '../stats.js'
-import type { ParseProblem, ProblemLocation } from './problems.js'
-import { primarySlug, resolveAbility, resolveItem, resolveMove, resolveSpecies } from './resolve.js'
+import type { Dex } from '../dex'
+import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from '../ids'
+import { abilityId, itemId, moveId, speciesId, toSlug } from '../ids'
+import type { TeraType } from '../pokemon-type'
+import { isTeraType } from '../pokemon-type'
+import type { Gender, MoveSlots, PokemonSet } from '../set'
+import { MAX_MOVES } from '../set'
+import type { Nature, Stat, StatSpread } from '../stats'
+import { DEFAULT_LEVEL, EMPTY_EVS, isNature, MAX_EV_TOTAL, PERFECT_IVS, totalEvs } from '../stats'
+import type { ParseProblem, ProblemLocation } from './problems'
+import { primarySlug, resolveAbility, resolveItem, resolveMove, resolveSpecies } from './resolve'
 
 export type SetIdInput = {
   /** 0-based index of the set block within the paste. */

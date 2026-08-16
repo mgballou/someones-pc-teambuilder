@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import type { SessionUser } from '../auth/session.js'
-import { ThemeToggle } from './theme-toggle.js'
-import { NavLink } from './nav-link.js'
-import { signOutAction } from '../actions/auth.js'
+import type { SessionUser } from '../auth/session'
+import { ThemeToggle } from './theme-toggle'
+import { NavLink } from './nav-link'
+import { signOutAction } from '../actions/auth'
 
 /**
  * The persistent frame.

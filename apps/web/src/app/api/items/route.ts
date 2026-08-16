@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { dex } from '../../../lib/dex.js'
+import { dex } from '../../../lib/dex'
 
 const LIMIT = 40
 

@@ -27,8 +27,8 @@ import type {
   SpeciesClassification,
   SpeciesId,
   StatSpread,
-} from '../../src/index.js'
-import { abilityId, EMPTY_LEGALITY, formatId, itemId, moveId, speciesId } from '../../src/index.js'
+} from '../../src/index'
+import { abilityId, EMPTY_LEGALITY, formatId, itemId, moveId, speciesId } from '../../src/index'
 
 const NO_FLAGS: MoveFlags = {
   contact: false,

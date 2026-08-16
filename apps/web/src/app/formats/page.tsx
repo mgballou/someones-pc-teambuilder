@@ -1,7 +1,7 @@
 import { CLAUSE_DESCRIPTION, CLAUSE_LABEL } from '@spc/core'
-import { dex } from '../../lib/dex.js'
-import { Panel, SourceNote } from '../../components/panel.js'
-import { formatCount } from '../../lib/format.js'
+import { dex } from '../../lib/dex'
+import { Panel, SourceNote } from '../../components/panel'
+import { formatCount } from '../../lib/format'
 
 /**
  * Formats are code, not rows, and every one shows where its rules came from.

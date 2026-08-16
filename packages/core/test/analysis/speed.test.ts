@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { analyzeSpeed, ladderEntrySpeed } from '../../src/analysis/index.js'
-import type { LadderEntry, SpeedModifier } from '../../src/analysis/index.js'
-import { gen9Ou, regulationH } from '../../src/formats/index.js'
-import type { Team } from '../../src/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
-import { makeTeam } from './support.js'
+import { analyzeSpeed, ladderEntrySpeed } from '../../src/analysis/index'
+import type { LadderEntry, SpeedModifier } from '../../src/analysis/index'
+import { gen9Ou, regulationH } from '../../src/formats/index'
+import type { Team } from '../../src/index'
+import { fixtureDex } from '../fixtures/dex'
+import { makeTeam } from './support'
 
 const speedOf = (team: Team, format = regulationH) =>
   analyzeSpeed({ team, format, dex: fixtureDex })

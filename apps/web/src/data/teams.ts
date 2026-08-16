@@ -3,10 +3,10 @@ import 'server-only'
 import { and, asc, eq, isNull, max } from 'drizzle-orm'
 import type { PokemonSet, SetId, Team, TeamId } from '@spc/core'
 import { cloneSet } from '@spc/core'
-import { db } from '../db/client.js'
-import { pokemonSets, teams } from '../db/schema.js'
-import { toDomainSet, toDomainTeam, toRowValues } from './mappers.js'
-import { NotAuthorized } from '../auth/session.js'
+import { db } from '../db/client'
+import { pokemonSets, teams } from '../db/schema'
+import { toDomainSet, toDomainTeam, toRowValues } from './mappers'
+import { NotAuthorized } from '../auth/session'
 
 /**
  * Every function here takes the acting user's id and scopes its query by it.

@@ -1,8 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { createTeamAction } from '../actions/teams.js'
-import { Button } from './button.js'
+import { createTeamAction } from '../actions/teams'
+import { Button } from './button'
 
 export type FormatOption = { readonly id: string; readonly name: string }
 

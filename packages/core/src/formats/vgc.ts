@@ -11,9 +11,9 @@
  * interface shows that string next to every verdict.
  */
 
-import { EMPTY_LEGALITY, type Format, type FormatSource } from '../format.js'
-import { formatId, speciesId, type SpeciesId } from '../ids.js'
-import type { SpeciesClassification } from '../species.js'
+import { EMPTY_LEGALITY, type Format, type FormatSource } from '../format'
+import { formatId, speciesId, type SpeciesId } from '../ids'
+import type { SpeciesClassification } from '../species'
 
 /** The date every ruleset in this package was last read against its authority. */
 export const VERIFIED_ON = '2026-08-16'

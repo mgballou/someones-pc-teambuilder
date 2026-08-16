@@ -46,12 +46,11 @@ test('the legality panel names its source', async ({ page }) => {
 test('a set duplicates in place', async ({ page }) => {
   await page.getByRole('link', { name: /Reg H Rain/ }).click()
 
-  const before = await page.getByRole('article').count()
-  await page
-    .getByRole('article')
-    .first()
-    .getByRole('button', { name: 'Duplicate this set' })
-    .click()
+  const cards = page.getByRole('article')
+  await expect(cards.first()).toBeVisible()
+  const before = await cards.count()
 
-  await expect(page.getByRole('article')).toHaveCount(before + 1)
+  await cards.first().getByRole('button', { name: 'Duplicate this set' }).click()
+
+  await expect(cards).toHaveCount(before + 1)
 })

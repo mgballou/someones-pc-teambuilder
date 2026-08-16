@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { PokemonType, TeraType } from '../../src/index.js'
-import { stabModifier } from '../../src/damage/index.js'
+import type { PokemonType, TeraType } from '../../src/index'
+import { stabModifier } from '../../src/damage/index'
 
 const GARCHOMP: readonly PokemonType[] = ['dragon', 'ground']
 

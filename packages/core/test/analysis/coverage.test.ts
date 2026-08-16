@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { analyzeCoverage } from '../../src/analysis/index.js'
-import { regulationH } from '../../src/formats/index.js'
-import type { Team } from '../../src/index.js'
-import { fixtureDex } from '../fixtures/dex.js'
-import { makeTeam } from './support.js'
+import { analyzeCoverage } from '../../src/analysis/index'
+import { regulationH } from '../../src/formats/index'
+import type { Team } from '../../src/index'
+import { fixtureDex } from '../fixtures/dex'
+import { makeTeam } from './support'
 
 const coverageOf = (team: Team) => analyzeCoverage({ team, dex: fixtureDex })
 

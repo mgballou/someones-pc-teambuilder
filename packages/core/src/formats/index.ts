@@ -5,21 +5,15 @@
  * its rules; nothing in the codebase reads an id and branches on it.
  */
 
-import type { Format } from '../format.js'
-import type { FormatId } from '../ids.js'
-import { gen9Ou, gen9Ubers } from './smogon.js'
-import { unrestricted } from './unrestricted.js'
-import { regulationG, regulationH, regulationI } from './vgc.js'
+import type { Format } from '../format'
+import type { FormatId } from '../ids'
+import { gen9Ou, gen9Ubers } from './smogon'
+import { unrestricted } from './unrestricted'
+import { regulationG, regulationH, regulationI } from './vgc'
 
-export {
-  VERIFIED_ON,
-  VGC_RESTRICTED_SPECIES,
-  regulationG,
-  regulationH,
-  regulationI,
-} from './vgc.js'
-export { gen9Ou, gen9Ubers } from './smogon.js'
-export { unrestricted } from './unrestricted.js'
+export { VERIFIED_ON, VGC_RESTRICTED_SPECIES, regulationG, regulationH, regulationI } from './vgc'
+export { gen9Ou, gen9Ubers } from './smogon'
+export { unrestricted } from './unrestricted'
 
 /**
  * Every format the app ships with, in the order the format picker shows them:

@@ -7,8 +7,8 @@ import type {
   Team,
   TeamId,
   TeraType,
-} from '../../src/index.js'
-import { abilityId, EMPTY_EVS, itemId, moveId, newSet, speciesId } from '../../src/index.js'
+} from '../../src/index'
+import { abilityId, EMPTY_EVS, itemId, moveId, newSet, speciesId } from '../../src/index'
 
 /** `ids.ts` ships no `setId`/`teamId` factory, so the tests brand their own. */
 const setId = (value: string): SetId => value as SetId

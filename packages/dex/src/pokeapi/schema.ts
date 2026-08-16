@@ -181,7 +181,10 @@ export type AbilityResponse = z.infer<typeof abilitySchema>
 
 /** The English `short_effect`, or an empty string when PokéAPI has none. */
 export function englishEffect(
-  entries: readonly { readonly short_effect: string; readonly language: { readonly name: string } }[],
+  entries: readonly {
+    readonly short_effect: string
+    readonly language: { readonly name: string }
+  }[],
 ): string {
   return entries.find((entry) => entry.language.name === 'en')?.short_effect ?? ''
 }

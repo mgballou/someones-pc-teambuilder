@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { fixtureDex } from '../fixtures/dex.js'
-import { EMPTY_EVS, PERFECT_IVS } from '../../src/index.js'
+import { fixtureDex } from '../fixtures/dex'
+import { EMPTY_EVS, PERFECT_IVS } from '../../src/index'
 import {
   describeProblem,
   parse,
@@ -8,7 +8,7 @@ import {
   resolveSpecies,
   setsOf,
   slugCandidates,
-} from '../../src/showdown/index.js'
+} from '../../src/showdown/index'
 
 const only = (paste: string) => {
   const set = setsOf(parse({ paste, dex: fixtureDex }))[0]
