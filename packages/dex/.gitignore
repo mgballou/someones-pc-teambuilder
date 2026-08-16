@@ -1,0 +1,3 @@
+# Gzipped PokéAPI responses, so a re-run of `pnpm ingest` costs nothing.
+# Never committed: it is several hundred megabytes and it is reproducible.
+.cache/

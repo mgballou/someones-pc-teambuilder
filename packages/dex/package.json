@@ -1,0 +1,21 @@
+{
+  "name": "@spc/dex",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "ingest": "tsx src/ingest/run.ts"
+  },
+  "dependencies": {
+    "@spc/core": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.12",
+    "vitest": "^3.2.4"
+  }
+}

@@ -34,3 +34,11 @@ export const moveId = (value: string): MoveId => toSlug(value) as MoveId
 export const itemId = (value: string): ItemId => toSlug(value) as ItemId
 export const abilityId = (value: string): AbilityId => toSlug(value) as AbilityId
 export const formatId = (value: string): FormatId => toSlug(value) as FormatId
+
+/**
+ * Set and team ids are opaque, not slugs — they come from a uuid generator at
+ * the boundary, never from a name. They get factories anyway so that callers
+ * brand them in one obvious place instead of scattering casts.
+ */
+export const setId = (value: string): SetId => value as SetId
+export const teamId = (value: string): TeamId => value as TeamId
