@@ -7,8 +7,8 @@ tiers, coverage gaps, and whether it is legal where you intend to play it.
 **Read `docs/specs/2026-08-16-someones-pc-design.md` before starting work.** It holds the
 design, the decisions and their reasons. This file holds only how to write code here.
 
-The audience is adults who play a game for children. Every interface decision serves the
-competitive player. **The app is never cute about it.** See §Tone.
+The audience is the adult and late-teen competitive scene. Every interface decision serves
+the competitive player. See §Tone.
 
 ---
 
@@ -150,8 +150,8 @@ monospace numerics. Nostalgic in structure, adult in execution. The rules most e
 
 ## Tone
 
-The old versions of this app rolled for shiny sprites, put your favorite Pokémon in the navbar,
-and colored the header by its type. That is the failure this rebuild exists to correct.
+The audience is doing work, and the app should read like a tool they reached for, not a game
+they are playing.
 
 - **Never gamify.** No XP, no badges, no streaks, no achievements, no unlockables, no
   celebration animation when a team is finished. The person is doing work.
@@ -163,6 +163,10 @@ and colored the header by its type. That is the failure this rebuild exists to c
   second person cheerleading. Say what is true.
 - **The nostalgia is structural.** The box, the slot grid, the panel chrome. It is never
   written into the copy.
+- **These are build rules, not public copy.** They decide what gets made. They never appear in
+  the README, the docs or the interface as a position the app is arguing for, and never as a
+  contrast against earlier versions or the people who built them. Say what the app does, not
+  what it refuses to do.
 
 ---
 

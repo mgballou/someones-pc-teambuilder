@@ -2,51 +2,74 @@
 
 **A team-building planning companion for competitive Pokémon.**
 
-You author **sets**, arrange them into **teams** under a **format**, and the app tells you what
-you built: damage rolls, speed tiers, coverage gaps, and whether it is legal where you intend to
-play it. Built for VGC doubles and Smogon singles.
+It keeps a library of sets, arranges them into teams under a chosen format, and reports what the
+team can do — damage rolls, speed tiers, coverage gaps, and whether it is legal where you mean to
+play it. It covers VGC doubles and Smogon singles.
 
-It is a tool for adults who play a game for children, and it is never cute about it. There are
-no badges, no streaks, no random shiny rolls, and nothing congratulates you for finishing a
-team.
+_Most of this page is written in the vocabulary of competitive play. There is a
+[glossary](#the-vocabulary) below that maps each term to the type that models it, and if you are
+here for the code, start at [Technical skeleton](#technical-skeleton)._
 
 ![The bench: six slots under one format, with the standing counts in the header.](docs/assets/bench.png)
 
-_The bench. Six slots, the format's rules applied live, and the three numbers people actually
-check — how full the team is, how many rules it breaks, and how concentrated its weaknesses are._
+_The bench. Six slots, the format's rules applied live, and the three numbers a builder checks
+most: how full the team is, how many rules it breaks, and how concentrated its weaknesses are._
 
 ---
 
 ## What it does
 
-**The Box** is a library of saved sets — the thing every competitive builder ends up maintaining
-by hand in a text file. **The Bench** is where one team gets built, six slots under one format,
-with the analysis attached.
+**The Box** is a library of saved sets — the thing most builders end up keeping by hand in a text
+file. **The Bench** is where one team gets built: six slots under one format, with the analysis
+attached.
 
 Sets are **copied** between the two, never shared by reference. A set pulled from the Box into a
-team is a snapshot; editing it there does not reach back into the Box. The alternative means
-editing one team silently changes another, which is the worst thing a builder can do to someone.
+team is a snapshot, and editing it there does not reach back into the Box. Sharing them by
+reference would mean editing one team quietly changes another.
 
-Four analysis panels, all pure functions of the team as it stands:
+Four analysis panels, each a pure function of the team as it stands:
 
 | Panel        | What it answers                                                               |
 | ------------ | ----------------------------------------------------------------------------- |
 | **Damage**   | Gen 9 formula, integer-exact. All sixteen rolls, spread reduction, Tera STAB. |
 | **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.  |
-| **Coverage** | What your moves hit, and what four of your six take double damage from.       |
+| **Coverage** | What the team's moves hit, and what several members share a weakness to.      |
 | **Legality** | Every violated rule, named, with the source of that rule beside it.           |
 
 ![The coverage grid: every member against all eighteen attacking types, with shared weaknesses ranked beside it.](docs/assets/coverage.png)
 
 _Every cell prints its multiplier, so the grid never relies on color alone. Read across a row for
-one Pokémon's weaknesses, down a column to see how many members share one._
+one Pokémon's weaknesses, down a column to count how many members share one._
 
 ![The damage panel: attacker, defender and field on the left, all sixteen rolls on the right.](docs/assets/damage.png)
 
-_The calculator returns all sixteen rolls, not one. It runs in the browser against a `Dex` built
-from the few records the calculation touches, so changing the weather costs no request._
+_The calculator returns all sixteen rolls. It runs in the browser against a `Dex` built from the
+few records the calculation touches, so changing the weather costs no request._
 
-Teams import and export as Showdown pastes, which is how this ecosystem already shares.
+Teams import and export as Showdown pastes, which is how the ecosystem already shares them.
+
+---
+
+## The vocabulary
+
+Competitive Pokémon has its own terms, and most of the app's domain model is a direct translation
+of them. If any of the copy above was opaque, this is the decoder ring.
+
+| Term               | What it means to a player                                                                                                                 | What models it                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Set**            | One configured Pokémon: species, ability, item, nature, four moves, a stat spread. The unit of team-building.                             | `PokemonSet` — `core/src/set.ts`                   |
+| **EVs / IVs**      | The two stat budgets. 508 EVs to distribute, 252 to any one stat; IVs are fixed per Pokémon, 0–31.                                        | `StatSpread` — `core/src/stats.ts`                 |
+| **Nature**         | A ±10% trade between two stats. Adamant buys Attack with Special Attack.                                                                  | `Nature`, `natureMultiplier` — `core/src/stats.ts` |
+| **Format**         | The ruleset you play under: team size, level, legal species, banned moves, clauses. VGC calls these regulations, Smogon calls them tiers. | `Format` — `core/src/format.ts`                    |
+| **Clause**         | A rule about the team rather than about a species — no two of the same Pokémon, no two of the same item.                                  | `Clause` — `core/src/format.ts`                    |
+| **STAB**           | Same-Type Attack Bonus. A move matching the user's own type deals 1.5×.                                                                   | `core/src/damage/stab.ts`                          |
+| **Tera**           | Generation 9's gimmick: change a Pokémon's type mid-battle, which reshapes both its STAB and what it resists.                             | `core/src/damage/stab.ts`, five cases              |
+| **Roll**           | Damage is randomized across sixteen outcomes, 85%–100%. "Low roll" and "high roll" mean the ends of that range.                           | `DamageResult.rolls` — `core/src/damage/`          |
+| **2HKO**           | Knocks the target out in two hits. Results are quoted this way, along with how many of the sixteen rolls manage it.                       | `core/src/damage/ko.ts`                            |
+| **Spread move**    | Hits more than one opponent, and takes a 0.75× penalty for it. Only matters in doubles.                                                   | `isSpreadMove` — `core/src/move.ts`                |
+| **Speed tier**     | The ordered list of how fast everything is. Winning a tie decides who moves first, so builders tune to specific numbers.                  | `core/src/analysis/speed.ts`                       |
+| **Coverage**       | Which types the team can hit hard, and which types can hit the team hard.                                                                 | `core/src/analysis/coverage.ts`                    |
+| **Showdown paste** | The plain-text format Pokémon Showdown uses to write out a team. The way this ecosystem already shares them.                              | `core/src/showdown/`                               |
 
 ---
 
@@ -63,8 +86,8 @@ pnpm dev            # http://localhost:3000
 demo@someones.pc / competitive
 ```
 
-If you would rather point at your own Postgres, copy `.env.example` to `.env.local` and set
-`DATABASE_URL`, then run `pnpm db:push && pnpm db:seed`.
+To point at your own Postgres instead, copy `.env.example` to `.env.local`, set `DATABASE_URL`,
+and run `pnpm db:push && pnpm db:seed`.
 
 ### Commands
 
@@ -81,7 +104,10 @@ pnpm ingest         # rebuild the dataset from PokéAPI
 
 ---
 
-## How it is built
+## Technical skeleton
+
+A pnpm workspace, TypeScript throughout, strict plus `noUncheckedIndexedAccess` and
+`exactOptionalPropertyTypes`.
 
 ```
 packages/core/     domain types, the calculator, analysis, Showdown I/O. pure.
@@ -91,71 +117,61 @@ apps/web/          Next.js 16 + React 19, Postgres via Drizzle, session auth.
 
 Dependencies flow one way: **web → dex → core**.
 
-**The core is pure** — no clock, no ambient randomness, no I/O, enforced by lint. Three things
-fall out of that:
+**The core is pure.** No clock, no ambient randomness, no I/O, enforced by lint. Two things
+follow. Every calculator test is a plain assertion against a fixture, with no mocks and no flake.
+And the calculator cannot roll dice, so it returns all sixteen rolls and lets the caller decide —
+which is what a player wants to read anyway.
 
-- Every calculator test is a plain assertion against a fixture. No mocks, no flake.
-- The calc returns **all sixteen rolls** rather than one, because it cannot roll dice. That
-  turned out to be the right interface anyway — "2HKO, 0 to 6 rolls" is the answer a player
-  wants, and a single number never was.
-- The analysis panels run on the server, on the client, or in a test, unchanged.
+**`core` declares the data it needs and never learns where it comes from.** `Dex` is an interface
+in `core/src/dex.ts`. `@spc/dex` implements it against the built dataset, the test suite
+implements it against a thirteen-species fixture, and the browser implements it against the few
+records the current calculation touches. That inversion is why the calculator is testable without
+loading a thousand forms.
 
-**`core` declares the data it needs and never learns where it comes from.** `Dex` is an
-interface in `core/src/dex.ts`; `@spc/dex` implements it against the built dataset, and the test
-suite implements it against a thirteen-species fixture. That is why the calculator is testable
-without loading a thousand forms.
+**Format is a parameter, never a branch.** Nothing anywhere reads a format id and switches on it.
+A `Format` declares its team size, level rule, gimmick, clauses and legality, and callers ask the
+format. Adding a regulation is a data change.
 
-**Format is a parameter, never a branch.** No function anywhere reads a format id and switches
-on it. A `Format` declares its team size, level rule, gimmick, clauses and legality; callers ask
-the format. Adding a regulation is a data change.
-
-**The dataset is built, not fetched.** `pnpm ingest` walks PokéAPI once, validates every
-response with zod, normalizes it into the domain types and writes a compact dataset that is
-committed to the repo. The app reads it synchronously. Fetching that at runtime would be slow,
-rate-limited, and would make the app untestable in CI.
+**The dataset is built, not fetched.** `pnpm ingest` walks PokéAPI once, validates every response
+with zod, normalizes it into the domain types, and writes a compact dataset that is committed to
+the repo. The app reads it synchronously. Fetching at runtime would be slow, rate-limited, and
+would make CI depend on someone else's uptime.
 
 ---
 
-## What it does not know
+## What the data covers
 
-Several things here are approximations, and the app says so wherever it shows them.
+Several answers here are approximations. The app names each one wherever it shows it, and they
+are worth knowing before you rely on the output.
 
-- **Legality is curated, not derived.** PokéAPI has no concept of a tier or a regulation. Every
-  format carries an authority, a citation and the date its ruleset was last checked by hand —
-  shown next to every verdict, permanently. Check the official rules before a tournament.
-- **The damage calculator models a curated set of items and abilities.** Anything outside the
-  model is named in the result rather than silently ignored. A calculator that quietly drops
-  Adaptability is worse than one that admits it cannot see it.
-- **Learnsets are by generation, not by method.** Egg chains, event-only moves and version
-  exclusives are not modelled, so the move picker is broader than what one save file can legally
-  produce. It says so.
-- **Speed benchmarks are computed from base stats**, at maximum investment with a Speed-raising
-  nature. They are not usage statistics — this app has none and will not invent any.
-- **Coverage reads a move at its printed type.** Tera Blast's type change is not modelled.
+- **Legality is curated.** PokéAPI has no concept of a tier or a regulation, so every banlist is
+  transcribed by hand. Each format carries its authority, a citation and the date it was last
+  checked, displayed next to every verdict. Check the official rules before a tournament.
+- **Learnsets are absolute.** A move is listed if the species can learn it in Generation 9 by any
+  route. Egg chains, event distributions and version exclusives are not modelled, so the picker
+  does not know whether a given save file can legally produce the set.
+- **The damage calculator models a curated list of items and abilities.** A result names anything
+  it could not account for.
+- **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
+  They are not filtered by usage statistics.
+- **Coverage reads each move at its printed type.** Tera Blast's type change is not modelled.
 
-Deliberately out of scope: usage statistics, teambuilding suggestions, battle simulation, and
-any social layer. It calculates; it does not play, and it does not have opinions about your
-sixth slot.
+Not in scope: usage statistics, team suggestions, battle simulation, and sharing or social
+features. The app reports on the team in front of it.
 
 ---
 
-## Where this came from
+## History
 
-This is the fourth version. The first three are from 2023 and modelled a Pokémon as:
+Someone's PC began in 2023 as a group project at General Assembly's Software Engineering
+Immersive, built with Anthony Blalock and Ciaran Kearney — Express, EJS and Mongo, a box of
+sprites, and named teams saved against a login. Later that year I rebuilt it on my own as a REST
+API and a React front end, which added EVs, IVs, the real stat formula, and drag-and-drop between
+the box and the party.
 
-```js
-{
-  ;(name, dexNumber, sprite, nickname, type1, type2, abilities, stats, heldItem, nature)
-}
-```
-
-No moves. No EVs, no IVs, no level, no format. The planning documents list "Setting EV's and
-IV's, movesets, held items" as a stretch goal, below shiny-sprite RNG, favourite-Pokémon avatars
-and a type-colored navbar.
-
-That is the whole diagnosis. It was a Pokédex scrapbook with a login, built by people treating
-the subject as a children's game. This version is a tool for the competitive scene that actually
-plays it.
+Both stopped short of moves and formats, which is where planning a competitive team actually
+begins. This version picks up there: four-move sets, formats as data, and analysis that reads a
+finished team back to you.
 
 ---
 

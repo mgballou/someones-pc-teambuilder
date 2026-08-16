@@ -8,26 +8,27 @@ A team-building planning companion for competitive Pokémon.
 
 ## 1. What this is, and what it replaces
 
-Three earlier versions exist, all from 2023. `Someones-PC` was Express + EJS + Mongo with Google
-OAuth. `api-someonespc` and `react-someones-pc` split that into a REST backend and a Vite
-frontend. All three modelled a Pokémon as:
+Two earlier versions exist, both from 2023.
 
-```js
-{
-  ;(name, dexNumber, sprite, nickname, type1, type2, abilities, stats, heldItem, nature)
-}
-```
+`Someones-PC` was the original: a General Assembly SEI group project, Express + EJS + Mongo with
+Google OAuth, written with Anthony Blalock and Ciaran Kearney. It established the box, the sprite
+grid and named teams — the shape this version still uses. Its planning documents list "Setting
+EV's and IV's, movesets, held items" as a _stretch goal_, below "shiny sprites", "favourite
+pokemon as avatar" and "have the colorset match user's avatar", and those are the priorities that
+shipped: a 1-in-10 shiny roll on the box, a navbar colored by a chosen avatar's type.
 
-There are no moves in that model. No EVs, no IVs, no format, no level. The planning documents
-list "Setting EV's and IV's, movesets, held items" as a _stretch goal_, below "shiny sprites",
-"favourite pokemon as avatar", and "have the colorset match user's avatar".
+`api-someonespc` + `react-someones-pc` was the solo rebuild, splitting the app into a REST backend
+and a Vite frontend. It cut the shiny roll, added EVs and IVs with the correct Gen 3+ stat
+formula, and moved Pokémon between the box and the party by drag-and-drop. It is a materially
+better tool than the first, and its data model is where this one starts from.
 
-That is the diagnosis. The old app was a Pokédex scrapbook with a login. Contributors treated
-the subject as a children's game and built accordingly: a 1-in-10 roll for a shiny sprite, a
-type-colored navbar, share buttons, comments. None of it helps anyone build a team.
+Where both stop is moves and formats. A Pokémon in either is
+`(species, nickname, types, abilities, stats, item, nature)` — no moveset, no level, no legality,
+no notion of which game you intend to play. That is most of what a competitive builder is
+actually deciding.
 
-**This version is a tool.** The audience is the late-teen and adult competitive scene — VGC and
-Smogon singles. Everything in §Tone of `CLAUDE.md` follows from that.
+**This version is a planning tool.** The audience is the late-teen and adult competitive scene —
+VGC and Smogon singles. Everything in §Tone of `CLAUDE.md` follows from that.
 
 ---
 
@@ -44,8 +45,7 @@ analysis panels reading the team as it stands.
 
 Sets are **copied**, not referenced, on the way between the two. A set pulled from the Box into
 a team is a snapshot; editing it on the team does not reach back into the Box, and vice versa.
-The alternative — shared references — means editing one team silently changes another, which is
-the single worst thing a builder can do to someone.
+The alternative — shared references — means editing one team quietly changes another.
 
 ```
    BOX                      BENCH
@@ -75,8 +75,8 @@ fall out of that:
 
 - Every calculator test is a plain assertion against a fixture. No mocks, no flake.
 - The damage calc returns **all sixteen rolls** rather than one, because it cannot roll dice.
-  That turned out to be the right interface anyway — "0 to 6 rolls to KO" is the answer a player
-  wants, and a single number never was.
+  That is the interface a player wants anyway: "0 to 6 rolls to KO" is the answer, not an
+  average.
 - The analysis panels can run on the client, on the server, or in a test, unchanged.
 
 ### 3.2 Why `Dex` is an interface in `core`
