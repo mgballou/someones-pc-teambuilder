@@ -28,13 +28,13 @@ jobs:
       AUTH_SECRET: ci-only-secret-not-used-anywhere-real
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # No `version` here on purpose. The action reads `packageManager` from
       # package.json, and pinning it in both places is an error, not a default.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
