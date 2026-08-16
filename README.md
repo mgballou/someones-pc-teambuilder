@@ -10,6 +10,11 @@ It is a tool for adults who play a game for children, and it is never cute about
 no badges, no streaks, no random shiny rolls, and nothing congratulates you for finishing a
 team.
 
+![The bench: six slots under one format, with the standing counts in the header.](docs/assets/bench.png)
+
+_The bench. Six slots, the format's rules applied live, and the three numbers people actually
+check — how full the team is, how many rules it breaks, and how concentrated its weaknesses are._
+
 ---
 
 ## What it does
@@ -30,6 +35,16 @@ Four analysis panels, all pure functions of the team as it stands:
 | **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.  |
 | **Coverage** | What your moves hit, and what four of your six take double damage from.       |
 | **Legality** | Every violated rule, named, with the source of that rule beside it.           |
+
+![The coverage grid: every member against all eighteen attacking types, with shared weaknesses ranked beside it.](docs/assets/coverage.png)
+
+_Every cell prints its multiplier, so the grid never relies on color alone. Read across a row for
+one Pokémon's weaknesses, down a column to see how many members share one._
+
+![The damage panel: attacker, defender and field on the left, all sixteen rolls on the right.](docs/assets/damage.png)
+
+_The calculator returns all sixteen rolls, not one. It runs in the browser against a `Dex` built
+from the few records the calculation touches, so changing the weather costs no request._
 
 Teams import and export as Showdown pastes, which is how this ecosystem already shares.
 
