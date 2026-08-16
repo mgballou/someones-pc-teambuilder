@@ -1,0 +1,310 @@
+{
+  "earthquake": {
+    "id": 89,
+    "name": "earthquake",
+    "accuracy": 100,
+    "power": 100,
+    "pp": 10,
+    "priority": 0,
+    "damage_class": {
+      "name": "physical"
+    },
+    "type": {
+      "name": "ground"
+    },
+    "target": {
+      "name": "all-other-pokemon"
+    },
+    "generation": {
+      "name": "generation-i"
+    },
+    "effect_chance": null,
+    "meta": {
+      "category": {
+        "name": "damage"
+      },
+      "crit_rate": 0,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": null,
+      "max_hits": null
+    },
+    "stat_changes": [],
+    "effect_entries": [
+      {
+        "short_effect": "Inflicts regular damage and can hit Dig users.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "aerial-ace": {
+    "id": 332,
+    "name": "aerial-ace",
+    "accuracy": null,
+    "power": 60,
+    "pp": 20,
+    "priority": 0,
+    "damage_class": {
+      "name": "physical"
+    },
+    "type": {
+      "name": "flying"
+    },
+    "target": {
+      "name": "selected-pokemon"
+    },
+    "generation": {
+      "name": "generation-iii"
+    },
+    "effect_chance": null,
+    "meta": {
+      "category": {
+        "name": "damage"
+      },
+      "crit_rate": 0,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": null,
+      "max_hits": null
+    },
+    "stat_changes": [],
+    "effect_entries": [
+      {
+        "short_effect": "Never misses.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "close-combat": {
+    "id": 370,
+    "name": "close-combat",
+    "accuracy": 100,
+    "power": 120,
+    "pp": 5,
+    "priority": 0,
+    "damage_class": {
+      "name": "physical"
+    },
+    "type": {
+      "name": "fighting"
+    },
+    "target": {
+      "name": "selected-pokemon"
+    },
+    "generation": {
+      "name": "generation-iv"
+    },
+    "effect_chance": 100,
+    "meta": {
+      "category": {
+        "name": "damage-raise"
+      },
+      "crit_rate": 0,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": null,
+      "max_hits": null
+    },
+    "stat_changes": [
+      {
+        "change": -1,
+        "stat": {
+          "name": "defense"
+        }
+      },
+      {
+        "change": -1,
+        "stat": {
+          "name": "special-defense"
+        }
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Lowers the user’s Defense and Special Defense by one stage after inflicting damage.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "surging-strikes": {
+    "id": 818,
+    "name": "surging-strikes",
+    "accuracy": 100,
+    "power": 25,
+    "pp": 5,
+    "priority": 0,
+    "damage_class": {
+      "name": "physical"
+    },
+    "type": {
+      "name": "water"
+    },
+    "target": {
+      "name": "selected-pokemon"
+    },
+    "generation": {
+      "name": "generation-viii"
+    },
+    "effect_chance": null,
+    "meta": {
+      "category": {
+        "name": "damage"
+      },
+      "crit_rate": 6,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": 3,
+      "max_hits": 3
+    },
+    "stat_changes": [],
+    "effect_entries": [
+      {
+        "short_effect": "Inflicts regular damage with no additional effect.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "wave-crash": {
+    "id": 834,
+    "name": "wave-crash",
+    "accuracy": 100,
+    "power": 120,
+    "pp": 10,
+    "priority": 0,
+    "damage_class": {
+      "name": "physical"
+    },
+    "type": {
+      "name": "water"
+    },
+    "target": {
+      "name": "selected-pokemon"
+    },
+    "generation": {
+      "name": "generation-viii"
+    },
+    "effect_chance": null,
+    "meta": null,
+    "stat_changes": [],
+    "effect_entries": []
+  },
+  "swords-dance": {
+    "id": 14,
+    "name": "swords-dance",
+    "accuracy": null,
+    "power": null,
+    "pp": 20,
+    "priority": 0,
+    "damage_class": {
+      "name": "status"
+    },
+    "type": {
+      "name": "normal"
+    },
+    "target": {
+      "name": "user"
+    },
+    "generation": {
+      "name": "generation-i"
+    },
+    "effect_chance": null,
+    "meta": {
+      "category": {
+        "name": "net-good-stats"
+      },
+      "crit_rate": 0,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": null,
+      "max_hits": null
+    },
+    "stat_changes": [
+      {
+        "change": 2,
+        "stat": {
+          "name": "attack"
+        }
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Raises the user’s Attack by two stages.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "night-shade": {
+    "id": 101,
+    "name": "night-shade",
+    "accuracy": 100,
+    "power": null,
+    "pp": 15,
+    "priority": 0,
+    "damage_class": {
+      "name": "special"
+    },
+    "type": {
+      "name": "ghost"
+    },
+    "target": {
+      "name": "selected-pokemon"
+    },
+    "generation": {
+      "name": "generation-i"
+    },
+    "effect_chance": null,
+    "meta": {
+      "category": {
+        "name": "damage"
+      },
+      "crit_rate": 0,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": null,
+      "max_hits": null
+    },
+    "stat_changes": [],
+    "effect_entries": [
+      {
+        "short_effect": "Inflicts damage equal to the user’s level.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "ivy-cudgel": {
+    "id": 904,
+    "name": "ivy-cudgel",
+    "accuracy": 100,
+    "power": 100,
+    "pp": 10,
+    "priority": 0,
+    "damage_class": {
+      "name": "physical"
+    },
+    "type": {
+      "name": "grass"
+    },
+    "target": {
+      "name": "selected-pokemon"
+    },
+    "generation": {
+      "name": "generation-ix"
+    },
+    "effect_chance": null,
+    "meta": null,
+    "stat_changes": [],
+    "effect_entries": []
+  }
+}

@@ -70,7 +70,10 @@ export default async function SpeedPage({
                 <th className="px-2 py-1 text-right font-medium">Base</th>
                 <th className="px-2 py-1 text-right font-medium">As built</th>
                 {report.members[0]?.modifiers.map((modifier) => (
-                  <th key={modifier.modifier} className="px-2 py-1 text-right font-medium">
+                  <th
+                    key={speedModifierLabel(modifier.modifier)}
+                    className="px-2 py-1 text-right font-medium"
+                  >
                     {speedModifierLabel(modifier.modifier)}
                   </th>
                 ))}
@@ -84,7 +87,7 @@ export default async function SpeedPage({
                   <td className="num px-2 py-1 text-right font-semibold">{member.effective}</td>
                   {member.modifiers.map((modifier) => (
                     <td
-                      key={modifier.modifier}
+                      key={speedModifierLabel(modifier.modifier)}
                       className="num px-2 py-1 text-right"
                       style={{
                         color: modifier.available ? 'var(--text)' : 'var(--text-faint)',
@@ -105,8 +108,8 @@ export default async function SpeedPage({
         </div>
 
         <SourceNote>
-          A dimmed number is one this set cannot currently reach — a Scarf line on a Pokémon
-          holding something else, or a Booster line without the ability.
+          A dimmed number is one this set cannot currently reach — a Scarf line on a Pokémon holding
+          something else, or a Booster line without the ability.
         </SourceNote>
       </Panel>
     </div>

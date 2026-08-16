@@ -24,8 +24,8 @@ editing one team silently changes another, which is the worst thing a builder ca
 
 Four analysis panels, all pure functions of the team as it stands:
 
-| Panel        | What it answers                                                              |
-| ------------ | ---------------------------------------------------------------------------- |
+| Panel        | What it answers                                                               |
+| ------------ | ----------------------------------------------------------------------------- |
 | **Damage**   | Gen 9 formula, integer-exact. All sixteen rolls, spread reduction, Tera STAB. |
 | **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.  |
 | **Coverage** | What your moves hit, and what four of your six take double damage from.       |
@@ -129,7 +129,9 @@ sixth slot.
 This is the fourth version. The first three are from 2023 and modelled a Pokémon as:
 
 ```js
-{ name, dexNumber, sprite, nickname, type1, type2, abilities, stats, heldItem, nature }
+{
+  ;(name, dexNumber, sprite, nickname, type1, type2, abilities, stats, heldItem, nature)
+}
 ```
 
 No moves. No EVs, no IVs, no level, no format. The planning documents list "Setting EV's and

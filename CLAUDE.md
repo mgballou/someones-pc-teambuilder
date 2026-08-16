@@ -54,11 +54,11 @@ Load-bearing. Breaking any one costs more than it saves.
 
 1. **No `Date.now()`, no `Math.random()`, no I/O inside `packages/core`.** Enforced by lint.
    A damage roll takes its randomness as an explicit roll index (0–15), which is why the calc
-   returns *all sixteen* rolls rather than one, and why every calc test is a plain assertion.
+   returns _all sixteen_ rolls rather than one, and why every calc test is a plain assertion.
 
 2. **A `PokemonSet` is data, and only data.** No methods, no class. It serializes to JSON,
    round-trips through a Showdown paste, and survives a schema bump. Anything that wants to
-   *do* something with a set is a function that takes one.
+   _do_ something with a set is a function that takes one.
 
 3. **Format is a parameter, never a branch.** No function anywhere reads a format id and
    switches on it. A `Format` declares its team size, its level rule, its gimmick, its clauses
@@ -96,19 +96,19 @@ Load-bearing. Breaking any one costs more than it saves.
 
 ## Naming
 
-| Concept              | Pattern                                  | Example                                 |
-| -------------------- | ---------------------------------------- | --------------------------------------- |
-| Pure domain function | verb                                     | `calculate`, `validate`, `parse`        |
-| Selector             | noun or `verbNoun`, pure and read-only   | `baseStatTotal`, `evsRemaining`         |
-| Predicate            | `canX` / `isX` / `hasX` / `allowsX`      | `isSpreadMove`, `hasClause`             |
-| Type                 | noun                                     | `Species`, `PokemonSet`, `DamageResult` |
-| Report from a check  | `{X}Report`                              | `LegalityReport`, `CoverageReport`      |
-| Client impl          | `{Which}PokeApiClient`                   | `LivePokeApiClient`, `FakePokeApiClient`|
-| Typed error          | `{Reason}` + static factory              | `MissingFromDex.species(id)`            |
-| React component      | noun of what it shows                    | `BoxGrid`, `SetCard`, `SpeedLadder`     |
-| Hook                 | `use{Noun}`                              | `useTeam`, `useCalc`                    |
-| Server action        | `{verb}{Noun}`                           | `createTeam`, `duplicateSet`            |
-| Test file            | mirrors the source path                  | `src/damage.ts` → `test/damage.test.ts` |
+| Concept              | Pattern                                | Example                                  |
+| -------------------- | -------------------------------------- | ---------------------------------------- |
+| Pure domain function | verb                                   | `calculate`, `validate`, `parse`         |
+| Selector             | noun or `verbNoun`, pure and read-only | `baseStatTotal`, `evsRemaining`          |
+| Predicate            | `canX` / `isX` / `hasX` / `allowsX`    | `isSpreadMove`, `hasClause`              |
+| Type                 | noun                                   | `Species`, `PokemonSet`, `DamageResult`  |
+| Report from a check  | `{X}Report`                            | `LegalityReport`, `CoverageReport`       |
+| Client impl          | `{Which}PokeApiClient`                 | `LivePokeApiClient`, `FakePokeApiClient` |
+| Typed error          | `{Reason}` + static factory            | `MissingFromDex.species(id)`             |
+| React component      | noun of what it shows                  | `BoxGrid`, `SetCard`, `SpeedLadder`      |
+| Hook                 | `use{Noun}`                            | `useTeam`, `useCalc`                     |
+| Server action        | `{verb}{Noun}`                         | `createTeam`, `duplicateSet`             |
+| Test file            | mirrors the source path                | `src/damage.ts` → `test/damage.test.ts`  |
 
 ---
 
@@ -118,7 +118,7 @@ Vitest. Tests mirror source paths.
 
 - **Never mock the core.** It is pure and fast. Build real sets from fixtures.
 - **The damage calculator is tested against known values**, taken from the published formula
-  and cross-checked by hand. A calc test asserts a *range* of sixteen rolls, not one number.
+  and cross-checked by hand. A calc test asserts a _range_ of sixteen rolls, not one number.
 - **Prefer a property to three examples.** Properties worth pinning: a set's computed stats
   never exceed the level-100 maximum; a Showdown paste round-trips to an identical set; a
   team legal in a format stays legal after a reorder; spread damage is never more than
@@ -139,7 +139,7 @@ monospace numerics. Nostalgic in structure, adult in execution. The rules most e
 - **Nothing rebuilds to show that it is loading.** Placeholders in place, sized to content.
 - **No raw values outside the token definitions.** Semantic names only — `surface`, `line`,
   `accent`. Never `zinc-800`, never `#e8563f`.
-- **Type colors are data, not decoration.** A type badge is colored because the color *is* the
+- **Type colors are data, not decoration.** A type badge is colored because the color _is_ the
   type. Nothing else on the page borrows those eighteen hues.
 - **Every terminal state names what happens next.** The empty box is the highest-leverage
   screen in the app.

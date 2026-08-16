@@ -13,11 +13,13 @@ OAuth. `api-someonespc` and `react-someones-pc` split that into a REST backend a
 frontend. All three modelled a Pokémon as:
 
 ```js
-{ name, dexNumber, sprite, nickname, type1, type2, abilities, stats, heldItem, nature }
+{
+  ;(name, dexNumber, sprite, nickname, type1, type2, abilities, stats, heldItem, nature)
+}
 ```
 
 There are no moves in that model. No EVs, no IVs, no format, no level. The planning documents
-list "Setting EV's and IV's, movesets, held items" as a *stretch goal*, below "shiny sprites",
+list "Setting EV's and IV's, movesets, held items" as a _stretch goal_, below "shiny sprites",
 "favourite pokemon as avatar", and "have the colorset match user's avatar".
 
 That is the diagnosis. The old app was a Pokédex scrapbook with a login. Contributors treated
@@ -113,18 +115,18 @@ branches on it.** Adding a regulation is a data change.
 
 Shipping:
 
-| Format             | Style   | Team | Bring | Level | Gimmick   |
-| ------------------ | ------- | ---- | ----- | ----- | --------- |
-| VGC Regulation H   | doubles | 6    | 4     | 50    | Terastal  |
-| VGC Regulation I   | doubles | 6    | 4     | 50    | Terastal  |
-| VGC Regulation G   | doubles | 6    | 4     | 50    | Terastal  |
-| Smogon Gen 9 OU    | singles | 6    | 6     | 100   | Terastal  |
-| Smogon Gen 9 Ubers | singles | 6    | 6     | 100   | Terastal  |
-| Unrestricted       | either  | 6    | 6     | 100   | Terastal  |
+| Format             | Style   | Team | Bring | Level | Gimmick  |
+| ------------------ | ------- | ---- | ----- | ----- | -------- |
+| VGC Regulation H   | doubles | 6    | 4     | 50    | Terastal |
+| VGC Regulation I   | doubles | 6    | 4     | 50    | Terastal |
+| VGC Regulation G   | doubles | 6    | 4     | 50    | Terastal |
+| Smogon Gen 9 OU    | singles | 6    | 6     | 100   | Terastal |
+| Smogon Gen 9 Ubers | singles | 6    | 6     | 100   | Terastal |
+| Unrestricted       | either  | 6    | 6     | 100   | Terastal |
 
 Legality uses two mechanisms because real formats use both: **category bans** (Regulation H bans
 every legendary, mythical and paradox at once) and **name bans** (Smogon tiers ban one Pokémon
-at a time). Regulation G additionally allows two *restricted* legendaries, which is a cap, not a
+at a time). Regulation G additionally allows two _restricted_ legendaries, which is a cap, not a
 ban.
 
 **Legality is curated.** PokéAPI has no tiers. Every format carries a `source` — authority,

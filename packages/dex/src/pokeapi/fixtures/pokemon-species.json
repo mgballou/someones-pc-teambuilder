@@ -1,0 +1,134 @@
+{
+  "landorus": {
+    "id": 645,
+    "name": "landorus",
+    "is_legendary": true,
+    "is_mythical": false,
+    "generation": {
+      "name": "generation-v"
+    },
+    "evolves_from_species": null,
+    "varieties": [
+      {
+        "is_default": true,
+        "pokemon": {
+          "name": "landorus-incarnate"
+        }
+      },
+      {
+        "is_default": false,
+        "pokemon": {
+          "name": "landorus-therian"
+        }
+      }
+    ],
+    "names": [
+      {
+        "name": "Landorus",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "dusclops": {
+    "id": 356,
+    "name": "dusclops",
+    "is_legendary": false,
+    "is_mythical": false,
+    "generation": {
+      "name": "generation-iii"
+    },
+    "evolves_from_species": {
+      "name": "duskull"
+    },
+    "varieties": [
+      {
+        "is_default": true,
+        "pokemon": {
+          "name": "dusclops"
+        }
+      }
+    ],
+    "names": [
+      {
+        "name": "Dusclops",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "dusknoir": {
+    "id": 477,
+    "name": "dusknoir",
+    "is_legendary": false,
+    "is_mythical": false,
+    "generation": {
+      "name": "generation-iv"
+    },
+    "evolves_from_species": {
+      "name": "dusclops"
+    },
+    "varieties": [
+      {
+        "is_default": true,
+        "pokemon": {
+          "name": "dusknoir"
+        }
+      }
+    ],
+    "names": [
+      {
+        "name": "Dusknoir",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "ogerpon": {
+    "id": 1017,
+    "name": "ogerpon",
+    "is_legendary": true,
+    "is_mythical": false,
+    "generation": {
+      "name": "generation-ix"
+    },
+    "evolves_from_species": null,
+    "varieties": [
+      {
+        "is_default": true,
+        "pokemon": {
+          "name": "ogerpon"
+        }
+      },
+      {
+        "is_default": false,
+        "pokemon": {
+          "name": "ogerpon-wellspring-mask"
+        }
+      },
+      {
+        "is_default": false,
+        "pokemon": {
+          "name": "ogerpon-hearthflame-mask"
+        }
+      },
+      {
+        "is_default": false,
+        "pokemon": {
+          "name": "ogerpon-cornerstone-mask"
+        }
+      }
+    ],
+    "names": [
+      {
+        "name": "Ogerpon",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  }
+}

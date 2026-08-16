@@ -62,9 +62,8 @@ export default async function LegalityPage({
         </dl>
 
         <SourceNote>
-          {format.source.citation} These rulesets are maintained by hand — PokéAPI has no
-          concept of a tier or a regulation. Check the current official rules before entering
-          a tournament.
+          {format.source.citation} These rulesets are maintained by hand — PokéAPI has no concept of
+          a tier or a regulation. Check the current official rules before entering a tournament.
         </SourceNote>
       </Panel>
     </div>

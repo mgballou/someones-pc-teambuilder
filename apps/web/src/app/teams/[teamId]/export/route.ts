@@ -6,10 +6,7 @@ import { dex } from '../../../../lib/dex.js'
  * Teams leave as a Showdown paste, which is how this ecosystem already shares.
  * Nothing is locked in here. Spec §7.
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ teamId: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ teamId: string }> }) {
   const { teamId } = await params
   const { team, format } = await loadTeam(teamId)
 

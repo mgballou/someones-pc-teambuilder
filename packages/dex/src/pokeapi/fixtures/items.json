@@ -1,0 +1,163 @@
+{
+  "choice-band": {
+    "id": 197,
+    "name": "choice-band",
+    "fling_power": 10,
+    "category": {
+      "name": "choice"
+    },
+    "attributes": [
+      {
+        "name": "holdable"
+      },
+      {
+        "name": "holdable-active"
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Increases Attack by 50%, but restricts the holder to only one move.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "eviolite": {
+    "id": 581,
+    "name": "eviolite",
+    "fling_power": 40,
+    "category": {
+      "name": "held-items"
+    },
+    "attributes": [],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Holder has 1.5× Defense and Special Defense, as long as it’s not fully evolved.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "leftovers": {
+    "id": 211,
+    "name": "leftovers",
+    "fling_power": 10,
+    "category": {
+      "name": "held-items"
+    },
+    "attributes": [
+      {
+        "name": "holdable"
+      },
+      {
+        "name": "holdable-active"
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Restores 1/16 (6.25%) holder’s max HP at the end of each turn.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "occa-berry": {
+    "id": 161,
+    "name": "occa-berry",
+    "fling_power": 10,
+    "category": {
+      "name": "type-protection"
+    },
+    "attributes": [
+      {
+        "name": "holdable-active"
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Consumed when struck by a super-effective Fire-type attack to halve the damage.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "charizardite-x": {
+    "id": 699,
+    "name": "charizardite-x",
+    "fling_power": 80,
+    "category": {
+      "name": "mega-stones"
+    },
+    "attributes": [],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Allows Charizard to Mega Evolve into Mega Charizard X.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "metronome": {
+    "id": 254,
+    "name": "metronome",
+    "fling_power": 30,
+    "category": {
+      "name": "held-items"
+    },
+    "attributes": [
+      {
+        "name": "holdable"
+      },
+      {
+        "name": "holdable-active"
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Consectutive uses of the same attack have a cumulative damage boost of 10%. Maximum 100% boost.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  },
+  "wellspring-mask": {
+    "id": 2106,
+    "name": "wellspring-mask",
+    "fling_power": null,
+    "category": {
+      "name": "held-items"
+    },
+    "attributes": [],
+    "effect_entries": []
+  },
+  "charcoal": {
+    "id": 226,
+    "name": "charcoal",
+    "fling_power": 30,
+    "category": {
+      "name": "type-enhancement"
+    },
+    "attributes": [
+      {
+        "name": "holdable"
+      },
+      {
+        "name": "holdable-active"
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Held: Fire-Type moves from holder do 20% more damage.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
+  }
+}

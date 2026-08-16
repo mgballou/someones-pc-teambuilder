@@ -13,10 +13,7 @@ const INITIAL: AuthState = { error: null }
  */
 export function CredentialsForm({ mode }: { readonly mode: 'sign-in' | 'sign-up' }) {
   const signingIn = mode === 'sign-in'
-  const [state, action, pending] = useActionState(
-    signingIn ? signInAction : signUpAction,
-    INITIAL,
-  )
+  const [state, action, pending] = useActionState(signingIn ? signInAction : signUpAction, INITIAL)
 
   return (
     <div className="mx-auto max-w-sm py-12">

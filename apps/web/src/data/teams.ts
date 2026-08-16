@@ -66,11 +66,7 @@ export type CreateTeamInput = {
   readonly formatId: string
 }
 
-export async function createTeam({
-  userId,
-  name,
-  formatId,
-}: CreateTeamInput): Promise<TeamId> {
+export async function createTeam({ userId, name, formatId }: CreateTeamInput): Promise<TeamId> {
   const [row] = await db
     .insert(teams)
     .values({ userId, name, formatId })
@@ -123,11 +119,7 @@ export type CloneTeamInput = {
  * editing the copy can never reach back into the original — the guarantee
  * spec §2 rests on.
  */
-export async function cloneTeamDeep({
-  userId,
-  teamId,
-  name,
-}: CloneTeamInput): Promise<TeamId> {
+export async function cloneTeamDeep({ userId, teamId, name }: CloneTeamInput): Promise<TeamId> {
   const source = await getTeam(userId, teamId)
   if (source === null) throw NotAuthorized.team(teamId)
 
@@ -193,9 +185,7 @@ export async function saveSet({ userId, set, now }: SaveSetInput): Promise<void>
 }
 
 export async function deleteSet(userId: string, setId: SetId): Promise<void> {
-  await db
-    .delete(pokemonSets)
-    .where(and(eq(pokemonSets.id, setId), eq(pokemonSets.userId, userId)))
+  await db.delete(pokemonSets).where(and(eq(pokemonSets.id, setId), eq(pokemonSets.userId, userId)))
 }
 
 /** Duplicate in place, landing directly after the original. */
@@ -237,11 +227,7 @@ export type ReorderInput = {
   readonly order: readonly SetId[]
 }
 
-export async function reorderMembers({
-  userId,
-  teamId,
-  order,
-}: ReorderInput): Promise<void> {
+export async function reorderMembers({ userId, teamId, order }: ReorderInput): Promise<void> {
   await assertOwnsTeam(userId, teamId)
   await db.transaction(async (tx) => {
     for (const [index, setId] of order.entries()) {
@@ -260,11 +246,7 @@ export type TransferInput = {
 }
 
 /** Move a set onto another team. The source team loses it. */
-export async function moveSetToTeam({
-  userId,
-  setId,
-  toTeamId,
-}: TransferInput): Promise<void> {
+export async function moveSetToTeam({ userId, setId, toTeamId }: TransferInput): Promise<void> {
   await assertOwnsTeam(userId, toTeamId)
   const position = await nextPosition(toTeamId)
   const updated = await db
@@ -276,11 +258,7 @@ export async function moveSetToTeam({
 }
 
 /** Copy a set onto another team, leaving the original where it is. */
-export async function copySetToTeam({
-  userId,
-  setId,
-  toTeamId,
-}: TransferInput): Promise<SetId> {
+export async function copySetToTeam({ userId, setId, toTeamId }: TransferInput): Promise<SetId> {
   await assertOwnsTeam(userId, toTeamId)
   const row = await db.query.pokemonSets.findFirst({
     where: and(eq(pokemonSets.id, setId), eq(pokemonSets.userId, userId)),
@@ -320,10 +298,6 @@ export async function saveToBox(userId: string, setId: SetId): Promise<SetId> {
 }
 
 /** Copy a Box set into a team slot. Also a snapshot. */
-export async function pullFromBox({
-  userId,
-  setId,
-  toTeamId,
-}: TransferInput): Promise<SetId> {
+export async function pullFromBox({ userId, setId, toTeamId }: TransferInput): Promise<SetId> {
   return copySetToTeam({ userId, setId, toTeamId })
 }

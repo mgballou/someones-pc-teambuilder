@@ -27,8 +27,8 @@ export default async function BoxPage() {
         <h1 className="text-base font-semibold tracking-tight">Box</h1>
         <span className="num text-xs text-text-faint">{sets.length}</span>
         <p className="ml-auto max-w-md text-right text-[0.6875rem] text-text-faint">
-          Saved sets, reusable across teams. Pulling one into a team copies it — editing the
-          copy does not change what is stored here.
+          Saved sets, reusable across teams. Pulling one into a team copies it — editing the copy
+          does not change what is stored here.
         </p>
       </div>
 

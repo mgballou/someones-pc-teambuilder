@@ -24,9 +24,7 @@ const createTeamSchema = z.object({
   formatId: z.string().trim().min(1),
 })
 
-export type ActionResult =
-  | { readonly ok: true }
-  | { readonly ok: false; readonly message: string }
+export type ActionResult = { readonly ok: true } | { readonly ok: false; readonly message: string }
 
 function failure(error: unknown): ActionResult {
   const message = error instanceof Error ? error.message : 'Something went wrong.'
@@ -45,10 +43,7 @@ export async function createTeamAction(formData: FormData): Promise<never> {
   redirect(`/teams/${teamId}`)
 }
 
-export async function renameTeamAction(
-  teamId: string,
-  name: string,
-): Promise<ActionResult> {
+export async function renameTeamAction(teamId: string, name: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.updateTeam({
@@ -64,10 +59,7 @@ export async function renameTeamAction(
   }
 }
 
-export async function setTeamFormatAction(
-  teamId: string,
-  formatId: string,
-): Promise<ActionResult> {
+export async function setTeamFormatAction(teamId: string, formatId: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.updateTeam({
@@ -124,10 +116,7 @@ export async function addSpeciesAction(
   }
 }
 
-export async function duplicateSetAction(
-  teamId: string,
-  setId: string,
-): Promise<ActionResult> {
+export async function duplicateSetAction(teamId: string, setId: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.duplicateSet(user.id, setIdSchema.parse(setId) as SetId)
@@ -138,10 +127,7 @@ export async function duplicateSetAction(
   }
 }
 
-export async function deleteSetAction(
-  teamId: string,
-  setId: string,
-): Promise<ActionResult> {
+export async function deleteSetAction(teamId: string, setId: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.deleteSet(user.id, setIdSchema.parse(setId) as SetId)
@@ -170,10 +156,7 @@ export async function reorderAction(
   }
 }
 
-export async function moveSetAction(
-  setId: string,
-  toTeamId: string,
-): Promise<ActionResult> {
+export async function moveSetAction(setId: string, toTeamId: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.moveSetToTeam({
@@ -188,10 +171,7 @@ export async function moveSetAction(
   }
 }
 
-export async function copySetAction(
-  setId: string,
-  toTeamId: string,
-): Promise<ActionResult> {
+export async function copySetAction(setId: string, toTeamId: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.copySetToTeam({
@@ -228,10 +208,7 @@ export async function saveToBoxAction(setId: string): Promise<ActionResult> {
   }
 }
 
-export async function pullFromBoxAction(
-  setId: string,
-  toTeamId: string,
-): Promise<ActionResult> {
+export async function pullFromBoxAction(setId: string, toTeamId: string): Promise<ActionResult> {
   try {
     const user = await requireUser(new Date())
     await repo.pullFromBox({

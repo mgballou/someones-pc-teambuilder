@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { eq } from 'drizzle-orm'
 import type { PokemonSet, SetId, StatSpread } from '@spc/core'
 import { EMPTY_EVS, PERFECT_IVS, abilityId, formatId, itemId, moveId, speciesId } from '@spc/core'

@@ -32,14 +32,7 @@ export type SpreadEditorProps = {
   readonly onChange: (next: { readonly evs: StatSpread; readonly ivs: StatSpread }) => void
 }
 
-export function SpreadEditor({
-  baseStats,
-  evs,
-  ivs,
-  nature,
-  level,
-  onChange,
-}: SpreadEditorProps) {
+export function SpreadEditor({ baseStats, evs, ivs, nature, level, onChange }: SpreadEditorProps) {
   const used = STATS.reduce((sum, stat) => sum + evs[stat], 0)
   const remaining = MAX_EV_TOTAL - used
   const over = remaining < 0
@@ -102,11 +95,7 @@ export function SpreadEditor({
                     </span>
                   )}
                   {multiplier < 1 && (
-                    <span
-                      className="ml-0.5"
-                      style={{ color: 'var(--danger)' }}
-                      title="Nature ×0.9"
-                    >
+                    <span className="ml-0.5" style={{ color: 'var(--danger)' }} title="Nature ×0.9">
                       −
                     </span>
                   )}

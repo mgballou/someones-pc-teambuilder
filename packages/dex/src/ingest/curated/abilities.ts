@@ -14,10 +14,8 @@ export const UNSUPPRESSABLE_ABILITIES: ReadonlySet<string> = new Set([
   'comatose',
   'commander',
   'disguise',
-  'embody-aspect-cornerstone',
-  'embody-aspect-hearthflame',
-  'embody-aspect-teal',
-  'embody-aspect-wellspring',
+  /** PokéAPI carries one `embody-aspect`, not one per mask. */
+  'embody-aspect',
   'gulp-missile',
   'ice-face',
   'multitype',
