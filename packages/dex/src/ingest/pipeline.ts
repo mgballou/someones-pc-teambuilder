@@ -22,7 +22,7 @@ import { IngestError } from '../errors.js'
 import { normalizeAbility } from './abilities.js'
 import { megaStonesByHolder, normalizeItem } from './items.js'
 import { learnsetOf } from './learnsets.js'
-import { normalizeMove } from './moves.js'
+import { isMainSeriesMove, normalizeMove } from './moves.js'
 import { evolvingSpeciesFrom, normalizeSpecies } from './species.js'
 
 export type IngestResult = {
@@ -58,13 +58,17 @@ export async function ingest(
     fetch: async (name) => normalizeAbility(await client.ability(name)),
   })
 
-  const moves = await walk({
+  const moveResults = await walk({
     stage: 'moves',
     names: await client.moveIndex(),
     concurrency,
     report,
-    fetch: async (name) => normalizeMove(await client.move(name)),
+    fetch: async (name) => {
+      const response = await client.move(name)
+      return isMainSeriesMove(response) ? normalizeMove(response) : null
+    },
   })
+  const moves = moveResults.filter((move): move is Move => move !== null)
 
   const items = await walk({
     stage: 'items',

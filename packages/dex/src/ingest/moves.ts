@@ -78,6 +78,18 @@ const FOE_TARGETS: ReadonlySet<MoveTarget> = new Set<MoveTarget>([
   'random-opponent',
 ])
 
+/**
+ * False for the twenty Shadow moves from Colosseum and XD.
+ *
+ * They carry a `shadow` type, which is not one of the eighteen, and no
+ * generation IX Pokémon can learn one. They are dropped rather than coerced —
+ * a Shadow Rush typed Normal would be a move in the picker that does not
+ * exist in the game the app is about.
+ */
+export function isMainSeriesMove(response: MoveResponse): boolean {
+  return isPokemonType(response.type.name)
+}
+
 export function normalizeMove(response: MoveResponse): Move {
   const name = response.name
   const target = TARGETS[response.target.name]
