@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { PokemonSet, SetId, StatSpread } from '@spc/core'
 import { EMPTY_EVS, PERFECT_IVS, abilityId, formatId, itemId, moveId, speciesId } from '@spc/core'
-import { loadDex } from '@spc/dex'
+import { dex as loadDex } from '@spc/dex'
 import { db } from './client.js'
 import { pokemonSets, teams, users } from './schema.js'
 import { hashPassword } from '../auth/session.js'

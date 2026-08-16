@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { Dex, Format, FormatId, Species, SpeciesId } from '@spc/core'
 import { requireFormat } from '@spc/core'
-import { loadDex } from '@spc/dex'
+import { dex as loadDex } from '@spc/dex'
 
 /**
  * The app's single handle on the dataset.
