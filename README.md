@@ -10,6 +10,11 @@ _Most of this page is written in the vocabulary of competitive play. There is a
 [glossary](#the-vocabulary) below that maps each term to the type that models it, and if you are
 here for the code, start at [Technical skeleton](#technical-skeleton)._
 
+![The bench: six slots under one format, with the standing counts in the header.](docs/assets/bench.png)
+
+_The bench. Six slots, the format's rules applied live, and the three numbers a builder checks
+most: how full the team is, how many rules it breaks, and how concentrated its weaknesses are._
+
 ---
 
 ## What it does
@@ -30,6 +35,16 @@ Four analysis panels, each a pure function of the team as it stands:
 | **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.  |
 | **Coverage** | What the team's moves hit, and what several members share a weakness to.      |
 | **Legality** | Every violated rule, named, with the source of that rule beside it.           |
+
+![The coverage grid: every member against all eighteen attacking types, with shared weaknesses ranked beside it.](docs/assets/coverage.png)
+
+_Every cell prints its multiplier, so the grid never relies on color alone. Read across a row for
+one Pokémon's weaknesses, down a column to count how many members share one._
+
+![The damage panel: attacker, defender and field on the left, all sixteen rolls on the right.](docs/assets/damage.png)
+
+_The calculator returns all sixteen rolls. It runs in the browser against a `Dex` built from the
+few records the calculation touches, so changing the weather costs no request._
 
 Teams import and export as Showdown pastes, which is how the ecosystem already shares them.
 
