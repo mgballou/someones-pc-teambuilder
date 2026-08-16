@@ -1,0 +1,1883 @@
+{
+  "landorus-incarnate": {
+    "id": 645,
+    "name": "landorus-incarnate",
+    "is_default": true,
+    "height": 15,
+    "weight": 680,
+    "species": {
+      "name": "landorus"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "ground"
+        }
+      },
+      {
+        "slot": 2,
+        "type": {
+          "name": "flying"
+        }
+      }
+    ],
+    "abilities": [
+      {
+        "slot": 1,
+        "is_hidden": false,
+        "ability": {
+          "name": "sand-force"
+        }
+      },
+      {
+        "slot": 3,
+        "is_hidden": true,
+        "ability": {
+          "name": "sheer-force"
+        }
+      }
+    ],
+    "stats": [
+      {
+        "base_stat": 89,
+        "stat": {
+          "name": "hp"
+        }
+      },
+      {
+        "base_stat": 125,
+        "stat": {
+          "name": "attack"
+        }
+      },
+      {
+        "base_stat": 90,
+        "stat": {
+          "name": "defense"
+        }
+      },
+      {
+        "base_stat": 115,
+        "stat": {
+          "name": "special-attack"
+        }
+      },
+      {
+        "base_stat": 80,
+        "stat": {
+          "name": "special-defense"
+        }
+      },
+      {
+        "base_stat": 101,
+        "stat": {
+          "name": "speed"
+        }
+      }
+    ],
+    "moves": [
+      {
+        "move": {
+          "name": "swords-dance"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "earthquake"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "rock-slide"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "protect"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "sludge-bomb"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "knock-off"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "u-turn"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "stealth-rock"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "landorus-therian": {
+    "id": 10021,
+    "name": "landorus-therian",
+    "is_default": false,
+    "height": 13,
+    "weight": 680,
+    "species": {
+      "name": "landorus"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "ground"
+        }
+      },
+      {
+        "slot": 2,
+        "type": {
+          "name": "flying"
+        }
+      }
+    ],
+    "abilities": [
+      {
+        "slot": 1,
+        "is_hidden": false,
+        "ability": {
+          "name": "intimidate"
+        }
+      }
+    ],
+    "stats": [
+      {
+        "base_stat": 89,
+        "stat": {
+          "name": "hp"
+        }
+      },
+      {
+        "base_stat": 145,
+        "stat": {
+          "name": "attack"
+        }
+      },
+      {
+        "base_stat": 90,
+        "stat": {
+          "name": "defense"
+        }
+      },
+      {
+        "base_stat": 105,
+        "stat": {
+          "name": "special-attack"
+        }
+      },
+      {
+        "base_stat": 80,
+        "stat": {
+          "name": "special-defense"
+        }
+      },
+      {
+        "base_stat": 91,
+        "stat": {
+          "name": "speed"
+        }
+      }
+    ],
+    "moves": [
+      {
+        "move": {
+          "name": "swords-dance"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "earthquake"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "rock-slide"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "protect"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "sludge-bomb"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "knock-off"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "u-turn"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "stealth-rock"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "dusclops": {
+    "id": 356,
+    "name": "dusclops",
+    "is_default": true,
+    "height": 16,
+    "weight": 306,
+    "species": {
+      "name": "dusclops"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "ghost"
+        }
+      }
+    ],
+    "abilities": [
+      {
+        "slot": 1,
+        "is_hidden": false,
+        "ability": {
+          "name": "pressure"
+        }
+      },
+      {
+        "slot": 3,
+        "is_hidden": true,
+        "ability": {
+          "name": "frisk"
+        }
+      }
+    ],
+    "stats": [
+      {
+        "base_stat": 40,
+        "stat": {
+          "name": "hp"
+        }
+      },
+      {
+        "base_stat": 70,
+        "stat": {
+          "name": "attack"
+        }
+      },
+      {
+        "base_stat": 130,
+        "stat": {
+          "name": "defense"
+        }
+      },
+      {
+        "base_stat": 60,
+        "stat": {
+          "name": "special-attack"
+        }
+      },
+      {
+        "base_stat": 130,
+        "stat": {
+          "name": "special-defense"
+        }
+      },
+      {
+        "base_stat": 25,
+        "stat": {
+          "name": "speed"
+        }
+      }
+    ],
+    "moves": [
+      {
+        "move": {
+          "name": "earthquake"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "ruby-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "emerald"
+            }
+          },
+          {
+            "version_group": {
+              "name": "firered-leafgreen"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "colosseum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "xd"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "night-shade"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "ruby-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "emerald"
+            }
+          },
+          {
+            "version_group": {
+              "name": "firered-leafgreen"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "colosseum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "xd"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "rock-slide"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "emerald"
+            }
+          },
+          {
+            "version_group": {
+              "name": "firered-leafgreen"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "protect"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "ruby-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "emerald"
+            }
+          },
+          {
+            "version_group": {
+              "name": "firered-leafgreen"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "colosseum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "xd"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "pain-split"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "shadow-ball"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "ruby-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "emerald"
+            }
+          },
+          {
+            "version_group": {
+              "name": "firered-leafgreen"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "colosseum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "xd"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "legends-arceus"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "will-o-wisp"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "ruby-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "emerald"
+            }
+          },
+          {
+            "version_group": {
+              "name": "firered-leafgreen"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "diamond-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "platinum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "heartgold-soulsilver"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-white"
+            }
+          },
+          {
+            "version_group": {
+              "name": "colosseum"
+            }
+          },
+          {
+            "version_group": {
+              "name": "xd"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "black-2-white-2"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "x-y"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "omega-ruby-alpha-sapphire"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sun-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "ultra-sun-ultra-moon"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "sword-shield"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "brilliant-diamond-shining-pearl"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          },
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "ogerpon-wellspring-mask": {
+    "id": 10273,
+    "name": "ogerpon-wellspring-mask",
+    "is_default": false,
+    "height": 12,
+    "weight": 398,
+    "species": {
+      "name": "ogerpon"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "grass"
+        }
+      },
+      {
+        "slot": 2,
+        "type": {
+          "name": "water"
+        }
+      }
+    ],
+    "abilities": [
+      {
+        "slot": 1,
+        "is_hidden": false,
+        "ability": {
+          "name": "water-absorb"
+        }
+      }
+    ],
+    "stats": [
+      {
+        "base_stat": 80,
+        "stat": {
+          "name": "hp"
+        }
+      },
+      {
+        "base_stat": 120,
+        "stat": {
+          "name": "attack"
+        }
+      },
+      {
+        "base_stat": 84,
+        "stat": {
+          "name": "defense"
+        }
+      },
+      {
+        "base_stat": 60,
+        "stat": {
+          "name": "special-attack"
+        }
+      },
+      {
+        "base_stat": 96,
+        "stat": {
+          "name": "special-defense"
+        }
+      },
+      {
+        "base_stat": 110,
+        "stat": {
+          "name": "speed"
+        }
+      }
+    ],
+    "moves": [
+      {
+        "move": {
+          "name": "swords-dance"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "protect"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "knock-off"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "u-turn"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      },
+      {
+        "move": {
+          "name": "ivy-cudgel"
+        },
+        "version_group_details": [
+          {
+            "version_group": {
+              "name": "scarlet-violet"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

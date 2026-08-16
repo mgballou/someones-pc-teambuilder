@@ -19,7 +19,10 @@ export default async function SetEditorPage({
   const species = catalog.species(view.set.species)
   if (species === undefined) notFound()
 
-  const abilities = [...species.abilities, ...(species.hiddenAbility === null ? [] : [species.hiddenAbility])]
+  const abilities = [
+    ...species.abilities,
+    ...(species.hiddenAbility === null ? [] : [species.hiddenAbility]),
+  ]
     .map((id) => catalog.ability(id))
     .flatMap((ability) => (ability === undefined ? [] : [{ id: ability.id, name: ability.name }]))
 

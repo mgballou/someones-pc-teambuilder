@@ -16,9 +16,9 @@ export default async function LandingPage() {
         A planning companion for competitive Pokémon.
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-text-dim">
-        Build sets, arrange them into teams under a format, and see what you built — damage
-        rolls, speed tiers, coverage gaps, and whether it is legal where you intend to play it.
-        Built for VGC and Smogon singles.
+        Build sets, arrange them into teams under a format, and see what you built — damage rolls,
+        speed tiers, coverage gaps, and whether it is legal where you intend to play it. Built for
+        VGC and Smogon singles.
       </p>
 
       <ul className="mt-8 grid gap-px overflow-hidden rounded-panel border border-line bg-line text-sm">
@@ -42,9 +42,9 @@ export default async function LandingPage() {
       </div>
 
       <p className="mt-10 text-[0.6875rem] leading-relaxed text-text-faint">
-        Legality rulesets are maintained by hand and every one shows its source and the date it
-        was last checked. Species, move and item data comes from PokéAPI. This tool calculates;
-        it does not simulate battles, and it has no usage statistics.
+        Legality rulesets are maintained by hand and every one shows its source and the date it was
+        last checked. Species, move and item data comes from PokéAPI. This tool calculates; it does
+        not simulate battles, and it has no usage statistics.
       </p>
     </div>
   )
@@ -53,9 +53,7 @@ export default async function LandingPage() {
 function Row({ term, detail }: { readonly term: string; readonly detail: string }) {
   return (
     <li className="grid grid-cols-[7rem_1fr] gap-3 bg-panel px-3 py-2">
-      <span className="text-xs font-semibold uppercase tracking-wider text-text-faint">
-        {term}
-      </span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-text-faint">{term}</span>
       <span className="text-xs text-text-dim">{detail}</span>
     </li>
   )

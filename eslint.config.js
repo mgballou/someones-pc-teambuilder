@@ -8,6 +8,12 @@ export default tseslint.config(
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
+      // A leading underscore is the codebase's way of saying "destructured to
+      // discard it" — most often to omit immutable columns from an update.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+      ],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       'no-restricted-syntax': [
         'error',

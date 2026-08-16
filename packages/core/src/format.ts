@@ -128,9 +128,7 @@ export type FormatSource = {
 }
 
 export function levelFor(format: Format, requested: number): number {
-  return format.level.kind === 'fixed'
-    ? format.level.level
-    : Math.min(requested, format.level.max)
+  return format.level.kind === 'fixed' ? format.level.level : Math.min(requested, format.level.max)
 }
 
 export function hasClause(format: Format, clause: Clause): boolean {

@@ -17,8 +17,8 @@ export default function FormatsPage() {
         <h1 className="text-base font-semibold tracking-tight">Formats</h1>
         <p className="mt-1 max-w-2xl text-xs leading-relaxed text-text-dim">
           Legality rulesets are maintained by hand. PokéAPI has no concept of a tier or a
-          regulation, so every ruleset below names its authority and the date it was last
-          checked against that authority.
+          regulation, so every ruleset below names its authority and the date it was last checked
+          against that authority.
         </p>
       </div>
 
@@ -67,8 +67,8 @@ export default function FormatsPage() {
               )}
 
               <SourceNote>
-                Source: {format.source.authority.toUpperCase()} · {format.source.citation} ·
-                Last checked {format.source.verifiedOn}.
+                Source: {format.source.authority.toUpperCase()} · {format.source.citation} · Last
+                checked {format.source.verifiedOn}.
               </SourceNote>
             </Panel>
           </li>

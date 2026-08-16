@@ -24,19 +24,11 @@ export function TeamHeader({ header }: { readonly header: TeamHeaderView }) {
         </div>
 
         <dl className="flex items-center gap-4 text-xs">
-          <Standing label="Members">
-            {formatCount(header.memberCount, header.teamSize)}
-          </Standing>
-          <Standing
-            label="Problems"
-            tone={header.violationCount > 0 ? 'danger' : 'ok'}
-          >
+          <Standing label="Members">{formatCount(header.memberCount, header.teamSize)}</Standing>
+          <Standing label="Problems" tone={header.violationCount > 0 ? 'danger' : 'ok'}>
             {header.violationCount}
           </Standing>
-          <Standing
-            label="Shared weak"
-            tone={header.sharedWeaknessCount > 2 ? 'warn' : undefined}
-          >
+          <Standing label="Shared weak" tone={header.sharedWeaknessCount > 2 ? 'warn' : undefined}>
             {header.sharedWeaknessCount}
           </Standing>
         </dl>
@@ -57,7 +49,7 @@ function Standing({
   children,
 }: {
   readonly label: string
-  readonly tone?: 'danger' | 'warn' | 'ok'
+  readonly tone?: 'danger' | 'warn' | 'ok' | undefined
   readonly children: React.ReactNode
 }) {
   const color =

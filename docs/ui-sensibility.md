@@ -17,20 +17,20 @@ what the code has to produce.
 Three earlier versions shipped **Level 0** and called it an interface. Level 0 is real work and
 it is not enough. **Level 1 is the bar.**
 
-|            | **Level 0 — it works**                        | **Level 1 — the bar**                                                     |
-| ---------- | --------------------------------------------- | ------------------------------------------------------------------------- |
-| Flow       | Pages: teams index, team show, pokemon edit.  | A bench. The team and its consequences on screen together.                |
-| Landing    | A hero and a Sign Up button.                  | A box with teams already in it, and one obvious next move.                |
-| Unit       | A Pokémon row.                                | **The set.** Species plus spread plus moves, judged as one thing.         |
-| Actions    | Add, Edit, Delete, Save, all equal.           | **One primary per region.** Everything else is quiet.                     |
-| Feedback   | Save, then reload to see the result.          | Analysis updates as you edit. The calc says what it did not model.        |
-| Dead ends  | "No pokemon found."                           | Every empty state names the one thing to do and offers it.                |
-| Color      | A type-colored banner, because Pokémon.       | Eighteen hues reserved for type identity. Nothing else borrows them.      |
-| Depth      | A border, sometimes.                          | A named surface stack. Panel, slot, well. Each height is a decision.      |
-| Numbers    | `text-sm`, proportional, ragged.              | Tabular figures, aligned, monospace. A stat column you can scan.          |
-| Frame      | Routes swap the whole view.                   | A persistent team header. The subnav swaps one panel.                     |
-| Waiting    | Spinner over everything.                      | Placeholders **in place**, sized to content. Nothing unmounts.            |
-| Tone       | "Your team is looking great!"                 | "4 of 6." The person is working.                                          |
+|           | **Level 0 — it works**                       | **Level 1 — the bar**                                                |
+| --------- | -------------------------------------------- | -------------------------------------------------------------------- |
+| Flow      | Pages: teams index, team show, pokemon edit. | A bench. The team and its consequences on screen together.           |
+| Landing   | A hero and a Sign Up button.                 | A box with teams already in it, and one obvious next move.           |
+| Unit      | A Pokémon row.                               | **The set.** Species plus spread plus moves, judged as one thing.    |
+| Actions   | Add, Edit, Delete, Save, all equal.          | **One primary per region.** Everything else is quiet.                |
+| Feedback  | Save, then reload to see the result.         | Analysis updates as you edit. The calc says what it did not model.   |
+| Dead ends | "No pokemon found."                          | Every empty state names the one thing to do and offers it.           |
+| Color     | A type-colored banner, because Pokémon.      | Eighteen hues reserved for type identity. Nothing else borrows them. |
+| Depth     | A border, sometimes.                         | A named surface stack. Panel, slot, well. Each height is a decision. |
+| Numbers   | `text-sm`, proportional, ragged.             | Tabular figures, aligned, monospace. A stat column you can scan.     |
+| Frame     | Routes swap the whole view.                  | A persistent team header. The subnav swaps one panel.                |
+| Waiting   | Spinner over everything.                     | Placeholders **in place**, sized to content. Nothing unmounts.       |
+| Tone      | "Your team is looking great!"                | "4 of 6." The person is working.                                     |
 
 The gap is not polish. Each row on the right is a decision the left column never made.
 
@@ -148,11 +148,11 @@ Every terminal state names what happens next:
 
 ### 2.9 Choose the depth of each step
 
-| Depth                      | Costs                            | Use for                                            |
-| -------------------------- | -------------------------------- | -------------------------------------------------- |
-| **A full-screen takeover** | Changes where you are            | Sign in. Deleting a team.                          |
+| Depth                      | Costs                            | Use for                                                               |
+| -------------------------- | -------------------------------- | --------------------------------------------------------------------- |
+| **A full-screen takeover** | Changes where you are            | Sign in. Deleting a team.                                             |
 | **An overlay**             | Borrows attention, gives it back | Picking a species, a move, an item. Choosing a team to move a set to. |
-| **An inline reveal**       | Nothing                          | Quick edits on a card. A calc's detail. A violation's explanation. |
+| **An inline reveal**       | Nothing                          | Quick edits on a card. A calc's detail. A violation's explanation.    |
 
 **The bench must be actionable without scrolling on a laptop.**
 
@@ -179,15 +179,15 @@ loading and saving touch the server. **Never round-trip to recalculate.**
 Every region answers "what is the one thing to do here" before it is designed. That action
 carries the accent; everything else in the region is quiet.
 
-| Region          | The one action        |
-| --------------- | --------------------- |
-| Empty Box       | Start a team          |
-| Box, populated  | Open a team           |
-| Empty slot      | Add a Pokémon         |
-| Filled slot     | Edit the set          |
-| Set editor      | Done                  |
-| Damage panel    | Choose the other side |
-| Legality panel  | Fix the first problem |
+| Region         | The one action        |
+| -------------- | --------------------- |
+| Empty Box      | Start a team          |
+| Box, populated | Open a team           |
+| Empty slot     | Add a Pokémon         |
+| Filled slot    | Edit the set          |
+| Set editor     | Done                  |
+| Damage panel   | Choose the other side |
+| Legality panel | Fix the first problem |
 
 **Navigation never takes the accent.** A nav item is not an action.
 
@@ -241,12 +241,12 @@ thing has a front face.
 
 A named stack, and every element's height is a decision:
 
-| Surface          | What sits on it                              |
-| ---------------- | -------------------------------------------- |
-| `page`           | The backdrop behind the chrome                |
-| `panel`          | The box body, the bench, an analysis card     |
-| `raised`         | A filled slot, a set card                     |
-| `well`           | An empty slot, an input, the paste box        |
+| Surface  | What sits on it                           |
+| -------- | ----------------------------------------- |
+| `page`   | The backdrop behind the chrome            |
+| `panel`  | The box body, the bench, an analysis card |
+| `raised` | A filled slot, a set card                 |
+| `well`   | An empty slot, an input, the paste box    |
 
 Rules:
 

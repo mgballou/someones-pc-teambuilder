@@ -239,8 +239,8 @@ export function SetEditor({
 
           <p className="mt-2 text-[0.6875rem] leading-relaxed text-text-faint">
             Learnsets are by generation, not by method. Egg chains, event-only moves and version
-            exclusives are not modelled, so this list is broader than what one save file can
-            legally produce.
+            exclusives are not modelled, so this list is broader than what one save file can legally
+            produce.
           </p>
         </Panel>
       </div>

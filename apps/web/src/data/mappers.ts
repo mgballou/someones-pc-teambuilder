@@ -1,12 +1,5 @@
 import type { PokemonSet, SetId, Team, TeamId } from '@spc/core'
-import {
-  abilityId,
-  EMPTY_EVS,
-  formatId,
-  itemId,
-  PERFECT_IVS,
-  speciesId,
-} from '@spc/core'
+import { abilityId, EMPTY_EVS, formatId, itemId, PERFECT_IVS, speciesId } from '@spc/core'
 import type { PokemonSetRow, TeamRow } from '../db/schema.js'
 
 /**
@@ -73,9 +66,7 @@ export type TeamWithMembers = {
 }
 
 export function toDomainTeam({ team, members }: TeamWithMembers): Team {
-  const ordered = [...members].sort(
-    (left, right) => (left.position ?? 0) - (right.position ?? 0),
-  )
+  const ordered = [...members].sort((left, right) => (left.position ?? 0) - (right.position ?? 0))
   return {
     id: team.id as TeamId,
     name: team.name,

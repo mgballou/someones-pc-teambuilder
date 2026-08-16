@@ -107,23 +107,14 @@ export type MoveMemberResult = {
  * Move one set from one team to another. Returns both teams so the caller
  * commits them together — a half-applied move loses a Pokémon.
  */
-export function moveMemberBetween(
-  from: Team,
-  to: Team,
-  setId: SetId,
-): MoveMemberResult | null {
+export function moveMemberBetween(from: Team, to: Team, setId: SetId): MoveMemberResult | null {
   const member = findMember(from, setId)
   if (member === undefined) return null
   return { from: removeMember(from, setId), to: addMember(to, member) }
 }
 
 /** Copy one set into another team, leaving the original where it is. */
-export function copyMemberTo(
-  from: Team,
-  to: Team,
-  setId: SetId,
-  newId: SetId,
-): Team | null {
+export function copyMemberTo(from: Team, to: Team, setId: SetId, newId: SetId): Team | null {
   const member = findMember(from, setId)
   if (member === undefined) return null
   return addMember(to, cloneSet(member, newId))

@@ -52,14 +52,9 @@ const patchSchema = z.object({
 
 export type SetPatch = z.infer<typeof patchSchema>
 
-export type SaveSetResult =
-  | { readonly ok: true }
-  | { readonly ok: false; readonly message: string }
+export type SaveSetResult = { readonly ok: true } | { readonly ok: false; readonly message: string }
 
-export async function updateSetAction(
-  setId: string,
-  patch: SetPatch,
-): Promise<SaveSetResult> {
+export async function updateSetAction(setId: string, patch: SetPatch): Promise<SaveSetResult> {
   try {
     const user = await requireUser(new Date())
     const parsed = patchSchema.parse(patch)
@@ -114,14 +109,16 @@ function applyPatch(set: PokemonSet, patch: SetPatch): PokemonSet {
     notes: patch.notes ?? set.notes,
     evs: patch.evs === undefined ? set.evs : clampSpread(patch.evs, MAX_EV_PER_STAT),
     ivs: patch.ivs === undefined ? set.ivs : clampSpread(patch.ivs, MAX_IV),
-    moves:
-      patch.moves === undefined
-        ? set.moves
-        : ([0, 1, 2, 3].map((index) => {
-            const value = patch.moves?.[index]
-            return value === undefined || value === null || value === '' ? null : moveId(value)
-          }) as PokemonSet['moves']),
+    moves: patch.moves === undefined ? set.moves : toMoveSlots(patch.moves),
   }
+}
+
+function toMoveSlots(values: readonly (string | null)[]): PokemonSet['moves'] {
+  const slot = (index: number): PokemonSet['moves'][number] => {
+    const value = values[index]
+    return value === undefined || value === null || value === '' ? null : moveId(value)
+  }
+  return [slot(0), slot(1), slot(2), slot(3)]
 }
 
 function normalizeNickname(value: string | null): string | null {
@@ -130,10 +127,7 @@ function normalizeNickname(value: string | null): string | null {
   return trimmed === '' ? null : trimmed
 }
 
-function clampSpread(
-  spread: Record<string, number>,
-  max: number,
-): PokemonSet['evs'] {
+function clampSpread(spread: Record<string, number>, max: number): PokemonSet['evs'] {
   return Object.fromEntries(
     STATS.map((stat) => [stat, Math.max(0, Math.min(max, spread[stat] ?? 0))]),
   ) as PokemonSet['evs']

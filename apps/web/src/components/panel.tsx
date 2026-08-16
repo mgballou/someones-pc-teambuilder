@@ -25,9 +25,7 @@ export function Panel({
     <section className={`panel overflow-hidden ${className}`}>
       {title !== undefined && (
         <header className="flex items-center gap-3 border-b border-line bg-well/50 px-3 py-2">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-text-dim">
-            {title}
-          </h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-text-dim">{title}</h2>
           {subtitle !== undefined && (
             <span className="truncate text-xs text-text-faint">{subtitle}</span>
           )}

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
-import { speciesId } from '@spc/core'
+import { formatId, speciesId } from '@spc/core'
 import { currentUser } from '../../auth/session.js'
 import { listTeams } from '../../data/teams.js'
 import { dex } from '../../lib/dex.js'
@@ -46,7 +46,7 @@ export default async function TeamsPage() {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {teams.map((team) => {
-            const format = dex().format(team.format)
+            const format = dex().format(formatId(team.format))
             return (
               <li key={team.id}>
                 <Link href={`/teams/${team.id}`} className="panel block p-3 hover:bg-well/40">

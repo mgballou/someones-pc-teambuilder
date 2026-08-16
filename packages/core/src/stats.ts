@@ -151,13 +151,7 @@ export type ComputeSpreadInput = {
 }
 
 /** Every final stat for a set, in one pass. */
-export function computeSpread({
-  base,
-  ivs,
-  evs,
-  level,
-  nature,
-}: ComputeSpreadInput): StatSpread {
+export function computeSpread({ base, ivs, evs, level, nature }: ComputeSpreadInput): StatSpread {
   const hp = computeHp({ base: base.hp, iv: ivs.hp, ev: evs.hp, level })
   const other = Object.fromEntries(
     BOOSTABLE_STATS.map((stat) => [

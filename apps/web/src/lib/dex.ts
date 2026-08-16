@@ -15,8 +15,9 @@ import { loadDex } from '@spc/dex'
 let cached: Dex | null = null
 
 export function dex(): Dex {
-  cached ??= loadDex()
-  return cached
+  const loaded = cached ?? loadDex()
+  cached = loaded
+  return loaded
 }
 
 export function formatOf(formatId: FormatId): Format {

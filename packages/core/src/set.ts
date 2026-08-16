@@ -38,12 +38,7 @@ export type PokemonSet = {
   readonly notes: string
 }
 
-export type MoveSlots = readonly [
-  MoveId | null,
-  MoveId | null,
-  MoveId | null,
-  MoveId | null,
-]
+export type MoveSlots = readonly [MoveId | null, MoveId | null, MoveId | null, MoveId | null]
 
 export const EMPTY_MOVES: MoveSlots = [null, null, null, null]
 

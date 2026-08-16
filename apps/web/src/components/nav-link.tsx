@@ -8,7 +8,13 @@ import type { ReactNode } from 'react'
  * Current position is always legible. ui-sensibility.md §7.2.
  * The active state is a surface change, never the accent — §4.2.
  */
-export function NavLink({ href, children }: { readonly href: string; readonly children: ReactNode }) {
+export function NavLink({
+  href,
+  children,
+}: {
+  readonly href: string
+  readonly children: ReactNode
+}) {
   const pathname = usePathname()
   const active = pathname === href || pathname.startsWith(`${href}/`)
 
