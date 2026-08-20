@@ -2,64 +2,82 @@
   "project": "someones-pc",
   "base_url": "http://localhost:3000",
   "viewport": { "width": 430, "height": 932 },
+  "auth": {
+    "demo": { "email": "demo@someones.pc", "password": "competitive" },
+    "signed-out": null
+  },
   "screens": [
     {
       "name": "landing",
       "path": "/",
+      "auth": "signed-out",
+      "note": "Only reachable signed out. A signed-in session bounces to /teams. Use a private window.",
       "question": "Does this page say what the tool does?",
       "answers": ["clear", "vague", "unsure"]
     },
     {
       "name": "teams",
       "path": "/teams",
+      "auth": "demo",
       "question": "Can you tell the three teams apart at a glance?",
       "answers": ["yes", "no", "unsure"]
     },
     {
       "name": "bench",
       "path": "/teams/bdc4eece-3279-4968-b0ac-bd3ada1e2021",
+      "auth": "demo",
       "question": "At this width, is the slot grid readable?",
       "answers": ["readable", "cramped", "unsure"]
     },
     {
       "name": "set-editor",
       "path": "/teams/bdc4eece-3279-4968-b0ac-bd3ada1e2021/sets/866c3c78-4cf4-415d-b3fb-b5836d2d2f96",
+      "auth": "demo",
       "question": "Would you edit a spread on this screen?",
       "answers": ["yes", "no", "unsure"]
     },
     {
       "name": "damage",
       "path": "/teams/bdc4eece-3279-4968-b0ac-bd3ada1e2021/damage",
+      "auth": "demo",
+      "setup": "The panel holds no result on load. Type Garchomp into Defender > Species and tap the first match. Attacker defaults to Pelipper, Hurricane.",
       "question": "Are the sixteen rolls easy to read here?",
       "answers": ["easy", "cluttered", "unsure"]
     },
     {
       "name": "speed",
       "path": "/teams/bdc4eece-3279-4968-b0ac-bd3ada1e2021/speed",
+      "auth": "demo",
       "question": "Does the ladder show where your team sits?",
       "answers": ["yes", "no", "unsure"]
     },
     {
       "name": "coverage",
       "path": "/teams/bdc4eece-3279-4968-b0ac-bd3ada1e2021/coverage",
+      "auth": "demo",
       "question": "Is the type grid usable at phone width?",
       "answers": ["usable", "unusable", "unsure"]
     },
     {
       "name": "legality",
       "path": "/teams/bdc4eece-3279-4968-b0ac-bd3ada1e2021/legality",
+      "auth": "demo",
+      "note": "Reg H Rain is deliberately broken: 7 members, 2 Pelipper, 2 Focus Sash. Three violations.",
       "question": "Do the named violations tell you what to fix?",
       "answers": ["yes", "no", "unsure"]
     },
     {
       "name": "box",
       "path": "/box",
+      "auth": "demo",
+      "note": "Empty by design. The seed writes every set into a team, and the Box holds only teamless sets.",
       "question": "Does the empty Box tell you what to do next?",
       "answers": ["yes", "no", "unsure"]
     },
     {
       "name": "formats",
       "path": "/formats",
+      "auth": "demo",
       "question": "Is it obvious the rules were checked by hand?",
       "answers": ["obvious", "buried", "unsure"]
     }
