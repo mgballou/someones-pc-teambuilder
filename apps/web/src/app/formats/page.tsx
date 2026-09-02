@@ -7,6 +7,10 @@ import { formatCount } from '../../lib/format'
  * Formats are code, not rows, and every one shows where its rules came from.
  * This page exists so that source is inspectable rather than buried behind a
  * verdict. CLAUDE.md §Honesty rules.
+ *
+ * The verification date leads the key/value table rather than trailing the
+ * source note. It answers the question the page is asked — were these rules
+ * checked by hand, and when — and at the bottom nobody read it.
  */
 export default function FormatsPage() {
   const formats = dex().allFormats()
@@ -27,6 +31,9 @@ export default function FormatsPage() {
           <li key={format.id}>
             <Panel title={format.name} subtitle={format.shortName}>
               <dl className="grid grid-cols-[8rem_1fr] gap-x-3 gap-y-1 text-xs">
+                <dt className="text-text-faint">Last verified</dt>
+                <dd className="num">{format.source.verifiedOn}</dd>
+
                 <dt className="text-text-faint">Style</dt>
                 <dd className="capitalize">{format.style}</dd>
 
@@ -67,8 +74,7 @@ export default function FormatsPage() {
               )}
 
               <SourceNote>
-                Source: {format.source.authority.toUpperCase()} · {format.source.citation} · Last
-                checked {format.source.verifiedOn}.
+                Source: {format.source.authority.toUpperCase()} · {format.source.citation}
               </SourceNote>
             </Panel>
           </li>
