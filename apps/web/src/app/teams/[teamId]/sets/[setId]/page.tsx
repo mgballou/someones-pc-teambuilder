@@ -40,6 +40,7 @@ export default async function SetEditorPage({
               category: move.category,
               basePower: move.basePower,
               accuracy: move.accuracy,
+              powerVaries: move.variablePower !== null,
             },
           ]
     })
