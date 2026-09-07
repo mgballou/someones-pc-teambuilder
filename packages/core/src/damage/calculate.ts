@@ -12,6 +12,7 @@ import type { BoostableStat, StatSpread } from '../stats'
 import { applyBoost, computeSpread, STAT_LABEL } from '../stats'
 import type { AbilityEntry } from './abilities'
 import { abilityEntry, absorbsType, foeBasePowerModifier } from './abilities'
+import { conditionalPower } from './conditional-power'
 import { moveEffectiveness, readingAgainst, typeReadings } from './effectiveness'
 import { UncalculableMove, ImpossibleState } from './errors'
 import type { ItemHandler, ItemHook, ItemRole } from './items'
@@ -99,11 +100,6 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
 
   const override = moveOverride(moveRecord.id)
 
-  const moveType: TeraType =
-    override?.typeFromTera === true && attackerTera !== null
-      ? attackerTera
-      : (override?.typeFromSpecies?.[attackerSpecies.id] ?? moveRecord.type)
-
   const category: 'physical' | 'special' =
     override?.categoryFromStats === true && attackerTera !== null
       ? applyBoost(attackerStats.atk, attacker.boosts.atk) >
@@ -145,6 +141,17 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     types: defenderTypes,
   })
 
+  /**
+   * The type is settled after the views because Terrain Pulse asks whether its
+   * user is standing on the ground, and `grounded` is something a view knows.
+   */
+  const moveType: TeraType =
+    override?.typeFromTera === true && attackerTera !== null
+      ? attackerTera
+      : (override?.typeFromSpecies?.[attackerSpecies.id] ??
+        override?.typeFromField?.({ field, attacker: attackerView }) ??
+        moveRecord.type)
+
   const criticalHit = attacker.criticalHit || moveRecord.critRatio >= 3
   if (criticalHit && !attacker.criticalHit) {
     notes.add(`${moveRecord.name} always lands a critical hit, so one was applied.`)
@@ -164,7 +171,37 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   if (power.note !== null) notes.add(power.note)
 
   const teraPower = attackerTera === null ? undefined : override?.basePowerFromTera?.[attackerTera]
-  const rawPower = power.kind === 'power' ? (teraPower ?? power.power) : 0
+  const printedPower = power.kind === 'power' ? (teraPower ?? power.power) : 0
+
+  const chartEffectiveness = moveEffectiveness({
+    moveId: moveRecord.id,
+    moveType,
+    defenderTypes,
+    defenderTerastallized: defender.terastallized,
+  })
+
+  const hits = moveRecord.multiHit?.max ?? 1
+  const conditional = conditionalPower(moveRecord.id)
+  const conditionInput = {
+    move: moveRecord,
+    attacker: attackerView,
+    defender: defenderView,
+    field,
+    effectiveness: chartEffectiveness,
+    hit: 1,
+  }
+  if (conditional !== null) notes.add(conditional.note(conditionInput))
+
+  /**
+   * One power per hit. They only differ for Triple Axel and Triple Kick, and
+   * they are computed per hit rather than once because Technician reads the
+   * base power and so has to be asked the same question three times.
+   */
+  const rawPowers: readonly number[] = Array.from({ length: hits }, (_unused, index) => {
+    if (conditional?.effect.kind !== 'power') return printedPower
+    return conditional.effect.of({ ...conditionInput, hit: index + 1 })
+  })
+  const rawPower = rawPowers[0] ?? printedPower
 
   const provisional: ModifierContext = {
     move: moveRecord,
@@ -173,12 +210,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     attackStatName,
     defenseStatName,
     basePower: rawPower,
-    effectiveness: moveEffectiveness({
-      moveId: moveRecord.id,
-      moveType,
-      defenderTypes,
-      defenderTerastallized: defender.terastallized,
-    }),
+    effectiveness: chartEffectiveness,
     attacker: attackerView,
     defender: defenderView,
     field,
@@ -209,23 +241,30 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     return exactResult({ context, damage: power.damage, maxHp, currentHp, notes })
   }
 
-  const basePower = Math.max(
-    1,
-    applyModifier(
-      rawPower,
-      chainModifiers([
-        attackerEntry?.basePower?.(context) ?? null,
-        foeBasePowerModifier(defenderEntry, moveType),
-        itemModifier(attackerItem, (handler) => handler.basePower, context),
-        terrainPowerModifier(field.terrain, context),
-        override?.halvedByGrassyTerrain === true &&
-        field.terrain === 'grassy' &&
-        defenderView.grounded
-          ? MOD_HALF
-          : null,
-      ]),
-    ),
-  )
+  const basePowers = rawPowers.map((raw, index) => {
+    const hitContext: ModifierContext = { ...context, basePower: raw }
+    return Math.max(
+      1,
+      applyModifier(
+        raw,
+        chainModifiers([
+          conditional?.effect.kind === 'modifier'
+            ? conditional.effect.of({ ...conditionInput, hit: index + 1 })
+            : null,
+          attackerEntry?.basePower?.(hitContext) ?? null,
+          foeBasePowerModifier(defenderEntry, moveType),
+          itemModifier(attackerItem, (handler) => handler.basePower, hitContext),
+          terrainPowerModifier(field.terrain, hitContext),
+          override?.halvedByGrassyTerrain === true &&
+          field.terrain === 'grassy' &&
+          defenderView.grounded
+            ? MOD_HALF
+            : null,
+        ]),
+      ),
+    )
+  })
+  const basePower = basePowers[0] ?? 1
 
   const attackStat = resolveAttack({
     context,
@@ -287,27 +326,35 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   ])
 
   const levelFactor = Math.floor((2 * attacker.set.level) / 5 + 2)
-  const baseDamage =
-    Math.floor(Math.floor((levelFactor * basePower * attackStat) / defenseStat) / 50) + 2
+  const baseDamages = basePowers.map(
+    (hitPower) =>
+      Math.floor(Math.floor((levelFactor * hitPower * attackStat) / defenseStat) / 50) + 2,
+  )
 
-  const hits = moveRecord.multiHit?.max ?? 1
   if (moveRecord.multiHit !== null && moveRecord.multiHit.min !== moveRecord.multiHit.max) {
     notes.add(
       `${moveRecord.name} was calculated at ${hits} hits. It can land as few as ${moveRecord.multiHit.min}.`,
     )
   }
 
-  const rolls = RANDOM_FACTORS.map((factor) => {
-    let damage = baseDamage
-    if (spread) damage = applyModifier(damage, MOD_THREE_QUARTERS)
-    damage = applyModifier(damage, weatherMod)
-    if (criticalHit) damage = Math.floor(damage * 1.5)
-    damage = Math.floor((damage * factor) / 100)
-    damage = applyModifier(damage, stab)
-    damage = Math.floor(damage * effectiveness)
-    if (burned) damage = Math.floor(damage * 0.5)
-    return Math.max(1, applyModifier(damage, finalMod)) * hits
-  })
+  /**
+   * A roll is the sum across hits, which for every move but Triple Axel and
+   * Triple Kick is one number added to itself. Summing rather than multiplying
+   * is what lets a hit carry its own base power.
+   */
+  const rolls = RANDOM_FACTORS.map((factor) =>
+    baseDamages.reduce((total, baseDamage) => {
+      let damage = baseDamage
+      if (spread) damage = applyModifier(damage, MOD_THREE_QUARTERS)
+      damage = applyModifier(damage, weatherMod)
+      if (criticalHit) damage = Math.floor(damage * 1.5)
+      damage = Math.floor((damage * factor) / 100)
+      damage = applyModifier(damage, stab)
+      damage = Math.floor(damage * effectiveness)
+      if (burned) damage = Math.floor(damage * 0.5)
+      return total + Math.max(1, applyModifier(damage, finalMod))
+    }, 0),
+  )
 
   return {
     rolls,

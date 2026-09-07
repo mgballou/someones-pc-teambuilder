@@ -11,7 +11,11 @@ export type MoveOption = {
   readonly category: MoveCategory
   readonly basePower: number
   readonly accuracy: number | null
-  /** True when base power is decided in battle, as Gyro Ball's and Grass Knot's are. */
+  /**
+   * True when base power is decided in battle, as Gyro Ball's and Grass Knot's
+   * are — and as Knock Off's and Facade's are, which have a printed number the
+   * battle then changes.
+   */
   readonly powerVaries: boolean
 }
 
@@ -26,8 +30,11 @@ export type MoveOption = {
  * the numbers are labelled and tabular; the type is a badge, which is the one
  * sanctioned place for a type hue (§4.3).
  *
- * A move whose power is decided in battle says `varies` rather than showing a
- * dash beside a status move's genuine absence of power. CLAUDE.md §Honesty.
+ * A move with no printed power at all says `varies` where its power is decided
+ * in battle, rather than showing a dash beside a status move's genuine absence
+ * of power. A move that has a printed number keeps it, because the number is
+ * what the choice is made on even when a condition can move it. CLAUDE.md
+ * §Honesty.
  */
 export function MovePicker({
   slot,
@@ -184,8 +191,8 @@ function Reading({
 }
 
 function powerReading(move: MoveOption): string {
-  if (move.powerVaries) return 'varies'
-  return move.basePower === 0 ? '—' : String(move.basePower)
+  if (move.basePower > 0) return String(move.basePower)
+  return move.powerVaries ? 'varies' : '—'
 }
 
 function accuracyReading(move: MoveOption): string {

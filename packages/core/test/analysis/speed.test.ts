@@ -133,13 +133,13 @@ describe('the ladder', () => {
   it('computes the fastest benchmark from base stats', () => {
     const fastest = speedOf(bare).ladder.find((entry) => entry.kind === 'benchmark')
 
-    expect(fastest?.speed).toBe(194)
+    expect(fastest?.speed).toBe(195)
   })
 
   it('labels a benchmark by how it was computed', () => {
     const fastest = speedOf(bare).ladder.find((entry) => entry.kind === 'benchmark')
 
-    expect(fastest?.label).toBe('Max Speed Jolly Weavile')
+    expect(fastest?.label).toBe('Max Speed Jolly Talonflame')
   })
 
   it('draws benchmarks only from species the format allows', () => {

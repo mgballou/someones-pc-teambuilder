@@ -205,6 +205,11 @@ function statChangeTarget(response: MoveResponse, target: MoveTarget): 'user' | 
   return target === 'user' || target === 'users-field' ? 'user' : 'target'
 }
 
+/**
+ * Null here means PokéAPI printed a power. It is not a claim that the power is
+ * a constant, and nothing downstream may read it as one: the moves whose
+ * printed power a battle changes are `CONDITIONAL_POWER` in `@spc/core`.
+ */
 function variablePowerOf(response: MoveResponse): VariablePower | null {
   const curated = CURATED_VARIABLE_POWER[response.name]
   if (curated !== undefined) return curated

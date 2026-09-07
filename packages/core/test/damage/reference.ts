@@ -19,8 +19,9 @@ import {
   Move as ReferenceMove,
   Pokemon as ReferencePokemon,
 } from '@smogon/calc'
-import type { Nature, StatSpread, TeraType } from '../../src/index'
-import { moveId } from '../../src/index'
+import type { BoostSpread, Nature, StatSpread, TeraType } from '../../src/index'
+import { moveId, ZERO_BOOSTS } from '../../src/index'
+import type { Field, Status, Terrain, Weather } from '../../src/damage/index'
 import { calculate, DEFAULT_FIELD, newAttacker, newDefender } from '../../src/damage/index'
 import { fixtureDex } from '../fixtures/dex'
 import { buildSet } from './helpers'
@@ -29,6 +30,34 @@ const GEN = Generations.get(9)
 
 type ReferenceOptions = NonNullable<ConstructorParameters<typeof ReferencePokemon>[2]>
 type ReferenceTypeName = NonNullable<ReferenceOptions['teraType']>
+type ReferenceStatusName = NonNullable<ReferenceOptions['status']>
+type ReferenceFieldOptions = NonNullable<ConstructorParameters<typeof ReferenceField>[0]>
+type ReferenceWeatherName = NonNullable<ReferenceFieldOptions['weather']>
+type ReferenceTerrainName = NonNullable<ReferenceFieldOptions['terrain']>
+
+/** Our slugs against the reference's, for everything a scenario can set. */
+const REFERENCE_STATUS: Readonly<Record<Exclude<Status, 'none'>, ReferenceStatusName>> = {
+  burn: 'brn',
+  poison: 'psn',
+  'badly-poisoned': 'tox',
+  paralysis: 'par',
+  sleep: 'slp',
+  freeze: 'frz',
+}
+
+const REFERENCE_WEATHER: Readonly<Record<Exclude<Weather, 'none'>, ReferenceWeatherName>> = {
+  sun: 'Sun',
+  rain: 'Rain',
+  sand: 'Sand',
+  snow: 'Snow',
+}
+
+const REFERENCE_TERRAIN: Readonly<Record<Exclude<Terrain, 'none'>, ReferenceTerrainName>> = {
+  electric: 'Electric',
+  grassy: 'Grassy',
+  psychic: 'Psychic',
+  misty: 'Misty',
+}
 
 /** Our slugs against the reference's spelling, written out so neither drifts. */
 const REFERENCE_TYPE: Readonly<Record<TeraType, ReferenceTypeName>> = {
@@ -65,6 +94,21 @@ export type Combatant = {
   readonly nature?: Nature
   readonly evs?: Partial<StatSpread>
   readonly teraType?: TeraType
+  /** The fixture's item slug. */
+  readonly item?: string
+  /** The same item as `@smogon/calc` spells it. */
+  readonly referenceItem?: string
+  readonly status?: Status
+  readonly boosts?: Partial<BoostSpread>
+  /** Remaining HP as a fraction of maximum. */
+  readonly hpFraction?: number
+  /**
+   * The reference only applies Protosynthesis and Quark Drive when it has been
+   * told which stat they boost, and `'auto'` is how it is told to work it out.
+   * The calculator here always works it out, so a Paradox carrier has to say so
+   * or the two sides are answering different questions.
+   */
+  readonly boostedStat?: 'auto'
 }
 
 export type Scenario = {
@@ -80,66 +124,110 @@ export type Scenario = {
    * it too.
    */
   readonly stellarFirstUse?: boolean
+  readonly weather?: Weather
+  readonly terrain?: Terrain
+  /** How many times a multi-hit move lands. The reference needs telling. */
+  readonly hits?: number
 }
 
-function ours({ attacker, defender, move }: Scenario): readonly number[] {
+function setFor(combatant: Combatant) {
+  return buildSet({
+    species: combatant.species,
+    nature: combatant.nature ?? 'hardy',
+    evs: combatant.evs ?? {},
+    ability: combatant.ability,
+    item: combatant.item ?? null,
+    teraType: combatant.teraType ?? null,
+  })
+}
+
+function stateOf(combatant: Combatant) {
+  return {
+    set: setFor(combatant),
+    boosts: { ...ZERO_BOOSTS, ...(combatant.boosts ?? {}) },
+    hpFraction: combatant.hpFraction ?? 1,
+    status: combatant.status ?? 'none',
+    terastallized: combatant.teraType !== undefined,
+  }
+}
+
+function fieldFor(scenario: Scenario): Field {
+  return {
+    ...DEFAULT_FIELD,
+    weather: scenario.weather ?? 'none',
+    terrain: scenario.terrain ?? 'none',
+  }
+}
+
+function ours(scenario: Scenario): readonly number[] {
   return calculate({
-    attacker: newAttacker({
-      set: buildSet({
-        species: attacker.species,
-        nature: attacker.nature ?? 'hardy',
-        evs: attacker.evs ?? {},
-        ability: attacker.ability,
-        teraType: attacker.teraType ?? null,
-      }),
-      terastallized: attacker.teraType !== undefined,
-    }),
-    defender: newDefender({
-      set: buildSet({
-        species: defender.species,
-        nature: defender.nature ?? 'hardy',
-        evs: defender.evs ?? {},
-        ability: defender.ability,
-        teraType: defender.teraType ?? null,
-      }),
-      terastallized: defender.teraType !== undefined,
-    }),
-    move: moveId(move),
-    field: DEFAULT_FIELD,
+    attacker: newAttacker(stateOf(scenario.attacker)),
+    defender: newDefender(stateOf(scenario.defender)),
+    move: moveId(scenario.move),
+    field: fieldFor(scenario),
     dex: fixtureDex,
   }).rolls
 }
 
 function referencePokemon(combatant: Combatant): ReferencePokemon {
-  return new ReferencePokemon(GEN, combatant.reference, {
+  const options: ReferenceOptions = {
     level: 50,
     nature: capitalize(combatant.nature ?? 'hardy'),
     evs: combatant.evs ?? {},
+    boosts: combatant.boosts ?? {},
     ability: combatant.referenceAbility,
-    ...(combatant.teraType === undefined ? {} : { teraType: REFERENCE_TYPE[combatant.teraType] }),
-  })
+  }
+  if (combatant.teraType !== undefined) options.teraType = REFERENCE_TYPE[combatant.teraType]
+  if (combatant.referenceItem !== undefined) options.item = combatant.referenceItem
+  if (combatant.boostedStat !== undefined) options.boostedStat = combatant.boostedStat
+  if (combatant.status !== undefined && combatant.status !== 'none') {
+    options.status = REFERENCE_STATUS[combatant.status]
+  }
+  if (combatant.hpFraction === undefined) {
+    return new ReferencePokemon(GEN, combatant.reference, options)
+  }
+  const full = new ReferencePokemon(GEN, combatant.reference, options)
+  options.curHP = Math.max(1, Math.floor(full.maxHP() * combatant.hpFraction))
+  return new ReferencePokemon(GEN, combatant.reference, options)
 }
 
 function capitalize(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1)
 }
 
+function referenceField(scenario: Scenario): ReferenceField {
+  return new ReferenceField({
+    ...(scenario.weather === undefined || scenario.weather === 'none'
+      ? {}
+      : { weather: REFERENCE_WEATHER[scenario.weather] }),
+    ...(scenario.terrain === undefined || scenario.terrain === 'none'
+      ? {}
+      : { terrain: REFERENCE_TERRAIN[scenario.terrain] }),
+  })
+}
+
 function reference(scenario: Scenario): readonly number[] {
   const move = new ReferenceMove(GEN, scenario.referenceMove, {
     isStellarFirstUse: scenario.stellarFirstUse ?? false,
+    ...(scenario.hits === undefined ? {} : { hits: scenario.hits }),
   })
   const result = referenceCalculate(
     GEN,
     referencePokemon(scenario.attacker),
     referencePokemon(scenario.defender),
     move,
-    new ReferenceField(),
+    referenceField(scenario),
   )
   const damage = result.damage
   // An absorbed hit comes back as the number zero rather than sixteen of them.
   if (typeof damage === 'number') return new Array<number>(16).fill(damage)
   if (!Array.isArray(damage)) throw new Error(`${scenario.referenceMove} gave no roll array`)
-  return damage as readonly number[]
+  // A multi-hit move comes back as one roll array per hit, summed roll by roll.
+  if (!Array.isArray(damage[0])) return damage as readonly number[]
+  return (damage as number[][]).reduce<number[]>(
+    (total, hit) => total.map((sum, index) => sum + (hit[index] ?? 0)),
+    new Array<number>(16).fill(0),
+  )
 }
 
 export type Differential = {

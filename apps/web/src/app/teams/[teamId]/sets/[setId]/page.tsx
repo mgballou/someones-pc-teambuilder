@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { NATURES, TERA_TYPES, allowsTera } from '@spc/core'
+import { NATURES, TERA_TYPES, allowsTera, conditionalPower } from '@spc/core'
 import { loadTeam } from '../../../../../lib/team-view'
 import { dex } from '../../../../../lib/dex'
 import { SetEditor } from '../../../../../components/set-editor'
@@ -40,7 +40,7 @@ export default async function SetEditorPage({
               category: move.category,
               basePower: move.basePower,
               accuracy: move.accuracy,
-              powerVaries: move.variablePower !== null,
+              powerVaries: move.variablePower !== null || conditionalPower(move.id) !== null,
             },
           ]
     })
