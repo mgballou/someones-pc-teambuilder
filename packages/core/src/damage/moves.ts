@@ -1,3 +1,4 @@
+import type { PokemonType, TeraType } from '../pokemon-type'
 import type { BoostableStat } from '../stats'
 
 /**
@@ -13,6 +14,14 @@ export type MoveOverride = {
   readonly defenseStat?: BoostableStat
   /** Tera Blast takes the user's Tera type once Terastallized. */
   readonly typeFromTera?: boolean
+  /**
+   * The move's type is a property of the form holding it. Ivy Cudgel is the
+   * mask Ogerpon is wearing; Raging Bull is the breed of Tauros. Keyed by
+   * species id, and any form absent from the table keeps the dataset's type.
+   */
+  readonly typeFromSpecies?: Readonly<Record<string, PokemonType>>
+  /** Tera Blast is 100 rather than 80 once the user's Tera type is Stellar. */
+  readonly basePowerFromTera?: Readonly<Partial<Record<TeraType, number>>>
   /** Tera Blast picks its category from the user's higher attacking stat. */
   readonly categoryFromStats?: boolean
   /** Facade is not halved by burn. */
@@ -26,8 +35,26 @@ export const MOVE_OVERRIDES: Readonly<Record<string, MoveOverride>> = {
   psyshock: { defenseStat: 'def' },
   psystrike: { defenseStat: 'def' },
   'secret-sword': { defenseStat: 'def' },
-  'tera-blast': { typeFromTera: true, categoryFromStats: true },
+  'tera-blast': {
+    typeFromTera: true,
+    categoryFromStats: true,
+    basePowerFromTera: { stellar: 100 },
+  },
   'tera-starstorm': { typeFromTera: true, categoryFromStats: true },
+  'ivy-cudgel': {
+    typeFromSpecies: {
+      'ogerpon-wellspring-mask': 'water',
+      'ogerpon-hearthflame-mask': 'fire',
+      'ogerpon-cornerstone-mask': 'rock',
+    },
+  },
+  'raging-bull': {
+    typeFromSpecies: {
+      'tauros-paldea-combat-breed': 'fighting',
+      'tauros-paldea-blaze-breed': 'fire',
+      'tauros-paldea-aqua-breed': 'water',
+    },
+  },
   facade: { ignoresBurn: true },
   earthquake: { halvedByGrassyTerrain: true },
   bulldoze: { halvedByGrassyTerrain: true },

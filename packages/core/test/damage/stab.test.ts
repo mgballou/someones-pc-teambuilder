@@ -72,10 +72,10 @@ describe('stabModifier when Terastallized', () => {
     ).toBe(6144)
   })
 
-  it('keeps 2x for that case with Adaptability', () => {
+  it('drops Adaptability for that case, because the holder is no longer that type', () => {
     expect(
       stab({ moveType: 'dragon', teraType: 'fire', terastallized: true, adaptability: true }),
-    ).toBe(8192)
+    ).toBe(6144)
   })
 
   it('gives nothing when neither the Tera type nor an original type matches', () => {

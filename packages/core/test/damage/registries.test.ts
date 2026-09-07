@@ -195,10 +195,10 @@ describe('ability registry', () => {
     expect(guts.max).toBeGreaterThan(plain.max * 2)
   })
 
-  it('doubles Technician base power under sixty', () => {
+  it('raises Technician base power by half under sixty', () => {
     expect(
       run({ attackerSpecies: 'garchomp', move: FAKE_OUT, attackerAbility: 'technician' }).basePower,
-    ).toBe(80)
+    ).toBe(60)
   })
 
   it('leaves Technician out above sixty', () => {

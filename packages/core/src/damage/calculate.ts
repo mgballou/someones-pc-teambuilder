@@ -5,14 +5,14 @@ import { abilityId } from '../ids'
 import type { Item } from '../item'
 import { isSpreadMove } from '../move'
 import type { PokemonType, TeraType } from '../pokemon-type'
-import { effectivenessAgainst, effectivenessOf } from '../pokemon-type'
 import type { PokemonSet } from '../set'
 import type { Species } from '../species'
 import { displayName } from '../species'
 import type { BoostableStat, StatSpread } from '../stats'
 import { applyBoost, computeSpread, STAT_LABEL } from '../stats'
 import type { AbilityEntry } from './abilities'
-import { abilityEntry } from './abilities'
+import { abilityEntry, absorbsType, foeBasePowerModifier } from './abilities'
+import { moveEffectiveness, readingAgainst, typeReadings } from './effectiveness'
 import { UncalculableMove, ImpossibleState } from './errors'
 import type { ItemHandler, ItemHook, ItemRole } from './items'
 import { ITEM_REGISTRY } from './items'
@@ -100,7 +100,9 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   const override = moveOverride(moveRecord.id)
 
   const moveType: TeraType =
-    override?.typeFromTera === true && attackerTera !== null ? attackerTera : moveRecord.type
+    override?.typeFromTera === true && attackerTera !== null
+      ? attackerTera
+      : (override?.typeFromSpecies?.[attackerSpecies.id] ?? moveRecord.type)
 
   const category: 'physical' | 'special' =
     override?.categoryFromStats === true && attackerTera !== null
@@ -161,7 +163,8 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   })
   if (power.note !== null) notes.add(power.note)
 
-  const rawPower = power.kind === 'power' ? power.power : 0
+  const teraPower = attackerTera === null ? undefined : override?.basePowerFromTera?.[attackerTera]
+  const rawPower = power.kind === 'power' ? (teraPower ?? power.power) : 0
 
   const provisional: ModifierContext = {
     move: moveRecord,
@@ -170,7 +173,12 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     attackStatName,
     defenseStatName,
     basePower: rawPower,
-    effectiveness: effectivenessOfMove(moveType, defenderTypes, defender.terastallized),
+    effectiveness: moveEffectiveness({
+      moveId: moveRecord.id,
+      moveType,
+      defenderTypes,
+      defenderTerastallized: defender.terastallized,
+    }),
     attacker: attackerView,
     defender: defenderView,
     field,
@@ -207,6 +215,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
       rawPower,
       chainModifiers([
         attackerEntry?.basePower?.(context) ?? null,
+        foeBasePowerModifier(defenderEntry, moveType),
         itemModifier(attackerItem, (handler) => handler.basePower, context),
         terrainPowerModifier(field.terrain, context),
         override?.halvedByGrassyTerrain === true &&
@@ -485,15 +494,6 @@ function itemModifier(
 
 // --- Type effectiveness -----------------------------------------------------
 
-function effectivenessOfMove(
-  moveType: TeraType,
-  defenderTypes: readonly PokemonType[],
-  defenderTerastallized: boolean,
-): number {
-  if (moveType === 'stellar') return defenderTerastallized ? 2 : 1
-  return effectivenessAgainst(moveType, defenderTypes)
-}
-
 type EffectivenessInput = {
   readonly provisional: ModifierContext
   readonly defenderEntry: AbilityEntry | null
@@ -515,7 +515,7 @@ function resolveEffectiveness({
   moveType,
   notes,
 }: EffectivenessInput): number {
-  if (defenderEntry?.immuneTo === moveType && defenderAbility !== null) {
+  if (absorbsType(defenderEntry, moveType) && defenderAbility !== null) {
     notes.add(
       `${abilityLabel(dex, defenderAbility)} makes ${displayName(defenderSpecies)} immune to ${typeLabel(moveType)}.`,
     )
@@ -528,7 +528,8 @@ function resolveEffectiveness({
       : defenderEntry.alterEffectiveness(provisional.effectiveness, provisional)
 
   if (altered === 0) {
-    const blocking = defenderTypes.find((type) => effectivenessOf(moveType, type) === 0)
+    const readings = typeReadings(provisional.move.id)
+    const blocking = defenderTypes.find((type) => readingAgainst(readings, moveType, type) === 0)
     if (blocking === undefined && defenderAbility !== null) {
       notes.add(
         `${abilityLabel(dex, defenderAbility)} blocks ${typeLabel(moveType)} against ${displayName(defenderSpecies)}.`,

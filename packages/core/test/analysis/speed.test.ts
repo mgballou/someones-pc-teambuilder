@@ -133,13 +133,13 @@ describe('the ladder', () => {
   it('computes the fastest benchmark from base stats', () => {
     const fastest = speedOf(bare).ladder.find((entry) => entry.kind === 'benchmark')
 
-    expect(fastest?.speed).toBe(169)
+    expect(fastest?.speed).toBe(194)
   })
 
   it('labels a benchmark by how it was computed', () => {
     const fastest = speedOf(bare).ladder.find((entry) => entry.kind === 'benchmark')
 
-    expect(fastest?.label).toBe('Max Speed Jolly Garchomp')
+    expect(fastest?.label).toBe('Max Speed Jolly Weavile')
   })
 
   it('draws benchmarks only from species the format allows', () => {
@@ -155,7 +155,7 @@ describe('the ladder', () => {
       .ladder.filter((entry) => entry.kind === 'benchmark')
       .map((entry) => entry.species)
 
-    expect(species).toContain('urshifu-rapid-strike')
+    expect(species).toContain('ogerpon')
   })
 
   it('says the benchmarks came from base stats and not from usage', () => {
