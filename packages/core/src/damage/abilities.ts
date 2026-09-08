@@ -55,6 +55,8 @@ export type AbilityEntry = {
   readonly foeAttackStage?: { readonly stat: BoostableStat; readonly stages: number }
   readonly adaptability?: boolean
   readonly ignoresBurn?: boolean
+  /** Skill Link: a two-to-five-hit move lands all five, every time. */
+  readonly everyHitLands?: boolean
   /** Unaware: the holder reads through the other side's stat stages. */
   readonly ignoresFoeBoosts?: boolean
   readonly moldBreaker?: boolean
@@ -204,6 +206,9 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
         ? null
         : 'Sheer Force found no secondary effect on this move in the dataset, so no boost was applied.',
   },
+
+  // Hit count
+  'skill-link': { everyHitLands: true },
 
   // Type handling
   adaptability: { adaptability: true },

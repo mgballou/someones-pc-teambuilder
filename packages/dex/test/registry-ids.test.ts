@@ -13,10 +13,18 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { CONDITIONAL_POWER, MOVE_OVERRIDES, MOVE_TYPE_READINGS, moveId } from '@spc/core'
+import {
+  abilityId,
+  ABILITY_REGISTRY,
+  CONDITIONAL_POWER,
+  MOVE_OVERRIDES,
+  MOVE_TYPE_READINGS,
+  moveId,
+} from '@spc/core'
 import { BUNDLED_DATASET } from '../src/bundled'
 
 const MOVES = new Set(BUNDLED_DATASET.moves.map((move) => move.id))
+const ABILITIES = new Set(BUNDLED_DATASET.abilities.map((ability) => ability.id))
 
 function absent(ids: readonly string[]): readonly string[] {
   return ids.filter((id) => !MOVES.has(moveId(id)))
@@ -58,5 +66,15 @@ describe('a move whose power the dataset says is constant', () => {
     })
 
     expect(zeroed).toEqual([])
+  })
+})
+
+describe('the ability registry', () => {
+  it('names no ability the dataset does not hold', () => {
+    expect(Object.keys(ABILITY_REGISTRY).filter((id) => !ABILITIES.has(abilityId(id)))).toEqual([])
+  })
+
+  it('is not empty, so an empty pass cannot look like a passing one', () => {
+    expect(Object.keys(ABILITY_REGISTRY).length).toBeGreaterThan(20)
   })
 })

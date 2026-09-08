@@ -21,8 +21,15 @@ import {
 } from '@smogon/calc'
 import type { BoostSpread, Nature, StatSpread, TeraType } from '../../src/index'
 import { moveId, ZERO_BOOSTS } from '../../src/index'
+import type { BattleStyle } from '../../src/index'
 import type { Field, Status, Terrain, Weather } from '../../src/damage/index'
-import { calculate, DEFAULT_FIELD, newAttacker, newDefender } from '../../src/damage/index'
+import {
+  calculate,
+  DEFAULT_FIELD,
+  newAttacker,
+  newDefender,
+  OPEN_SIDE,
+} from '../../src/damage/index'
 import { fixtureDex } from '../fixtures/dex'
 import { buildSet } from './helpers'
 
@@ -91,6 +98,7 @@ export type Combatant = {
   readonly ability: string
   /** The same ability as `@smogon/calc` spells it. */
   readonly referenceAbility: string
+  readonly level?: number
   readonly nature?: Nature
   readonly evs?: Partial<StatSpread>
   readonly teraType?: TeraType
@@ -126,13 +134,23 @@ export type Scenario = {
   readonly stellarFirstUse?: boolean
   readonly weather?: Weather
   readonly terrain?: Terrain
-  /** How many times a multi-hit move lands. The reference needs telling. */
+  /** How many times a multi-hit move lands. Both sides are told the same. */
   readonly hits?: number
+  /** Doubles changes the screen modifier and allows a spread hit. */
+  readonly style?: BattleStyle
+  /** How many Pokemon the hit lands on. Above one takes the spread reduction. */
+  readonly targets?: number
+  readonly helpingHand?: boolean
+  readonly reflect?: boolean
+  readonly lightScreen?: boolean
+  readonly auroraVeil?: boolean
+  readonly friendGuard?: boolean
 }
 
 function setFor(combatant: Combatant) {
   return buildSet({
     species: combatant.species,
+    level: combatant.level ?? 50,
     nature: combatant.nature ?? 'hardy',
     evs: combatant.evs ?? {},
     ability: combatant.ability,
@@ -156,12 +174,25 @@ function fieldFor(scenario: Scenario): Field {
     ...DEFAULT_FIELD,
     weather: scenario.weather ?? 'none',
     terrain: scenario.terrain ?? 'none',
+    style: scenario.style ?? 'singles',
+    attackerSide: { ...OPEN_SIDE, helpingHand: scenario.helpingHand ?? false },
+    defenderSide: {
+      ...OPEN_SIDE,
+      reflect: scenario.reflect ?? false,
+      lightScreen: scenario.lightScreen ?? false,
+      auroraVeil: scenario.auroraVeil ?? false,
+      friendGuard: scenario.friendGuard ?? false,
+    },
   }
 }
 
 function ours(scenario: Scenario): readonly number[] {
   return calculate({
-    attacker: newAttacker(stateOf(scenario.attacker)),
+    attacker: newAttacker({
+      ...stateOf(scenario.attacker),
+      targets: scenario.targets ?? 1,
+      ...(scenario.hits === undefined ? {} : { hits: scenario.hits }),
+    }),
     defender: newDefender(stateOf(scenario.defender)),
     move: moveId(scenario.move),
     field: fieldFor(scenario),
@@ -171,7 +202,7 @@ function ours(scenario: Scenario): readonly number[] {
 
 function referencePokemon(combatant: Combatant): ReferencePokemon {
   const options: ReferenceOptions = {
-    level: 50,
+    level: combatant.level ?? 50,
     nature: capitalize(combatant.nature ?? 'hardy'),
     evs: combatant.evs ?? {},
     boosts: combatant.boosts ?? {},
@@ -196,7 +227,8 @@ function capitalize(word: string): string {
 }
 
 function referenceField(scenario: Scenario): ReferenceField {
-  return new ReferenceField({
+  const field = new ReferenceField({
+    gameType: (scenario.style ?? 'singles') === 'doubles' ? 'Doubles' : 'Singles',
     ...(scenario.weather === undefined || scenario.weather === 'none'
       ? {}
       : { weather: REFERENCE_WEATHER[scenario.weather] }),
@@ -204,6 +236,12 @@ function referenceField(scenario: Scenario): ReferenceField {
       ? {}
       : { terrain: REFERENCE_TERRAIN[scenario.terrain] }),
   })
+  field.attackerSide.isHelpingHand = scenario.helpingHand ?? false
+  field.defenderSide.isReflect = scenario.reflect ?? false
+  field.defenderSide.isLightScreen = scenario.lightScreen ?? false
+  field.defenderSide.isAuroraVeil = scenario.auroraVeil ?? false
+  field.defenderSide.isFriendGuard = scenario.friendGuard ?? false
+  return field
 }
 
 function reference(scenario: Scenario): readonly number[] {

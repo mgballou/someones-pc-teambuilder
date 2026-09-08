@@ -877,6 +877,23 @@ const MOVES: readonly Move[] = [
     multiHit: { min: 3, max: 3 },
     flags: { contact: true },
   }),
+  makeMove({
+    id: 'icicle-spear',
+    type: 'ice',
+    category: 'physical',
+    basePower: 25,
+    multiHit: { min: 2, max: 5 },
+    flags: { contact: true },
+  }),
+  makeMove({
+    id: 'population-bomb',
+    type: 'normal',
+    category: 'physical',
+    basePower: 20,
+    accuracy: 90,
+    multiHit: { min: 1, max: 10 },
+    flags: { contact: true },
+  }),
   makeMove({ id: 'solar-beam', type: 'grass', category: 'special', basePower: 120 }),
   makeMove({ id: 'hex', type: 'ghost', category: 'special', basePower: 65 }),
   makeMove({

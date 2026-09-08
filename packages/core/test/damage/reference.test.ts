@@ -560,6 +560,27 @@ const BLISSEY_WITH_LEFTOVERS: Combatant = {
   referenceItem: 'Leftovers',
 }
 
+const GARCHOMP_ATTACKER: Combatant = { ...GARCHOMP, evs: { atk: 252 } }
+
+/**
+ * The review's Chien-Pao ran at level 100 with a neutral ability, which is
+ * what puts the tie inside the chain onto a roll: 2048 for the Reflect, 4915
+ * for the Expert Belt.
+ */
+const CHIEN_PAO_AT_100: Combatant = {
+  species: 'chien-pao',
+  reference: 'Chien-Pao',
+  ability: 'pressure',
+  referenceAbility: 'Pressure',
+  nature: 'adamant',
+  evs: { atk: 252 },
+  item: 'expert-belt',
+  referenceItem: 'Expert Belt',
+  level: 100,
+}
+
+const GARCHOMP_AT_100: Combatant = { ...GARCHOMP, evs: {}, level: 100 }
+
 describe('Knock Off against a target that is holding something', () => {
   it('agrees that it is 1.5x into a Blissey with Leftovers', () => {
     expect(
@@ -876,5 +897,185 @@ describe('Solar Beam, the one that read high', () => {
         referenceMove: 'Solar Beam',
       }),
     ).toEqual([55, 66])
+  })
+})
+
+describe('Helping Hand, which is a base power modifier', () => {
+  it('agrees on Charizard Flamethrower into Blissey', () => {
+    expect(
+      agrees({
+        attacker: CHARIZARD_ATTACKER,
+        defender: SPECIAL_BLISSEY,
+        move: 'flamethrower',
+        referenceMove: 'Flamethrower',
+        helpingHand: true,
+      }),
+    ).toEqual([67, 79])
+  })
+
+  /**
+   * The whole spread, not the ends. Applying Helping Hand after the random
+   * factor re-quantized the sixteen rolls into steps, so a range assertion
+   * alone would have passed on the wrong numbers in the middle.
+   */
+  it('agrees on every roll of that spread and not only its ends', () => {
+    const result = differential({
+      attacker: CHARIZARD_ATTACKER,
+      defender: SPECIAL_BLISSEY,
+      move: 'flamethrower',
+      referenceMove: 'Flamethrower',
+      helpingHand: true,
+    })
+    expect(result.ours).toEqual([67, 67, 69, 69, 70, 70, 72, 72, 73, 73, 75, 75, 76, 76, 78, 79])
+  })
+
+  it('agrees on Pelipper Hydro Pump into Blissey', () => {
+    expect(
+      agrees({
+        attacker: PELIPPER_ATTACKER,
+        defender: SPECIAL_BLISSEY,
+        move: 'hydro-pump',
+        referenceMove: 'Hydro Pump',
+        helpingHand: true,
+      }),
+    ).toEqual([75, 88])
+  })
+
+  it('agrees on Garchomp Earthquake into Blissey', () => {
+    expect(
+      agrees({
+        attacker: GARCHOMP_ATTACKER,
+        defender: BLISSEY,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+        helpingHand: true,
+      }),
+    ).toEqual([247, 292])
+  })
+
+  it('agrees that the same hit without it is unchanged', () => {
+    expect(
+      agrees({
+        attacker: CHARIZARD_ATTACKER,
+        defender: SPECIAL_BLISSEY,
+        move: 'flamethrower',
+        referenceMove: 'Flamethrower',
+      }),
+    ).toEqual([45, 54])
+  })
+
+  it('agrees that it stacks with a screen on the far side', () => {
+    expect(
+      agrees({
+        attacker: CHARIZARD_ATTACKER,
+        defender: SPECIAL_BLISSEY,
+        move: 'flamethrower',
+        referenceMove: 'Flamethrower',
+        helpingHand: true,
+        lightScreen: true,
+      }),
+    ).toEqual([33, 39])
+  })
+
+  /**
+   * Both land in the base power chain and both round, so this is the pair that
+   * would catch Helping Hand sitting on the wrong side of the terrain bonus.
+   */
+  it('agrees that it chains with a terrain bonus on a grounded user', () => {
+    expect(
+      agrees({
+        attacker: VENUSAUR,
+        defender: SPECIAL_BLISSEY,
+        move: 'solar-beam',
+        referenceMove: 'Solar Beam',
+        helpingHand: true,
+        terrain: 'grassy',
+      }),
+    ).toEqual([108, 127])
+  })
+})
+
+describe('the chain, on the roll where its rounding shows', () => {
+  it('agrees on Chien-Pao Icicle Crash into Garchomp through Reflect', () => {
+    const result = differential({
+      attacker: CHIEN_PAO_AT_100,
+      defender: GARCHOMP_AT_100,
+      move: 'icicle-crash',
+      referenceMove: 'Icicle Crash',
+      reflect: true,
+    })
+    expect(result.ours).toEqual(result.reference)
+  })
+
+  it('puts 418 on the fourteenth roll', () => {
+    const result = differential({
+      attacker: CHIEN_PAO_AT_100,
+      defender: GARCHOMP_AT_100,
+      move: 'icicle-crash',
+      referenceMove: 'Icicle Crash',
+      reflect: true,
+    })
+    expect(result.ours[13]).toBe(418)
+  })
+
+  it('agrees on the same hit with no screen up', () => {
+    expect(
+      agrees({
+        attacker: CHIEN_PAO_AT_100,
+        defender: GARCHOMP_AT_100,
+        move: 'icicle-crash',
+        referenceMove: 'Icicle Crash',
+      }),
+    ).toEqual([725, 854])
+  })
+})
+
+describe('Icicle Spear, at each number of hits it can land', () => {
+  it('agrees at two', () => {
+    expect(
+      agrees({
+        attacker: CLOYSTER,
+        defender: BLISSEY,
+        move: 'icicle-spear',
+        referenceMove: 'Icicle Spear',
+        hits: 2,
+      }),
+    ).toEqual([68, 84])
+  })
+
+  it('agrees at three', () => {
+    expect(
+      agrees({
+        attacker: CLOYSTER,
+        defender: BLISSEY,
+        move: 'icicle-spear',
+        referenceMove: 'Icicle Spear',
+        hits: 3,
+      }),
+    ).toEqual([102, 126])
+  })
+
+  it('agrees at four', () => {
+    expect(
+      agrees({
+        attacker: CLOYSTER,
+        defender: BLISSEY,
+        move: 'icicle-spear',
+        referenceMove: 'Icicle Spear',
+        hits: 4,
+      }),
+    ).toEqual([136, 168])
+  })
+
+  it('agrees at five', () => {
+    expect(
+      agrees({
+        attacker: CLOYSTER,
+        defender: BLISSEY,
+        move: 'icicle-spear',
+        referenceMove: 'Icicle Spear',
+        hits: 5,
+      }),
+    ).toEqual([170, 210])
   })
 })

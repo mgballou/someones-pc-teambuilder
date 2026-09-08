@@ -26,6 +26,7 @@ import {
   MOD_THREE_QUARTERS,
 } from './modifier'
 import { moveOverride } from './moves'
+import { hitCount, multiHitNote } from './multi-hit'
 import { koChance } from './ko'
 import { stabModifier } from './stab'
 import type {
@@ -180,7 +181,20 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     defenderTerastallized: defender.terastallized,
   })
 
-  const hits = moveRecord.multiHit?.max ?? 1
+  const everyHitLands = attackerEntry?.everyHitLands === true
+  const hits = hitCount({
+    multiHit: moveRecord.multiHit,
+    everyHitLands,
+    requested: attacker.hits,
+  })
+  notes.add(
+    multiHitNote({
+      move: moveRecord,
+      hits,
+      everyHitLands,
+      chosenByCaller: attacker.hits !== null,
+    }),
+  )
   const conditional = conditionalPower(moveRecord.id)
   const conditionInput = {
     move: moveRecord,
@@ -234,7 +248,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   addRegistryNotes({ context, attackerEntry, defenderEntry, attackerItem, defenderItem, notes })
 
   if (effectiveness === 0) {
-    return immuneResult({ context, maxHp, currentHp, notes })
+    return immuneResult({ context, maxHp, currentHp, hits, notes })
   }
 
   if (power.kind === 'exact') {
@@ -251,6 +265,14 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
           conditional?.effect.kind === 'modifier'
             ? conditional.effect.of({ ...conditionInput, hit: index + 1 })
             : null,
+          /**
+           * Helping Hand is a base-power modifier, not a final one. It sits
+           * ahead of the 85-100 random factor in the games, so applying it at
+           * the end re-quantizes the whole spread: the rolls come out stepped
+           * and both ends move. It goes here, after the move's own rule and
+           * before the terrain bonus, which is where the reference puts it.
+           */
+          field.attackerSide.helpingHand ? MOD_ONE_AND_A_HALF : null,
           attackerEntry?.basePower?.(hitContext) ?? null,
           foeBasePowerModifier(defenderEntry, moveType),
           itemModifier(attackerItem, (handler) => handler.basePower, hitContext),
@@ -316,7 +338,6 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     override?.ignoresBurn !== true
 
   const finalMod = chainModifiers([
-    field.attackerSide.helpingHand ? MOD_ONE_AND_A_HALF : null,
     screenModifier({ field, category, criticalHit, notes }),
     defenderEntry?.finalDefender?.(context) ?? null,
     field.defenderSide.friendGuard ? MOD_THREE_QUARTERS : null,
@@ -330,12 +351,6 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     (hitPower) =>
       Math.floor(Math.floor((levelFactor * hitPower * attackStat) / defenseStat) / 50) + 2,
   )
-
-  if (moveRecord.multiHit !== null && moveRecord.multiHit.min !== moveRecord.multiHit.max) {
-    notes.add(
-      `${moveRecord.name} was calculated at ${hits} hits. It can land as few as ${moveRecord.multiHit.min}.`,
-    )
-  }
 
   /**
    * A roll is the sum across hits, which for every move but Triple Axel and
@@ -815,7 +830,13 @@ type TerminalResultInput = {
   readonly notes: NoteLog
 }
 
-function immuneResult({ context, maxHp, currentHp, notes }: TerminalResultInput): DamageResult {
+function immuneResult({
+  context,
+  maxHp,
+  currentHp,
+  hits,
+  notes,
+}: TerminalResultInput & { readonly hits: number }): DamageResult {
   const rolls = RANDOM_FACTORS.map(() => 0)
   return {
     rolls,
@@ -829,7 +850,7 @@ function immuneResult({ context, maxHp, currentHp, notes }: TerminalResultInput)
     basePower: 0,
     attackStat: 0,
     defenseStat: 0,
-    hits: context.move.multiHit?.max ?? 1,
+    hits,
     criticalHit: context.criticalHit,
     immune: true,
     ko: koChance({ rolls, currentHp }),
