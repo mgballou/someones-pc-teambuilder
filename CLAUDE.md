@@ -43,7 +43,7 @@ apps/web/          Next.js 16 + React 19. auth, Postgres, the box, the bench.
 Dependencies flow one way: **web → dex → core**.
 
 `core` never imports `dex`. It declares the `Dex` interface it needs (`core/src/dex.ts`) and
-`dex` implements it. That inversion is what keeps the calculator testable against a nine-species
+`dex` implements it. That inversion is what keeps the calculator testable against a hand-built
 fixture instead of a 1,351-form dataset.
 
 ---

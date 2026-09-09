@@ -82,7 +82,7 @@ fall out of that:
 ### 3.2 Why `Dex` is an interface in `core`
 
 `core` declares the data it needs; `dex` supplies it. The calculator is therefore testable
-against a nine-species fixture rather than a 1,351-form dataset, and nothing in the domain layer
+against a hand-built fixture rather than a 1,351-form dataset, and nothing in the domain layer
 knows PokéAPI exists.
 
 ### 3.3 Why the dataset is built, not fetched

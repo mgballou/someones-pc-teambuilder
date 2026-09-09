@@ -29,12 +29,12 @@ reference would mean editing one team quietly changes another.
 
 Four analysis panels, each a pure function of the team as it stands:
 
-| Panel        | What it answers                                                               |
-| ------------ | ----------------------------------------------------------------------------- |
-| **Damage**   | Gen 9 formula, integer-exact. All sixteen rolls, spread reduction, Tera STAB. |
-| **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.  |
-| **Coverage** | What the team's moves hit, and what several members share a weakness to.      |
-| **Legality** | Every violated rule, named, with the source of that rule beside it.           |
+| Panel        | What it answers                                                                    |
+| ------------ | ---------------------------------------------------------------------------------- |
+| **Damage**   | The Gen 9 chain, rounding where the games round. Sixteen rolls, spread, Tera STAB. |
+| **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.       |
+| **Coverage** | What the team's moves hit, and what several members share a weakness to.           |
+| **Legality** | Every violated rule, named, with the source of that rule beside it.                |
 
 ![The coverage grid: every member against all eighteen attacking types, with shared weaknesses ranked beside it.](docs/assets/coverage.png)
 
@@ -86,8 +86,9 @@ pnpm dev            # http://localhost:3000
 demo@someones.pc / competitive
 ```
 
-To point at your own Postgres instead, copy `.env.example` to `.env.local`, set `DATABASE_URL`,
-and run `pnpm db:push && pnpm db:seed`.
+To point at your own Postgres instead, copy `apps/web/.env.example` to `apps/web/.env.local`,
+set `DATABASE_URL`, and run `pnpm db:push && pnpm db:seed`. That is the only env file `pnpm dev`,
+`db:push` and `db:seed` read, and `DATABASE_URL` is the only variable any of them looks for.
 
 ### Commands
 
@@ -124,7 +125,7 @@ which is what a player wants to read anyway.
 
 **`core` declares the data it needs and never learns where it comes from.** `Dex` is an interface
 in `core/src/dex.ts`. `@spc/dex` implements it against the built dataset, the test suite
-implements it against a thirteen-species fixture, and the browser implements it against the few
+implements it against a hand-built fixture, and the browser implements it against the few
 records the current calculation touches. That inversion is why the calculator is testable without
 loading a thousand forms.
 
@@ -158,11 +159,19 @@ are worth knowing before you rely on the output.
 - **Learnsets are absolute.** A move is listed if the species can learn it in Generation 9 by any
   route. Egg chains, event distributions and version exclusives are not modelled, so the picker
   does not know whether a given save file can legally produce the set.
-- **The damage calculator models a curated list of items and abilities.** A result names anything
-  it could not account for.
+- **The damage calculator models a curated list of items and abilities**, and its rolls are
+  checked match-up by match-up against `@smogon/calc` in the test suite. A result names what it
+  could not account for: an item or ability outside the model, or a power that turns on a turn
+  order or a battle history the app does not hold. One gap is still silent. A few moves bend the
+  formula rather than the power — Foul Play attacks with the target's Attack, Shell Side Arm picks
+  the side that hurts more — and those are read straight, with nothing said.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
   They are not filtered by usage statistics.
-- **Coverage reads each move at its printed type.** Tera Blast's type change is not modelled.
+- **Coverage scores against whole typings, not one type at a time**, and ability immunities move
+  the grid. Three things it does not do: it reads each move at its printed type, so Tera Blast's
+  type change is not modelled; an ability that changes a hit without changing the chart, Thick Fat
+  say, is named in the notes rather than folded into a multiplier; and the defensive grid uses each
+  member's printed typing, because Terastallizing changes one member once.
 
 Not in scope: usage statistics, team suggestions, battle simulation, and sharing or social
 features. The app reports on the team in front of it.
