@@ -29,27 +29,49 @@ const EVASION_ITEMS: readonly ItemId[] = ['bright-powder', 'lax-incense'].map(it
  * sits on the edge of a suspect test is left off rather than guessed at — a
  * legality checker that invents a ban is worse than one that misses it, because
  * the miss is visible when the team is rejected and the invention never is.
+ *
+ * That was the argument for the gaps; it did not survive contact with the list.
+ * Nineteen Uber species walked into OU, and none of them was a borderline call:
+ * Sneasler, Espathra, Iron Bundle, Roaring Moon, Archaludon, Gouging Fire,
+ * Rapid Strike Urshifu, Hearthflame Ogerpon and Original Magearna were simply
+ * missing, and the other ten were an id that matched nothing.
+ *
+ * Two id shapes are worth knowing before adding to this list. A Pokémon whose
+ * only forms are suffixed has no bare id — the dataset holds `palafin-zero` and
+ * `palafin-hero`, never `palafin`, and the bare entry that used to sit here
+ * banned nothing at all. And the four Koraidon and four Miraidon ride forms are
+ * separate records with the box legendary's stats, so a ban has to name each.
+ * `registry-ids.test.ts` in `@spc/dex` now fails on an id no species has, which
+ * is the only reason this can be trusted.
  */
 const OU_BANNED_SPECIES: readonly SpeciesId[] = [
   'annihilape',
   'arceus',
+  'archaludon',
   'baxcalibur',
   'calyrex-ice',
   'calyrex-shadow',
   'chi-yu',
   'chien-pao',
-  'deoxys-normal',
   'deoxys-attack',
+  'deoxys-normal',
   'deoxys-speed',
   'dialga',
   'dialga-origin',
+  'espathra',
   'eternatus',
   'flutter-mane',
   'giratina-altered',
   'giratina-origin',
+  'gouging-fire',
   'groudon',
   'ho-oh',
+  'iron-bundle',
   'koraidon',
+  'koraidon-gliding-build',
+  'koraidon-limited-build',
+  'koraidon-sprinting-build',
+  'koraidon-swimming-build',
   'kyogre',
   'kyurem',
   'kyurem-black',
@@ -58,22 +80,32 @@ const OU_BANNED_SPECIES: readonly SpeciesId[] = [
   'lugia',
   'lunala',
   'magearna',
+  'magearna-original',
   'mewtwo',
   'miraidon',
-  'necrozma-dusk',
+  'miraidon-aquatic-mode',
+  'miraidon-drive-mode',
+  'miraidon-glide-mode',
+  'miraidon-low-power-mode',
   'necrozma-dawn',
-  'palafin',
+  'necrozma-dusk',
+  'ogerpon-hearthflame-mask',
+  'palafin-hero',
+  'palafin-zero',
   'palkia',
   'palkia-origin',
   'rayquaza',
   'reshiram',
+  'roaring-moon',
   'shaymin-sky',
+  'sneasler',
   'solgaleo',
   'spectrier',
   'terapagos',
-  'terapagos-terastal',
   'terapagos-stellar',
+  'terapagos-terastal',
   'ursaluna-bloodmoon',
+  'urshifu-rapid-strike',
   'urshifu-single-strike',
   'volcarona',
   'zacian',
@@ -126,7 +158,7 @@ export const gen9Ou: Format = {
   },
   source: smogonSource(
     'OU',
-    'The species list holds the Uber tier and above; entries under active suspect discussion are left off rather than guessed at.',
+    'The species list holds the Uber tier and above, checked against the tier as published on the date above; entries under active suspect discussion are left off rather than guessed at.',
   ),
 }
 

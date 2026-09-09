@@ -118,6 +118,7 @@ export function normalizeMove(response: MoveResponse): Move {
     drain: drainOf(response) ?? curated.drain ?? 0,
     recoil: recoilOf(response) ?? curated.recoil ?? 0,
     statChanges: statChangesOf(response, target),
+    raisesEvasion: raisesEvasion(response, target),
     generation: generationNumber(response.generation.name),
     variablePower: variablePowerOf(response),
     description: oneSentence(englishEffect(response.effect_entries)),
@@ -195,6 +196,24 @@ function statChangesOf(response: MoveResponse, target: MoveTarget): readonly Mov
     changes.push({ stat, stages: entry.change, target: changeTarget, chance })
   }
   return changes
+}
+
+/**
+ * Whether the move raises its user's evasion.
+ *
+ * `statChanges` cannot answer this: `BoostableStat` is the five stats the
+ * damage chain multiplies, so `boostableStatKey` drops evasion and accuracy on
+ * the way in. The Evasion Clause needs the answer anyway, and a clause a format
+ * declares and cannot check is a claim to a completeness it does not have.
+ *
+ * Two moves in generation IX qualify — Double Team and Minimize. The target
+ * test is what keeps Zippy Zap out: PokéAPI still carries its Let's Go entry,
+ * where it raised evasion, and files it against a selected Pokémon rather than
+ * the user. Generation IX gave it a guaranteed critical hit instead.
+ */
+function raisesEvasion(response: MoveResponse, target: MoveTarget): boolean {
+  if (target !== 'user') return false
+  return response.stat_changes.some((entry) => entry.stat.name === 'evasion' && entry.change > 0)
 }
 
 function statChangeTarget(response: MoveResponse, target: MoveTarget): 'user' | 'target' {

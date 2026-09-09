@@ -147,6 +147,14 @@ are worth knowing before you rely on the output.
 - **Legality is curated.** PokéAPI has no concept of a tier or a regulation, so every banlist is
   transcribed by hand. Each format carries its authority, a citation and the date it was last
   checked, displayed next to every verdict. Check the official rules before a tournament.
+- **Which Pokémon Generation 9 holds is read from the data, not transcribed.** A form counts as
+  usable only where PokéAPI lists a move for it in Scarlet and Violet, which leaves 869 of the
+  1,351 forms in the dataset. Four forms the games only ever produce during a battle or through
+  an event are corrected by hand, and the source names each one. Mega Evolution is not in these
+  games, so no format has to ban it.
+- **Four of the seven clauses are checked**: Species, Item, OHKO and Evasion. Sleep and Endless
+  Battle are decided during a battle and nothing about a team could answer them. The Nickname
+  Clause is not checked.
 - **Learnsets are absolute.** A move is listed if the species can learn it in Generation 9 by any
   route. Egg chains, event distributions and version exclusives are not modelled, so the picker
   does not know whether a given save file can legally produce the set.

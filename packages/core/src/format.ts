@@ -99,8 +99,27 @@ export type LegalityRuleset = {
    * further narrowing of this list. Used by regional-dex formats.
    */
   readonly allowlist: readonly SpeciesId[] | null
+  /**
+   * Whether a species the format's generation does not hold may still be used.
+   *
+   * False everywhere anyone plays. The games of Generation 9 hold neither
+   * Pidgeot nor any Mega form, so no ban list has to name them and none does —
+   * a format that had to enumerate the 482 forms Scarlet and Violet left out
+   * would be wrong within a patch. True only for the sandbox, which exists to
+   * calculate match-ups no real format allows.
+   */
+  readonly allowsUnavailableSpecies: boolean
 }
 
+/**
+ * Nothing banned by name or by category.
+ *
+ * `allowsUnavailableSpecies` is false here and not because a species outside
+ * the generation is banned — it is not in the game to ban. Every real format
+ * spreads this and adds its own rules, so the safe answer has to be the one it
+ * inherits: a regulation added later that forgot the field would otherwise
+ * ship legal Mega Evolutions.
+ */
 export const EMPTY_LEGALITY: LegalityRuleset = {
   bannedClassifications: [],
   bannedSpecies: [],
@@ -110,6 +129,7 @@ export const EMPTY_LEGALITY: LegalityRuleset = {
   restrictedSpecies: [],
   maxRestricted: 0,
   allowlist: null,
+  allowsUnavailableSpecies: false,
 }
 
 /**

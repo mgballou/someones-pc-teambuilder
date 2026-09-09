@@ -100,6 +100,9 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
+      '@pkmn/dex':
+        specifier: 0.10.11
+        version: 0.10.11
       tsx:
         specifier: ^4.23.12
         version: 4.23.12
@@ -868,6 +871,15 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+
+  '@pkmn/dex-types@0.10.11':
+    resolution: {integrity: sha512-6hvvi/iHCdBbUGK7RmWPCKuZGujEC+1elvxcLK2BpL/j7Q0roSuC33xrodDsyg2EuyJ5szGunzRtFztyrtb7aQ==}
+
+  '@pkmn/dex@0.10.11':
+    resolution: {integrity: sha512-htR2Etf3WCiu4k4ukmyYD94do97sTm9LfmxJ8tg2uuPGJsZ98ZZGlJFUZNltfXU0pO61ItiU6obRXTw05qipDQ==}
+
+  '@pkmn/types@4.0.0':
+    resolution: {integrity: sha512-gR2s/pxJYEegek1TtsYCQupNR3d5hMlcJFsiD+2LyfKr4tc+gETTql47tWLX5mFSbPcbXh7f4+7txlMIDoZx/g==}
 
   '@playwright/test@1.62.1':
     resolution: {integrity: sha512-DTcUc8qii+cpHvtOwggMtBRMjKZHXYWdw8syRYu2vtzuq4Wxphqq4NfCs5Zt44L6mA8rfDfj+PHnxFc/FeK6mQ==}
@@ -2541,6 +2553,16 @@ snapshots:
 
   '@next/swc-win32-x64-msvc@16.3.1':
     optional: true
+
+  '@pkmn/dex-types@0.10.11':
+    dependencies:
+      '@pkmn/types': 4.0.0
+
+  '@pkmn/dex@0.10.11':
+    dependencies:
+      '@pkmn/dex-types': 0.10.11
+
+  '@pkmn/types@4.0.0': {}
 
   '@playwright/test@1.62.1':
     dependencies:

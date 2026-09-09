@@ -26,7 +26,13 @@ export const unrestricted: Format = {
   level: { kind: 'capped', max: 100 },
   gimmick: 'terastal',
   clauses: [],
-  legality: EMPTY_LEGALITY,
+  /**
+   * The one format that admits a species Generation 9 does not hold. Reading
+   * Mega Rayquaza's damage against a Pidgeot is exactly what a sandbox is for,
+   * and the honest place to say so is here, as a rule this format declares,
+   * rather than as a special case inside the legality check.
+   */
+  legality: { ...EMPTY_LEGALITY, allowsUnavailableSpecies: true },
   source: {
     authority: 'custom',
     citation: [

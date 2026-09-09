@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { analyzeSpeed, ladderEntrySpeed } from '../../src/analysis/index'
 import type { LadderEntry, SpeedModifier } from '../../src/analysis/index'
-import { gen9Ou, regulationH } from '../../src/formats/index'
+import { gen9Ou, regulationH, unrestricted } from '../../src/formats/index'
 import type { Team } from '../../src/index'
 import { fixtureDex } from '../fixtures/dex'
 import { makeTeam } from './support'
@@ -160,5 +160,37 @@ describe('the ladder', () => {
 
   it('says the benchmarks came from base stats and not from usage', () => {
     expect(speedOf(bare).basis.kind).toBe('max-investment')
+  })
+})
+
+/**
+ * The ladder draws its pool through `isSpeciesLegal`, so finding 11 landed here
+ * whole: the second-fastest Regulation G benchmark was Ninjask, which Generation
+ * 9 does not hold. Nothing in this file changed to fix it, which is the point.
+ */
+describe('the benchmark pool', () => {
+  const pool = (format = regulationH): readonly string[] =>
+    analyzeSpeed({ team: bare, format, dex: fixtureDex, benchmarkCount: 1000 })
+      .ladder.filter((entry) => entry.kind === 'benchmark')
+      .map((entry) => entry.species)
+
+  it('leaves out a species Generation 9 does not hold', () => {
+    expect(pool()).not.toContain('pidgeot')
+  })
+
+  it('leaves out a Mega Evolution', () => {
+    expect(pool()).not.toContain('mewtwo-mega-y')
+  })
+
+  it('leaves them out of a Smogon tier too', () => {
+    expect(pool(gen9Ou)).not.toContain('pidgeot')
+  })
+
+  it('keeps them in the sandbox, which allows what no format does', () => {
+    expect(pool(unrestricted)).toContain('pidgeot')
+  })
+
+  it('still holds the species the format does allow', () => {
+    expect(pool()).toContain('garchomp')
   })
 })

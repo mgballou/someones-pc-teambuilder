@@ -29,6 +29,20 @@ export type Species = {
   /** Metres. Only needed for a handful of interactions and for display. */
   readonly heightM: number
   readonly generation: number
+  /**
+   * The generations whose games actually hold this form, ascending.
+   *
+   * Not `generation`, which says when the form was introduced and never
+   * changes. Pidgeot was introduced in Generation 1 and cannot be brought to
+   * Generation 9 at all; every Mega form is in the same position, because Mega
+   * Evolution does not exist there. A format asks this question of a species
+   * before it asks any of its own.
+   *
+   * The ingest reads Generation 9 only, so in the shipped dataset this is
+   * `[9]` or empty. It is a list rather than a flag so that adding a
+   * generation is a data change.
+   */
+  readonly availableIn: readonly number[]
   readonly classification: SpeciesClassification
   /** True when the species can still evolve, which is what Eviolite keys on. */
   readonly canEvolve: boolean
@@ -63,6 +77,17 @@ export type SpeciesGimmicks = {
 
 export function displayName(species: Species): string {
   return species.formName === null ? species.name : `${species.name}-${species.formName}`
+}
+
+/**
+ * Whether a generation's games hold this form at all.
+ *
+ * The question every legality answer starts from: a Pokémon that is not in the
+ * game cannot be brought to a tournament played on it, whatever a format's own
+ * ban list says.
+ */
+export function isAvailableIn(species: Species, generation: number): boolean {
+  return species.availableIn.includes(generation)
 }
 
 export function isFullyEvolved(species: Species): boolean {

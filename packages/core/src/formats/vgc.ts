@@ -85,8 +85,23 @@ export const VGC_RESTRICTED_SPECIES: readonly SpeciesId[] = [
   'calyrex',
   'calyrex-ice',
   'calyrex-shadow',
+  /**
+   * Each box legendary of Scarlet and Violet carries four travel forms, and the
+   * dataset holds every one as its own record with the base form's stats. The
+   * cap is a list of ids, so a list holding only `koraidon` let a Sprinting
+   * Build onto a team of two restricted Pokémon as a third. The Species Clause
+   * catches two travel forms together; nothing caught one.
+   */
   'koraidon',
+  'koraidon-limited-build',
+  'koraidon-sprinting-build',
+  'koraidon-swimming-build',
+  'koraidon-gliding-build',
   'miraidon',
+  'miraidon-low-power-mode',
+  'miraidon-drive-mode',
+  'miraidon-aquatic-mode',
+  'miraidon-glide-mode',
   'terapagos',
   'terapagos-terastal',
   'terapagos-stellar',

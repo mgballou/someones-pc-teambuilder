@@ -27,6 +27,7 @@ import type {
   SpeciesClassification,
   SpeciesId,
   StatSpread,
+  VariablePower,
 } from '../../src/index'
 import { abilityId, EMPTY_LEGALITY, formatId, itemId, moveId, speciesId } from '../../src/index'
 
@@ -59,6 +60,8 @@ type SpeciesSeed = {
   canEvolve?: boolean
   formName?: string
   baseSpecies?: string
+  /** Defaults to generation IX. Pass `[]` for a form Scarlet and Violet lack. */
+  availableIn?: readonly number[]
 }
 
 function makeSpecies(seed: SpeciesSeed): Species {
@@ -83,6 +86,7 @@ function makeSpecies(seed: SpeciesSeed): Species {
     weightKg: seed.weightKg,
     heightM: seed.heightM ?? 1,
     generation: 9,
+    availableIn: seed.availableIn ?? [9],
     classification: seed.classification ?? 'ordinary',
     canEvolve: seed.canEvolve ?? false,
     gimmicks: { megaStones: [], canGigantamax: false, canTerastallize: true },
@@ -565,6 +569,51 @@ const SPECIES: readonly Species[] = [
     weightKg: 100,
     heightM: 2,
   }),
+  /**
+   * Not in Scarlet and Violet, and ordinary in every other respect: no
+   * classification bars it, no ban list names it, and it is fast enough to
+   * reach a Regulation G speed ladder it has no business being on.
+   */
+  makeSpecies({
+    id: 'pidgeot',
+    dexNumber: 18,
+    types: ['normal', 'flying'],
+    baseStats: { hp: 83, atk: 80, def: 75, spa: 70, spd: 70, spe: 101 },
+    abilities: ['keen-eye', 'tangled-feet'],
+    hiddenAbility: 'big-pecks',
+    weightKg: 39.5,
+    heightM: 1.5,
+    availableIn: [],
+  }),
+  makeSpecies({
+    id: 'mewtwo',
+    dexNumber: 150,
+    types: ['psychic'],
+    baseStats: { hp: 106, atk: 110, def: 90, spa: 154, spd: 90, spe: 130 },
+    abilities: ['pressure'],
+    hiddenAbility: 'unnerve',
+    weightKg: 122,
+    heightM: 2,
+    classification: 'restricted',
+  }),
+  /**
+   * A Mega form, classified as one. Mega Evolution does not exist in
+   * generation IX, so it is both `mega` and unavailable, and either fact on its
+   * own is enough to keep it out of a regulation.
+   */
+  makeSpecies({
+    id: 'mewtwo-mega-y',
+    dexNumber: 150,
+    baseSpecies: 'mewtwo',
+    formName: 'Mega-Y',
+    types: ['psychic'],
+    baseStats: { hp: 106, atk: 150, def: 70, spa: 194, spd: 120, spe: 140 },
+    abilities: ['insomnia'],
+    weightKg: 33,
+    heightM: 1.5,
+    classification: 'mega',
+    availableIn: [],
+  }),
 ]
 
 type MoveSeed = {
@@ -581,6 +630,8 @@ type MoveSeed = {
   multiHit?: { min: number; max: number }
   drain?: number
   recoil?: number
+  variablePower?: VariablePower
+  raisesEvasion?: boolean
 }
 
 function makeMove(seed: MoveSeed): Move {
@@ -603,8 +654,9 @@ function makeMove(seed: MoveSeed): Move {
     drain: seed.drain ?? 0,
     recoil: seed.recoil ?? 0,
     statChanges: [],
+    raisesEvasion: seed.raisesEvasion ?? false,
     generation: 9,
-    variablePower: null,
+    variablePower: seed.variablePower ?? null,
     description: '',
   }
 }
@@ -902,6 +954,26 @@ const MOVES: readonly Move[] = [
     category: 'physical',
     basePower: 60,
     flags: { contact: true },
+  }),
+  /** The two clauses every Smogon format declares and used to leave unchecked. */
+  makeMove({
+    id: 'sheer-cold',
+    type: 'ice',
+    category: 'special',
+    basePower: 0,
+    accuracy: 30,
+    pp: 5,
+    variablePower: { kind: 'ohko' },
+  }),
+  makeMove({
+    id: 'minimize',
+    type: 'normal',
+    category: 'status',
+    basePower: 0,
+    accuracy: null,
+    pp: 10,
+    target: 'user',
+    raisesEvasion: true,
   }),
 ]
 

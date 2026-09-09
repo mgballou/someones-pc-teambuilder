@@ -188,7 +188,14 @@ describe('the sandbox', () => {
       restrictedSpecies: [],
       maxRestricted: 0,
       allowlist: null,
+      allowsUnavailableSpecies: true,
     })
+  })
+
+  it('is the only shipped format that admits a species Generation 9 lacks', () => {
+    expect(SHIPPED_FORMATS.filter((format) => format.legality.allowsUnavailableSpecies)).toEqual([
+      unrestricted,
+    ])
   })
 
   it('applies no clause', () => {

@@ -13,6 +13,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import type { Format } from '@spc/core'
 import {
   abilityId,
   ABILITY_REGISTRY,
@@ -20,6 +21,7 @@ import {
   MOVE_OVERRIDES,
   MOVE_TYPE_READINGS,
   moveId,
+  SHIPPED_FORMATS,
 } from '@spc/core'
 import { BUNDLED_DATASET } from '../src/bundled'
 
@@ -76,5 +78,55 @@ describe('the ability registry', () => {
 
   it('is not empty, so an empty pass cannot look like a passing one', () => {
     expect(Object.keys(ABILITY_REGISTRY).length).toBeGreaterThan(20)
+  })
+})
+
+/**
+ * The fault the hostile read named, checked rather than fixed once.
+ *
+ * `'palafin'` sat in the OU ban list against a dataset holding `palafin-zero`
+ * and `palafin-hero`, and banned nothing. There was no lint, no test and no
+ * startup check that would ever have surfaced it, and a ban list is exactly the
+ * kind of hand-transcribed table where a wrong id looks like a right one.
+ */
+describe('every id a shipped format names', () => {
+  const SPECIES = new Set(BUNDLED_DATASET.species.map((species) => species.id))
+  const ITEMS = new Set(BUNDLED_DATASET.items.map((item) => item.id))
+
+  const dangling = (pick: (format: Format) => readonly string[]): readonly string[] =>
+    SHIPPED_FORMATS.flatMap((format) => pick(format).map((id) => `${format.shortName}: ${id}`))
+
+  it('names a species the dataset holds', () => {
+    expect(
+      dangling((format) =>
+        [...format.legality.bannedSpecies, ...format.legality.restrictedSpecies].filter(
+          (id) => !SPECIES.has(id),
+        ),
+      ),
+    ).toEqual([])
+  })
+
+  it('names a move the dataset holds', () => {
+    expect(
+      dangling((format) => format.legality.bannedMoves.filter((id) => !MOVES.has(id))),
+    ).toEqual([])
+  })
+
+  it('names an ability the dataset holds', () => {
+    expect(
+      dangling((format) => format.legality.bannedAbilities.filter((id) => !ABILITIES.has(id))),
+    ).toEqual([])
+  })
+
+  it('names an item the dataset holds', () => {
+    expect(
+      dangling((format) => format.legality.bannedItems.filter((id) => !ITEMS.has(id))),
+    ).toEqual([])
+  })
+
+  it('is checking a ban list with something in it', () => {
+    const named = SHIPPED_FORMATS.flatMap((format) => format.legality.bannedSpecies)
+
+    expect(named.length).toBeGreaterThan(50)
   })
 })

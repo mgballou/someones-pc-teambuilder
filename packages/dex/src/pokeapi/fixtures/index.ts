@@ -14,6 +14,8 @@
  * - `ogerpon-wellspring-mask` — a form that cannot Terastallize.
  * - `aerial-ace` — `accuracy: null`, which must never become 100.
  * - `wave-crash` — `meta: null`, so recoil comes from the curated table.
+ * - `minimize` — the only kind of stat change the dataset reads outside
+ *   `statChanges`, and the move the Evasion Clause exists for.
  * - `metronome` — an item whose effect is not modelled and is present anyway.
  */
 
