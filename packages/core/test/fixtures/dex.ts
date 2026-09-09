@@ -1076,11 +1076,16 @@ const ABILITY_NAMES = [
   'chlorophyll',
 ] as const
 
+/** `of` stays lower case, so the fixture reads `Sword of Ruin` like the games. */
+const MINOR_WORDS = new Set(['of', 'to', 'as', 'the'])
+
 const ABILITIES: readonly Ability[] = ABILITY_NAMES.map((name) => ({
   id: abilityId(name),
   name: name
     .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((part, index) =>
+      index > 0 && MINOR_WORDS.has(part) ? part : part.charAt(0).toUpperCase() + part.slice(1),
+    )
     .join(' '),
   description: '',
   suppressable: true,
