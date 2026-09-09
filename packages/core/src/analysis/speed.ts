@@ -12,28 +12,67 @@
  *
  * Every multiplier below truncates, as the games do. A Speed one point wrong is
  * a turn order that is wrong.
+ *
+ * Three things this file used to leave out, and now says out loud:
+ *
+ * - **Booster Energy needs the ability**, and Protosynthesis needs the sun. The
+ *   item on its own does nothing, which the damage calculator already knew and
+ *   this panel did not. A trigger is now required, and the field it reads is a
+ *   parameter with no weather in it by default.
+ * - **A tie is not an ordering.** Two Pokémon on the same number is a coin
+ *   flip, and a ladder that prints one above the other is inventing the result.
+ *   `ties` names every group sharing a number.
+ * - **Trick Room inverts the turn.** `trickRoomLadder` is the same entries the
+ *   other way up, because in doubles that is not an edge case.
+ *
+ * What is left is named in `notes` rather than dropped.
  */
 
+import type { Weather, Terrain } from '../damage/types'
 import type { Dex } from '../dex'
 import type { Format } from '../format'
 import { levelFor } from '../format'
-import { abilityId, itemId } from '../ids'
+import { itemId } from '../ids'
 import type { AbilityId, ItemId, SetId, SpeciesId } from '../ids'
 import type { PokemonSet } from '../set'
 import type { Species } from '../species'
 import { displayName } from '../species'
-import type { Nature } from '../stats'
+import type { BoostableStat, Nature } from '../stats'
 import { applyBoost, BOOSTABLE_STATS, computeStat, MAX_EV_PER_STAT, MAX_IV } from '../stats'
 import type { Team } from '../team'
 import { isSpeciesLegal } from './legality'
 
-/** Abilities that raise the holder's highest stat, Speed included. */
-const BOOST_ABILITIES: readonly AbilityId[] = ['protosynthesis', 'quark-drive'].map(abilityId)
+/**
+ * The two abilities that raise the holder's highest stat, and what switches
+ * each one on. Held as data rather than as a list of ids, because the trigger
+ * is the half this file used to be missing.
+ */
+const PARADOX_TRIGGERS: Readonly<Record<string, 'sun' | 'electric'>> = {
+  protosynthesis: 'sun',
+  'quark-drive': 'electric',
+}
 
 /** The item that switches those abilities on without the weather or terrain. */
 const BOOSTER_ENERGY: ItemId = itemId('booster-energy')
 
 const CHOICE_SCARF: ItemId = itemId('choice-scarf')
+
+/* ------------------------------------------------------------------- field */
+
+/**
+ * The part of the field a Speed reading depends on.
+ *
+ * Not `Field` from the calculator: screens, sides and battle style decide
+ * damage and never decide a turn order. Weather and terrain do, because they
+ * are what a Paradox ability waits for.
+ */
+export type SpeedField = {
+  readonly weather: Weather
+  readonly terrain: Terrain
+}
+
+/** No sun, no terrain. What a team builder is looking at before a game starts. */
+export const CLEAR_FIELD: SpeedField = { weather: 'none', terrain: 'none' }
 
 /* --------------------------------------------------------------- modifiers */
 
@@ -41,6 +80,10 @@ const CHOICE_SCARF: ItemId = itemId('choice-scarf')
  * A thing that changes a Speed number. A union rather than a set of named
  * fields, so a report can carry +1 and +2 without the type growing a field per
  * stage.
+ *
+ * Trick Room is deliberately not here. It changes no Speed number at all — it
+ * inverts which number goes first — so a multiplier could only lie about it.
+ * `SpeedReport.trickRoomLadder` is where it lives.
  */
 export type SpeedModifier =
   | { readonly kind: 'none' }
@@ -120,39 +163,6 @@ export type ModifiedSpeed = {
   readonly available: boolean
 }
 
-export type MemberSpeed = {
-  readonly setId: SetId
-  readonly species: SpeciesId
-  readonly name: string
-  readonly level: number
-  /** Computed Speed with nothing applied. */
-  readonly speed: number
-  /** Speed with the modifiers the set actually carries. */
-  readonly effective: number
-  readonly modifiers: readonly ModifiedSpeed[]
-}
-
-/**
- * How a benchmark was arrived at. Carried on the report so the interface can
- * say it out loud rather than letting the numbers imply an authority they do
- * not have.
- */
-export type BenchmarkBasis = {
-  readonly kind: 'max-investment'
-  readonly evs: number
-  readonly ivs: number
-  readonly nature: 'speed-raising'
-  readonly note: string
-}
-
-export const BENCHMARK_BASIS: BenchmarkBasis = {
-  kind: 'max-investment',
-  evs: MAX_EV_PER_STAT,
-  ivs: MAX_IV,
-  nature: 'speed-raising',
-  note: 'Computed from base stats in the dataset, at maximum Speed investment with a Speed-raising nature, for the species this format allows. Not usage statistics — this app has none.',
-}
-
 export type LadderEntry =
   | {
       readonly kind: 'benchmark'
@@ -181,12 +191,110 @@ export function ladderEntrySpeed(entry: LadderEntry): number {
   }
 }
 
+export type MemberSpeed = {
+  readonly setId: SetId
+  readonly species: SpeciesId
+  readonly name: string
+  readonly level: number
+  /** Computed Speed with nothing applied. */
+  readonly speed: number
+  /** Speed with the modifiers the set actually carries. */
+  readonly effective: number
+  readonly modifiers: readonly ModifiedSpeed[]
+  /**
+   * Everything else on the ladder sitting on this member's effective Speed.
+   * Non-empty means the turn is a coin flip and the ladder's order is arbitrary.
+   */
+  readonly tiedWith: readonly LadderEntry[]
+}
+
+/**
+ * Entries sharing one number.
+ *
+ * The games break a Speed tie at random, once, per turn. A ladder that prints
+ * an order for these is answering a question it cannot answer, so the group is
+ * carried separately and the interface can say so.
+ */
+export type SpeedTie = {
+  readonly speed: number
+  readonly entries: readonly LadderEntry[]
+  /** True when at least one of the tied entries is on this team. */
+  readonly involvesMember: boolean
+}
+
+/**
+ * How a benchmark was arrived at. Carried on the report so the interface can
+ * say it out loud rather than letting the numbers imply an authority they do
+ * not have.
+ */
+export type BenchmarkBasis = {
+  readonly kind: 'max-investment'
+  readonly evs: number
+  readonly ivs: number
+  readonly nature: 'speed-raising'
+  readonly note: string
+}
+
+export const BENCHMARK_BASIS: BenchmarkBasis = {
+  kind: 'max-investment',
+  evs: MAX_EV_PER_STAT,
+  ivs: MAX_IV,
+  nature: 'speed-raising',
+  note: 'Computed from base stats in the dataset, at maximum Speed investment with a Speed-raising nature, for the species this format allows. Not usage statistics — this app has none.',
+}
+
+/**
+ * What changes a turn order and is not in this report.
+ *
+ * Modelling every one of these is real work. Naming them is one array, and it
+ * is the difference between a ladder that is partial and a ladder that lies.
+ */
+export const UNMODELLED_SPEED_EFFECTS: readonly string[] = [
+  'Weather and terrain Speed abilities — Chlorophyll, Swift Swim, Sand Rush, Slush Rush, Surge Surfer',
+  'Abilities that need a turn or a trigger — Speed Boost, Unburden, Quick Feet, Steam Engine',
+  'Items that halve Speed — Iron Ball, Macho Brace, the Power items',
+  'Sticky Web, Tailwind running out, and move priority, which settles a turn before Speed is read',
+]
+
+/** Something the ladder could not account for, named rather than dropped. */
+export type SpeedNote =
+  | { readonly kind: 'speed-tie'; readonly speed: number; readonly count: number }
+  | { readonly kind: 'paradox-dormant'; readonly setId: SetId; readonly ability: AbilityId }
+  | { readonly kind: 'booster-without-ability'; readonly setId: SetId }
+  | { readonly kind: 'unmodelled'; readonly effects: readonly string[] }
+
+export function speedNoteText(note: SpeedNote): string {
+  switch (note.kind) {
+    case 'speed-tie':
+      return `${note.count} entries sit on ${note.speed}. A Speed tie is decided at random each turn, so the order shown between them is not a prediction.`
+    case 'paradox-dormant':
+      return `${note.ability} is dormant: no Booster Energy, and nothing on the field to switch it on. The ladder reads this set unboosted.`
+    case 'booster-without-ability':
+      return 'Booster Energy with no Protosynthesis or Quark Drive to spend it. The item does nothing here, and the ladder reads this set unboosted.'
+    case 'unmodelled':
+      return `Not accounted for: ${note.effects.join('; ')}.`
+    default: {
+      const exhaustive: never = note
+      return exhaustive
+    }
+  }
+}
+
 export type SpeedReport = {
   readonly level: number
   readonly members: readonly MemberSpeed[]
   /** Members and benchmarks together, fastest first. */
   readonly ladder: readonly LadderEntry[]
+  /**
+   * The same entries slowest first, which is the order a turn is taken in under
+   * Trick Room. Not a second set of numbers — Trick Room changes no Speed.
+   */
+  readonly trickRoomLadder: readonly LadderEntry[]
+  /** Every group of entries sharing a number, fastest first. */
+  readonly ties: readonly SpeedTie[]
   readonly basis: BenchmarkBasis
+  readonly field: SpeedField
+  readonly notes: readonly SpeedNote[]
 }
 
 export type AnalyzeSpeedInput = {
@@ -195,6 +303,11 @@ export type AnalyzeSpeedInput = {
   readonly dex: Dex
   /** How many benchmarks the ladder holds. */
   readonly benchmarkCount?: number
+  /**
+   * The weather and terrain to read Paradox abilities against. Clear by
+   * default, which is what a builder is looking at before a game starts.
+   */
+  readonly field?: SpeedField
 }
 
 const DEFAULT_BENCHMARK_COUNT = 10
@@ -204,17 +317,18 @@ export function analyzeSpeed({
   format,
   dex,
   benchmarkCount = DEFAULT_BENCHMARK_COUNT,
+  field = CLEAR_FIELD,
 }: AnalyzeSpeedInput): SpeedReport {
-  const members = team.members.flatMap((set) => {
+  const computed = team.members.flatMap((set) => {
     const species = dex.species(set.species)
-    return species === undefined ? [] : [memberSpeed({ set, species, format })]
+    return species === undefined ? [] : [memberSpeed({ set, species, format, field })]
   })
 
   const benchmarks = buildBenchmarks({ format, dex, count: benchmarkCount })
 
   const ladder: LadderEntry[] = [
     ...benchmarks,
-    ...members.map((member): LadderEntry => ({
+    ...computed.map(({ member }): LadderEntry => ({
       kind: 'member',
       setId: member.setId,
       species: member.species,
@@ -223,20 +337,82 @@ export function analyzeSpeed({
     })),
   ].sort((a, b) => b.speed - a.speed || compareLabels(a, b))
 
-  return { level: levelFor(format, 100), members, ladder, basis: BENCHMARK_BASIS }
+  const ties = buildTies(ladder)
+
+  const members = computed.map(({ member }) => ({
+    ...member,
+    tiedWith: tiedWith(ties, member),
+  }))
+
+  return {
+    level: levelFor(format, 100),
+    members,
+    ladder,
+    trickRoomLadder: [...ladder].sort((a, b) => a.speed - b.speed || compareLabels(a, b)),
+    ties,
+    basis: BENCHMARK_BASIS,
+    field,
+    notes: [
+      ...ties
+        .filter((tie) => tie.involvesMember)
+        .map((tie): SpeedNote => ({
+          kind: 'speed-tie',
+          speed: tie.speed,
+          count: tie.entries.length,
+        })),
+      ...computed.flatMap(({ notes }) => notes),
+      { kind: 'unmodelled', effects: UNMODELLED_SPEED_EFFECTS },
+    ],
+  }
+}
+
+/* ------------------------------------------------------------------- ties */
+
+function buildTies(ladder: readonly LadderEntry[]): readonly SpeedTie[] {
+  const bySpeed = new Map<number, LadderEntry[]>()
+  for (const entry of ladder) {
+    const existing = bySpeed.get(entry.speed)
+    if (existing === undefined) bySpeed.set(entry.speed, [entry])
+    else existing.push(entry)
+  }
+
+  return [...bySpeed.entries()]
+    .filter(([, entries]) => entries.length > 1)
+    .map(([speed, entries]) => ({
+      speed,
+      entries,
+      involvesMember: entries.some((entry) => entry.kind === 'member'),
+    }))
+    .sort((a, b) => b.speed - a.speed)
+}
+
+function tiedWith(
+  ties: readonly SpeedTie[],
+  member: Omit<MemberSpeed, 'tiedWith'>,
+): readonly LadderEntry[] {
+  const tie = ties.find((candidate) => candidate.speed === member.effective)
+  if (tie === undefined) return []
+  return tie.entries.filter((entry) => entry.kind !== 'member' || entry.setId !== member.setId)
 }
 
 /* ------------------------------------------------------------- the members */
+
+type ComputedMember = {
+  readonly member: Omit<MemberSpeed, 'tiedWith'>
+  readonly notes: readonly SpeedNote[]
+}
 
 function memberSpeed({
   set,
   species,
   format,
+  field,
 }: {
   readonly set: PokemonSet
   readonly species: Species
   readonly format: Format
-}): MemberSpeed {
+  readonly field: SpeedField
+}): ComputedMember {
   const level = levelFor(format, set.level)
   const speed = computeStat(
     { base: species.baseStats.spe, iv: set.ivs.spe, ev: set.evs.spe, level },
@@ -245,7 +421,8 @@ function memberSpeed({
   )
 
   const scarfed = set.item === CHOICE_SCARF
-  const boosted = canUseBoosterSpeed({ set, species, format })
+  const booster = boosterState({ set, species, format, field })
+  const boosted = booster.kind === 'active'
 
   const modifiers = SPEED_MODIFIERS.map((modifier) => ({
     modifier,
@@ -258,13 +435,16 @@ function memberSpeed({
   if (boosted) effective = applyModifier(effective, { kind: 'booster' })
 
   return {
-    setId: set.id,
-    species: species.id,
-    name: displayName(species),
-    level,
-    speed,
-    effective,
-    modifiers,
+    member: {
+      setId: set.id,
+      species: species.id,
+      name: displayName(species),
+      level,
+      speed,
+      effective,
+      modifiers,
+    },
+    notes: boosterNotes(set.id, booster),
   }
 }
 
@@ -294,12 +474,78 @@ function isAvailable({
   }
 }
 
+/* --------------------------------------------------------- the Paradox pair */
+
+/**
+ * Why a set does or does not get the Paradox Speed boost.
+ *
+ * A boolean could not carry the two cases that were wrong here: the item with
+ * no ability behind it, and the ability with nothing to switch it on. Both are
+ * a note rather than a silent `false`.
+ */
+type BoosterState =
+  | { readonly kind: 'active'; readonly ability: AbilityId }
+  | { readonly kind: 'dormant'; readonly ability: AbilityId }
+  | { readonly kind: 'item-without-ability' }
+  | { readonly kind: 'not-the-highest-stat'; readonly ability: AbilityId }
+  | { readonly kind: 'none' }
+
 /**
  * Protosynthesis and Quark Drive raise the holder's highest stat, and raise
- * Speed by 1.5x rather than the 1.3x the other four get. So the boost only
- * lands here when Speed is the highest of the five computed stats.
+ * Speed by 1.5x rather than the 1.3x the other four get. So the boost lands
+ * here only when Speed is the highest of the five computed stats — and only
+ * when something has switched the ability on at all.
+ *
+ * Booster Energy does that in hand; sun does it for Protosynthesis and Electric
+ * Terrain for Quark Drive. The item on its own does nothing, which is what
+ * `items.ts` has always said and this file used to contradict.
  */
-function canUseBoosterSpeed({
+function boosterState({
+  set,
+  species,
+  format,
+  field,
+}: {
+  readonly set: PokemonSet
+  readonly species: Species
+  readonly format: Format
+  readonly field: SpeedField
+}): BoosterState {
+  const holdsBooster = set.item === BOOSTER_ENERGY
+  const ability = set.ability
+  const trigger = ability === null ? undefined : PARADOX_TRIGGERS[ability]
+
+  if (ability === null || trigger === undefined) {
+    return holdsBooster ? { kind: 'item-without-ability' } : { kind: 'none' }
+  }
+
+  const switchedOn =
+    holdsBooster || (trigger === 'sun' ? field.weather === 'sun' : field.terrain === 'electric')
+  if (!switchedOn) return { kind: 'dormant', ability }
+
+  return highestStat({ set, species, format }) === 'spe'
+    ? { kind: 'active', ability }
+    : { kind: 'not-the-highest-stat', ability }
+}
+
+function boosterNotes(setId: SetId, state: BoosterState): readonly SpeedNote[] {
+  switch (state.kind) {
+    case 'dormant':
+      return [{ kind: 'paradox-dormant', setId, ability: state.ability }]
+    case 'item-without-ability':
+      return [{ kind: 'booster-without-ability', setId }]
+    case 'active':
+    case 'not-the-highest-stat':
+    case 'none':
+      return []
+    default: {
+      const exhaustive: never = state
+      return exhaustive
+    }
+  }
+}
+
+function highestStat({
   set,
   species,
   format,
@@ -307,10 +553,7 @@ function canUseBoosterSpeed({
   readonly set: PokemonSet
   readonly species: Species
   readonly format: Format
-}): boolean {
-  const hasAbility = set.ability !== null && BOOST_ABILITIES.includes(set.ability)
-  if (!hasAbility && set.item !== BOOSTER_ENERGY) return false
-
+}): BoostableStat {
   const level = levelFor(format, set.level)
   const computed = BOOSTABLE_STATS.map((stat) => ({
     stat,
@@ -321,8 +564,7 @@ function canUseBoosterSpeed({
     ),
   }))
 
-  const highest = computed.reduce((best, entry) => (entry.value > best.value ? entry : best))
-  return highest.stat === 'spe'
+  return computed.reduce((best, entry) => (entry.value > best.value ? entry : best)).stat
 }
 
 /* ---------------------------------------------------------- the benchmarks */

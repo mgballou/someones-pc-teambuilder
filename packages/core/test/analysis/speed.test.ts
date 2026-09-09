@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { analyzeSpeed, ladderEntrySpeed } from '../../src/analysis/index'
-import type { LadderEntry, SpeedModifier } from '../../src/analysis/index'
+import {
+  analyzeSpeed,
+  ladderEntrySpeed,
+  speedNoteText,
+  UNMODELLED_SPEED_EFFECTS,
+} from '../../src/analysis/index'
+import type { LadderEntry, SpeedField, SpeedModifier } from '../../src/analysis/index'
 import { gen9Ou, regulationH, unrestricted } from '../../src/formats/index'
 import type { Team } from '../../src/index'
 import { fixtureDex } from '../fixtures/dex'
@@ -8,6 +13,12 @@ import { makeTeam } from './support'
 
 const speedOf = (team: Team, format = regulationH) =>
   analyzeSpeed({ team, format, dex: fixtureDex })
+
+const speedOnField = (team: Team, field: SpeedField) =>
+  analyzeSpeed({ team, format: regulationH, dex: fixtureDex, field })
+
+const sun: SpeedField = { weather: 'sun', terrain: 'none' }
+const electric: SpeedField = { weather: 'none', terrain: 'electric' }
 
 const modifier = (team: Team, kind: SpeedModifier['kind']) =>
   speedOf(team).members[0]?.modifiers.find((entry) => entry.modifier.kind === kind)
@@ -71,6 +82,7 @@ describe('member speed', () => {
         id: 'a-flutter-mane',
         species: 'flutter-mane',
         ability: 'protosynthesis',
+        item: 'booster-energy',
         nature: 'timid',
         evs: { spe: 252 },
       },
@@ -85,6 +97,7 @@ describe('member speed', () => {
         id: 'a-flutter-mane',
         species: 'flutter-mane',
         ability: 'protosynthesis',
+        item: 'booster-energy',
         nature: 'modest',
         evs: { spa: 252 },
       },
@@ -95,6 +108,100 @@ describe('member speed', () => {
 
   it('withholds the Booster boost from a set without the ability or the item', () => {
     expect(modifier(bare, 'booster')?.available).toBe(false)
+  })
+})
+
+/**
+ * Finding 16. The item alone used to be enough, so a Jolly 252 Speed Garchomp
+ * holding Booster Energy read 253 instead of 169, and a Protosynthesis holder
+ * took the boost in a game with no sun in it.
+ */
+describe('the Paradox pair', () => {
+  const garchompHoldingBooster = makeTeam(regulationH, [
+    {
+      id: 'a-garchomp',
+      species: 'garchomp',
+      ability: 'rough-skin',
+      item: 'booster-energy',
+      nature: 'jolly',
+      evs: { spe: 252 },
+    },
+  ])
+
+  const flutterMane = (item?: string) =>
+    makeTeam(regulationH, [
+      {
+        id: 'a-flutter-mane',
+        species: 'flutter-mane',
+        ability: 'protosynthesis',
+        ...(item === undefined ? {} : { item }),
+        nature: 'timid',
+        evs: { spe: 252 },
+      },
+    ])
+
+  const ironLeaves = makeTeam(regulationH, [
+    {
+      id: 'a-iron-leaves',
+      species: 'iron-leaves',
+      ability: 'quark-drive',
+      nature: 'jolly',
+      evs: { spe: 252 },
+    },
+  ])
+
+  it('leaves Booster Energy inert on a Pokemon with no Paradox ability', () => {
+    expect(speedOf(garchompHoldingBooster).members[0]?.effective).toBe(169)
+  })
+
+  it('marks that Booster line unreachable', () => {
+    expect(modifier(garchompHoldingBooster, 'booster')?.available).toBe(false)
+  })
+
+  it('names the wasted item in the notes', () => {
+    expect(speedOf(garchompHoldingBooster).notes.map((note) => note.kind)).toContain(
+      'booster-without-ability',
+    )
+  })
+
+  it('leaves a Paradox ability dormant with no sun and no item', () => {
+    expect(speedOf(flutterMane()).members[0]?.effective).toBe(
+      speedOf(flutterMane()).members[0]?.speed,
+    )
+  })
+
+  it('names the dormant ability in the notes', () => {
+    expect(speedOf(flutterMane()).notes.map((note) => note.kind)).toContain('paradox-dormant')
+  })
+
+  it('wakes Protosynthesis in the sun', () => {
+    expect(speedOnField(flutterMane(), sun).members[0]?.effective).toBe(307)
+  })
+
+  it('leaves Protosynthesis dormant under Electric Terrain', () => {
+    expect(speedOnField(flutterMane(), electric).members[0]?.effective).toBe(205)
+  })
+
+  it('wakes Quark Drive under Electric Terrain', () => {
+    expect(speedOnField(ironLeaves, electric).members[0]?.effective).toBe(256)
+  })
+
+  it('leaves Quark Drive dormant in the sun', () => {
+    expect(speedOnField(ironLeaves, sun).members[0]?.effective).toBe(171)
+  })
+
+  it('wakes the ability with Booster Energy and no weather at all', () => {
+    expect(speedOf(flutterMane('booster-energy')).members[0]?.effective).toBe(307)
+  })
+
+  it('drops the dormant note once something switches the ability on', () => {
+    expect(speedOf(flutterMane('booster-energy')).notes.map((note) => note.kind)).not.toContain(
+      'paradox-dormant',
+    )
+  })
+
+  it('reads a clear field by default', () => {
+    expect(speedOf(bare).field).toEqual({ weather: 'none', terrain: 'none' })
   })
 })
 
@@ -192,5 +299,101 @@ describe('the benchmark pool', () => {
 
   it('still holds the species the format does allow', () => {
     expect(pool()).toContain('garchomp')
+  })
+})
+
+/**
+ * Finding 17. The ladder printed an order for numbers that are equal, and had
+ * no idea Trick Room existed.
+ */
+describe('ties and Trick Room', () => {
+  const onItsOwnBenchmark = makeTeam(regulationH, [
+    { id: 'a-garchomp', species: 'garchomp', nature: 'jolly', evs: { spe: 252 } },
+  ])
+
+  const tiedAt = (team: Team, speed: number) =>
+    speedOf(team).ties.find((tie) => tie.speed === speed)
+
+  it('groups the entries sharing a number', () => {
+    const member = speedOf(onItsOwnBenchmark).members[0]
+
+    expect(tiedAt(onItsOwnBenchmark, member?.effective ?? 0)?.entries.length).toBe(2)
+  })
+
+  it('marks a tie the team is part of', () => {
+    const member = speedOf(onItsOwnBenchmark).members[0]
+
+    expect(tiedAt(onItsOwnBenchmark, member?.effective ?? 0)?.involvesMember).toBe(true)
+  })
+
+  it('names what the member is tied with', () => {
+    expect(speedOf(onItsOwnBenchmark).members[0]?.tiedWith.map((entry) => entry.label)).toEqual([
+      'Max Speed Jolly Garchomp',
+    ])
+  })
+
+  it('leaves tiedWith empty for a member on a number of its own', () => {
+    expect(speedOf(bare).members[0]?.tiedWith).toEqual([])
+  })
+
+  it('says in the notes that a tie is not an ordering', () => {
+    expect(speedOf(onItsOwnBenchmark).notes.map((note) => note.kind)).toContain('speed-tie')
+  })
+
+  it('sorts every tie fastest first', () => {
+    const speeds = speedOf(onItsOwnBenchmark).ties.map((tie) => tie.speed)
+
+    expect(speeds.every((speed, index) => index === 0 || speeds[index - 1]! > speed)).toBe(true)
+  })
+
+  it('carries the same entries in the Trick Room ladder', () => {
+    expect(speedOf(onItsOwnBenchmark).trickRoomLadder.length).toBe(
+      speedOf(onItsOwnBenchmark).ladder.length,
+    )
+  })
+
+  it('sorts the Trick Room ladder slowest first', () => {
+    const speeds = speedOf(onItsOwnBenchmark).trickRoomLadder.map(ladderEntrySpeed)
+
+    expect(speeds.every((speed, index) => index === 0 || speeds[index - 1]! <= speed)).toBe(true)
+  })
+
+  it('puts the slowest thing on the field first under Trick Room', () => {
+    const slowest = Math.min(...speedOf(onItsOwnBenchmark).ladder.map(ladderEntrySpeed))
+
+    expect(speedOf(onItsOwnBenchmark).trickRoomLadder[0]?.speed).toBe(slowest)
+  })
+
+  it('changes no Speed number to do it', () => {
+    const straight = speedOf(onItsOwnBenchmark)
+      .ladder.map(ladderEntrySpeed)
+      .sort((a, b) => a - b)
+    const inverted = speedOf(onItsOwnBenchmark).trickRoomLadder.map(ladderEntrySpeed)
+
+    expect(inverted).toEqual(straight)
+  })
+
+  it('keeps Trick Room out of the multiplier table', () => {
+    expect(
+      speedOf(onItsOwnBenchmark).members[0]?.modifiers.map((entry) => entry.modifier.kind),
+    ).not.toContain('trick-room')
+  })
+})
+
+describe('what the ladder does not model', () => {
+  it('always names the Speed effects it leaves out', () => {
+    expect(speedOf(bare).notes.map((note) => note.kind)).toContain('unmodelled')
+  })
+
+  it('carries every one of them', () => {
+    const note = speedOf(bare).notes.find((entry) => entry.kind === 'unmodelled')
+
+    expect(note?.effects).toEqual(UNMODELLED_SPEED_EFFECTS)
+  })
+
+  it('writes a tie note a person can read', () => {
+    expect(speedNoteText({ kind: 'speed-tie', speed: 213, count: 2 })).toContain(
+      'decided at random',
+    )
   })
 })
