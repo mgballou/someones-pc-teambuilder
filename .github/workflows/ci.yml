@@ -25,7 +25,6 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://spc:spc@localhost:5433/someones_pc
-      AUTH_SECRET: ci-only-secret-not-used-anywhere-real
 
     steps:
       - uses: actions/checkout@v7
