@@ -174,10 +174,12 @@ are worth knowing before you rely on the output.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
   They are not filtered by usage statistics.
 - **Coverage scores against whole typings, not one type at a time**, and ability immunities move
-  the grid. Three things it does not do: it reads each move at its printed type, so Tera Blast's
-  type change is not modelled; an ability that changes a hit without changing the chart, Thick Fat
-  say, is named in the notes rather than folded into a multiplier; and the defensive grid uses each
-  member's printed typing, because Terastallizing changes one member once.
+  the defensive grid. Four things it does not do: it reads each move at its printed type, so Tera
+  Blast's type change is not modelled; an ability that changes a hit without changing the chart,
+  Thick Fat say, is named in the notes rather than folded into a multiplier; the defensive grid
+  uses each member's printed typing, because Terastallizing changes one member once; and the
+  offensive reading is against typing alone, because the other side's abilities cannot be known
+  from here — Levitate zeroes a Ground move the panel counts as a hit.
 
 Not in scope: usage statistics, team suggestions, battle simulation, and sharing or social
 features. The app reports on the team in front of it.
