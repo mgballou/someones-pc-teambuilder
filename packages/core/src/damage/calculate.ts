@@ -639,6 +639,14 @@ function resolveAttack({
 }: AttackInput): number {
   let stage = attacker.boosts[attackStatName]
 
+  const selfBoost = moveOverride(context.move.id)?.selfBoostBeforeHit
+  if (selfBoost !== undefined && selfBoost.stat === attackStatName) {
+    stage += selfBoost.stages
+    notes.add(
+      `${context.move.name} was applied as ${signed(selfBoost.stages)} ${STAT_LABEL[selfBoost.stat]}, ${selfBoost.why}. Clear it from the attacker's boosts if it is already counted there.`,
+    )
+  }
+
   const imposed = defenderEntry?.foeAttackStage
   if (imposed !== undefined && imposed.stat === attackStatName && defenderAbility !== null) {
     stage += imposed.stages

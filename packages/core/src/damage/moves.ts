@@ -43,6 +43,24 @@ export type MoveOverride = {
   readonly ignoresBurn?: boolean
   /** Earthquake and friends are halved on Grassy Terrain. */
   readonly halvedByGrassyTerrain?: boolean
+  /**
+   * A stat stage the move gives its own user before it lands.
+   *
+   * Meteor Beam and Electro Shot raise Special Attack while they charge, and
+   * there is no way for either to deal damage without that having happened: a
+   * Power Herb skips the wait, not the boost. So this is not a question about a
+   * turn the calculator does not hold — it is a rule of the move — and it is
+   * applied rather than noted as out of reach.
+   *
+   * Simple and Contrary change the size of it and neither is in the ability
+   * model, so both already arrive with a note saying they were not applied.
+   */
+  readonly selfBoostBeforeHit?: {
+    readonly stat: BoostableStat
+    readonly stages: number
+    /** Said on every call, so a stage nobody asked for is never silent. */
+    readonly why: string
+  }
 }
 
 const WEATHER_BALL_TYPE: Readonly<Partial<Record<Field['weather'], PokemonType>>> = {
@@ -90,6 +108,12 @@ export const MOVE_OVERRIDES: Readonly<Record<string, MoveOverride>> = {
   'terrain-pulse': {
     typeFromField: ({ field, attacker }) =>
       attacker.grounded ? (TERRAIN_PULSE_TYPE[field.terrain] ?? null) : null,
+  },
+  'meteor-beam': {
+    selfBoostBeforeHit: { stat: 'spa', stages: 1, why: 'which it gains as it charges' },
+  },
+  'electro-shot': {
+    selfBoostBeforeHit: { stat: 'spa', stages: 1, why: 'which it gains as it charges' },
   },
   facade: { ignoresBurn: true },
   earthquake: { halvedByGrassyTerrain: true },

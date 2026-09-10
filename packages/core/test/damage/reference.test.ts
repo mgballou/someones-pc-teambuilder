@@ -1079,3 +1079,59 @@ describe('Icicle Spear, at each number of hits it can land', () => {
     ).toEqual([170, 210])
   })
 })
+
+/**
+ * A charging move's own Special Attack stage.
+ *
+ * Meteor Beam and Electro Shot raise it while they charge, and neither can
+ * deal damage without that having happened — a Power Herb skips the wait, not
+ * the boost. So this is a rule of the move rather than a fact about a turn the
+ * calculator does not hold, and it is applied rather than declared out of
+ * reach. It was the only difference from the reference in the fuzz sweep that
+ * was not already a named finding.
+ */
+describe('the charge boost', () => {
+  it('agrees on Glimmora Meteor Beam into Blissey', () => {
+    expect(
+      agrees({
+        attacker: GLIMMORA,
+        defender: SPECIAL_BLISSEY,
+        move: 'meteor-beam',
+        referenceMove: 'Meteor Beam',
+      }),
+    ).toEqual([100, 118])
+  })
+
+  it('agrees on Raging Bolt Electro Shot into Blissey', () => {
+    expect(
+      agrees({
+        attacker: RAGING_BOLT,
+        defender: SPECIAL_BLISSEY,
+        move: 'electro-shot',
+        referenceMove: 'Electro Shot',
+      }),
+    ).toEqual([111, 132])
+  })
+
+  it('agrees when the user is already at a stage', () => {
+    expect(
+      agrees({
+        attacker: { ...GLIMMORA, boosts: { spa: 2 } },
+        defender: SPECIAL_BLISSEY,
+        move: 'meteor-beam',
+        referenceMove: 'Meteor Beam',
+      }),
+    ).toEqual([165, 195])
+  })
+
+  it('agrees when the user is already at the cap', () => {
+    expect(
+      agrees({
+        attacker: { ...GLIMMORA, boosts: { spa: 6 } },
+        defender: SPECIAL_BLISSEY,
+        move: 'meteor-beam',
+        referenceMove: 'Meteor Beam',
+      }),
+    ).toEqual([262, 310])
+  })
+})

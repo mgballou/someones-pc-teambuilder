@@ -947,6 +947,14 @@ const MOVES: readonly Move[] = [
     flags: { contact: true },
   }),
   makeMove({ id: 'solar-beam', type: 'grass', category: 'special', basePower: 120 }),
+  makeMove({
+    id: 'meteor-beam',
+    type: 'rock',
+    category: 'special',
+    basePower: 120,
+    accuracy: 90,
+  }),
+  makeMove({ id: 'electro-shot', type: 'electric', category: 'special', basePower: 130 }),
   makeMove({ id: 'hex', type: 'ghost', category: 'special', basePower: 65 }),
   makeMove({
     id: 'assurance',
