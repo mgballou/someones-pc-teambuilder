@@ -45,7 +45,7 @@ type SeedTeam = {
 const TEAMS: readonly SeedTeam[] = [
   {
     name: 'Reg H Rain',
-    format: 'vgc-2026-reg-h',
+    format: 'vgc-reg-h',
     notes: 'Pelipper sets the rain, Archaludon uses it. Amoonguss and Incineroar cover the speed.',
     members: [
       {
@@ -171,7 +171,7 @@ const TEAMS: readonly SeedTeam[] = [
   },
   {
     name: 'Reg G Miraidon',
-    format: 'vgc-2026-reg-g',
+    format: 'vgc-reg-g',
     notes: 'One restricted. Electric terrain plus Tailwind, Farigiraf blocks priority.',
     members: [
       {

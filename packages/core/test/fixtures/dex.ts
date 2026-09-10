@@ -1093,8 +1093,8 @@ const ABILITIES: readonly Ability[] = ABILITY_NAMES.map((name) => ({
 
 const FORMATS: readonly Format[] = [
   {
-    id: formatId('vgc-2026-reg-h'),
-    name: 'VGC 2026 Regulation H',
+    id: formatId('vgc-reg-h'),
+    name: 'VGC Regulation H',
     shortName: 'Reg H',
     generation: 9,
     style: 'doubles',
@@ -1111,6 +1111,7 @@ const FORMATS: readonly Format[] = [
       authority: 'vgc',
       citation: 'Fixture ruleset. Not the real Regulation H.',
       verifiedOn: '2026-08-16',
+      staleAfterDays: 30,
     },
   },
   {
@@ -1132,6 +1133,7 @@ const FORMATS: readonly Format[] = [
       authority: 'smogon',
       citation: 'Fixture ruleset. Not the real OU banlist.',
       verifiedOn: '2026-08-16',
+      staleAfterDays: 31,
     },
   },
 ]

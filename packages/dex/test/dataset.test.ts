@@ -27,7 +27,7 @@ describe('lookups', () => {
   })
 
   it('finds a format by id', () => {
-    expect(dex.format(formatId('vgc-2026-reg-h'))?.bringSize).toBe(4)
+    expect(dex.format(formatId('vgc-reg-h'))?.bringSize).toBe(4)
   })
 
   it('returns undefined for an id that is not there', () => {
@@ -47,8 +47,8 @@ describe('learnsets', () => {
 
 describe('curated formats', () => {
   it('fills Regulation G restricted list from the dataset', () => {
-    const regG = dex.format(formatId('vgc-2026-reg-g'))
-    expect(regG?.legality.maxRestricted).toBe(2)
+    const regG = dex.format(formatId('vgc-reg-g'))
+    expect(regG?.legality.maxRestricted).toBe(1)
   })
 
   it('carries a source on every format', () => {

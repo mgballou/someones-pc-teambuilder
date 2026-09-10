@@ -13,7 +13,9 @@
 
 import { EMPTY_LEGALITY, type Format } from '../format'
 import { formatId } from '../ids'
-import { VERIFIED_ON } from './vgc'
+
+/** The day this sandbox was defined. It answers to nobody, so it never ages. */
+const DEFINED_ON = '2026-08-16'
 
 export const unrestricted: Format = {
   id: formatId('unrestricted'),
@@ -40,6 +42,12 @@ export const unrestricted: Format = {
       'and no clause applies, so a legality verdict here says only that a set is internally',
       'coherent. It is not a format anyone plays.',
     ].join(' '),
-    verifiedOn: VERIFIED_ON,
+    verifiedOn: DEFINED_ON,
+    /**
+     * Never stale. The other formats age because an outside authority moves
+     * without telling this app; this one is defined here, so there is nothing
+     * for it to fall behind, and saying "last checked" of it would be theatre.
+     */
+    staleAfterDays: null,
   },
 }

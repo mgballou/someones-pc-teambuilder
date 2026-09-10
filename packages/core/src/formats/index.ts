@@ -11,8 +11,15 @@ import { gen9Ou, gen9Ubers } from './smogon'
 import { unrestricted } from './unrestricted'
 import { regulationG, regulationH, regulationI } from './vgc'
 
-export { VERIFIED_ON, VGC_RESTRICTED_SPECIES, regulationG, regulationH, regulationI } from './vgc'
-export { gen9Ou, gen9Ubers } from './smogon'
+export {
+  VGC_STALE_AFTER_DAYS,
+  VGC_VERIFIED_ON,
+  VGC_RESTRICTED_SPECIES,
+  regulationG,
+  regulationH,
+  regulationI,
+} from './vgc'
+export { SMOGON_STALE_AFTER_DAYS, SMOGON_VERIFIED_ON, gen9Ou, gen9Ubers } from './smogon'
 export { unrestricted } from './unrestricted'
 
 /**

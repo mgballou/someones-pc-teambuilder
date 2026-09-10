@@ -13,7 +13,18 @@
 import { EMPTY_LEGALITY, type Format, type FormatSource } from '../format'
 import { abilityId, formatId, itemId, moveId, speciesId } from '../ids'
 import type { AbilityId, ItemId, MoveId, SpeciesId } from '../ids'
-import { VERIFIED_ON } from './vgc'
+
+/**
+ * The date the ban lists below were last read against smogon.com.
+ *
+ * Its own constant, not the VGC one. Smogon retiers on a cadence Play! Pokémon
+ * has nothing to do with, and a single date shared between the two was true of
+ * neither.
+ */
+export const SMOGON_VERIFIED_ON = '2026-08-16'
+
+/** Smogon retiers monthly, so a transcription is worth a month and no longer. */
+export const SMOGON_STALE_AFTER_DAYS = 31
 
 /**
  * Banned by the Evasion Items Clause in every Smogon singles tier. Modelled as
@@ -131,7 +142,8 @@ const smogonSource = (tier: string, coverage: string): FormatSource => ({
     'snapshot taken on the date above rather than as the current tier. Anything decided by',
     'a suspect test since then is missing. Check smogon.com before relying on a verdict.',
   ].join(' '),
-  verifiedOn: VERIFIED_ON,
+  verifiedOn: SMOGON_VERIFIED_ON,
+  staleAfterDays: SMOGON_STALE_AFTER_DAYS,
 })
 
 /**

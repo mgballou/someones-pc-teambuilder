@@ -126,8 +126,8 @@ Shipping:
 
 Legality uses two mechanisms because real formats use both: **category bans** (Regulation H bans
 every legendary, mythical and paradox at once) and **name bans** (Smogon tiers ban one Pokémon
-at a time). Regulation G additionally allows two _restricted_ legendaries, which is a cap, not a
-ban.
+at a time). Regulation I additionally allows two _restricted_ legendaries and Regulation G allows
+one, which is a cap, not a ban.
 
 Before either mechanism runs, a format asks whether its generation holds the species at all.
 That question belongs to the games rather than to a ruleset: Scarlet and Violet hold 869 of the

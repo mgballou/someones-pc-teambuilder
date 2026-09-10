@@ -15,8 +15,18 @@ import { EMPTY_LEGALITY, type Format, type FormatSource } from '../format'
 import { formatId, speciesId, type SpeciesId } from '../ids'
 import type { SpeciesClassification } from '../species'
 
-/** The date every ruleset in this package was last read against its authority. */
-export const VERIFIED_ON = '2026-08-16'
+/** The date the regulations below were last read against Play! Pokémon's pages. */
+export const VGC_VERIFIED_ON = '2026-09-10'
+
+/**
+ * How long a reading of a Play! Pokémon regulation stays worth trusting.
+ *
+ * The VGC tournament handbook (§2.1.1) says the contents of a regulation set
+ * "may be announced up to 30 days prior to the first legal competition that
+ * would take place using a new regulation set". Thirty days is therefore the
+ * longest a snapshot can be relied on not to have been overtaken already.
+ */
+export const VGC_STALE_AFTER_DAYS = 30
 
 /**
  * Every classification that is not an ordinary Pokémon.
@@ -45,7 +55,7 @@ const NEVER_IN_VGC: readonly SpeciesClassification[] = ['mythical', 'mega', 'tot
 /**
  * The restricted tier — the box legendaries a team may hold a capped number of.
  *
- * Restricted is not banned. Regulation G allows two of these and Regulation I
+ * Restricted is not banned. Regulation I allows two of these and Regulation G
  * allows one, which is `maxRestricted`, not `bannedSpecies`.
  *
  * Form ids follow the dataset's slug convention. Where a species has forms that
@@ -116,17 +126,27 @@ export const VGC_RESTRICTED_SPECIES: readonly SpeciesId[] = [
  */
 const REGULATION_H_NAMED_BANS: readonly SpeciesId[] = ['ursaluna-bloodmoon'].map(speciesId)
 
-function vgcSource(regulation: string, restrictedNote: string): FormatSource {
+/**
+ * A regulation letter is not a season.
+ *
+ * These three carried "VGC 2026" in their names and in their ids, and no
+ * regulation belongs to one season: Regulation G ran in 2024 and again in 2025,
+ * H in 2025 and again in 2026, I in 2025 and again in 2026. The letter is the
+ * identity and the window is a fact about it, so the window is said here, where
+ * a date already lives, and the name is the letter alone.
+ */
+function vgcSource(regulation: string, window: string, restrictedNote: string): FormatSource {
   return {
     authority: 'vgc',
     citation: [
-      `Play! Pokémon VGC ${regulation} rules, transcribed by hand from the published`,
-      `regulation sheet. ${restrictedNote}`,
+      `Play! Pokémon VGC ${regulation} rules, transcribed by hand from the announcement at`,
+      `scarletviolet.pokemon.com. ${window} ${restrictedNote}`,
       'This is a curated snapshot, not a live feed. It may lag an errata or a mid-season',
       'correction, and the restricted list in particular is the part most likely to be out',
       'of date. Check the official rules before entering a tournament.',
     ].join(' '),
-    verifiedOn: VERIFIED_ON,
+    verifiedOn: VGC_VERIFIED_ON,
+    staleAfterDays: VGC_STALE_AFTER_DAYS,
   }
 }
 
@@ -135,8 +155,8 @@ function vgcSource(regulation: string, restrictedNote: string): FormatSource {
  * all. The most restrictive regulation, and the reason category bans exist.
  */
 export const regulationH: Format = {
-  id: formatId('vgc-2026-reg-h'),
-  name: 'VGC 2026 Regulation H',
+  id: formatId('vgc-reg-h'),
+  name: 'VGC Regulation H',
   shortName: 'Reg H',
   generation: 9,
   style: 'doubles',
@@ -152,6 +172,7 @@ export const regulationH: Format = {
   },
   source: vgcSource(
     'Regulation H',
+    'Ranked Battles 31 August 2024 to 5 January 2025, and official events again 1 September to 30 November 2025.',
     'Every legendary, mythical, sub-legendary, paradox and Ultra Beast is barred, so no restricted allowance applies.',
   ),
 }
@@ -161,34 +182,9 @@ export const regulationH: Format = {
  * everything else in the transferable dex except mythicals.
  */
 export const regulationG: Format = {
-  id: formatId('vgc-2026-reg-g'),
-  name: 'VGC 2026 Regulation G',
+  id: formatId('vgc-reg-g'),
+  name: 'VGC Regulation G',
   shortName: 'Reg G',
-  generation: 9,
-  style: 'doubles',
-  teamSize: 6,
-  bringSize: 4,
-  level: { kind: 'fixed', level: 50 },
-  gimmick: 'terastal',
-  clauses: ['species', 'item'],
-  legality: {
-    ...EMPTY_LEGALITY,
-    bannedClassifications: NEVER_IN_VGC,
-    restrictedSpecies: VGC_RESTRICTED_SPECIES,
-    maxRestricted: 2,
-  },
-  source: vgcSource('Regulation G', 'Two restricted Pokémon per team.'),
-}
-
-/**
- * Regulation I — the same pool as Regulation G with the restricted allowance
- * cut to one. The difference between the two formats is a single number, which
- * is the point of modelling the cap as data.
- */
-export const regulationI: Format = {
-  id: formatId('vgc-2026-reg-i'),
-  name: 'VGC 2026 Regulation I',
-  shortName: 'Reg I',
   generation: 9,
   style: 'doubles',
   teamSize: 6,
@@ -202,5 +198,38 @@ export const regulationI: Format = {
     restrictedSpecies: VGC_RESTRICTED_SPECIES,
     maxRestricted: 1,
   },
-  source: vgcSource('Regulation I', 'One restricted Pokémon per team.'),
+  source: vgcSource(
+    'Regulation G',
+    'Ranked Battles and official events 1 May to 31 August 2024, and again 5 January to 30 April 2025.',
+    'One restricted Pokémon per team: "Only one of the following special Pokémon may be registered to your Battle Team."',
+  ),
+}
+
+/**
+ * Regulation I — the same pool as Regulation G with the restricted allowance
+ * cut to one. The difference between the two formats is a single number, which
+ * is the point of modelling the cap as data.
+ */
+export const regulationI: Format = {
+  id: formatId('vgc-reg-i'),
+  name: 'VGC Regulation I',
+  shortName: 'Reg I',
+  generation: 9,
+  style: 'doubles',
+  teamSize: 6,
+  bringSize: 4,
+  level: { kind: 'fixed', level: 50 },
+  gimmick: 'terastal',
+  clauses: ['species', 'item'],
+  legality: {
+    ...EMPTY_LEGALITY,
+    bannedClassifications: NEVER_IN_VGC,
+    restrictedSpecies: VGC_RESTRICTED_SPECIES,
+    maxRestricted: 2,
+  },
+  source: vgcSource(
+    'Regulation I',
+    'Ranked Battles and official events 1 May to 31 August 2025, Ranked Battles again from 5 January 2026 and official events from 1 April 2026.',
+    'Two restricted Pokémon per team: "No more than two of the following special Pokémon may be registered to your Battle Team."',
+  ),
 }
