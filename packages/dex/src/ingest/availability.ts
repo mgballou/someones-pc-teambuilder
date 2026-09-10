@@ -12,12 +12,11 @@
  * move in them — a level-up move if nothing else. So availability is read off
  * the same payload the learnset is, against a narrower set of version groups.
  *
- * Narrower on purpose. `learnsets.ts` includes `champions`, because PokéAPI
- * files a handful of moves legal in Scarlet and Violet only there, and being
- * slightly permissive about a move is better than calling a real team illegal.
- * Existence is the opposite trade: `champions` carries a move list for 129
- * forms that are not in Scarlet and Violet at all, Pidgeot among them, and
- * reading one of those as presence is the whole bug.
+ * The same three version groups `learnsets.ts` reads, and for the same reason:
+ * `champions` carries a move list for 129 forms that are not in Scarlet and
+ * Violet at all, Pidgeot among them, and reading one of those as presence is
+ * the whole bug. Nothing here reads it, and since the evolution chain replaced
+ * it in `learnsets.ts`, nothing anywhere does.
  */
 
 import type { PokemonResponse } from '../pokeapi/schema'

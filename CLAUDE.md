@@ -178,8 +178,9 @@ This app makes claims about a competitive game. Several are approximations, and 
   `Format` carries a `source` with an authority and a `verifiedOn` date, and the interface shows
   it next to every legality verdict. Never write copy implying legality is authoritative or live.
 - **Learnsets are by-generation, not by-method.** The dataset knows Garchomp can learn
-  Earthquake in Gen 9. It does not model egg-move chains, version exclusivity, or event-only
-  moves. The move picker says so.
+  Earthquake in Gen 9, and it folds in what a Pokémon's pre-evolutions learn, because a Pokémon
+  keeps what it knew before it evolved. It does not model breeding chains, version exclusivity,
+  or event-only moves. The move picker says so.
 - **The damage calculator models a curated set of abilities and items.** Anything outside the
   model is `{ kind: 'unmodelled' }` and the result carries a note naming what it did not
   account for. A calculator that silently ignores Adaptability is worse than one that says it

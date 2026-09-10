@@ -30,9 +30,9 @@ export type Dex = {
   readonly allFormats: () => readonly Format[]
 
   /**
-   * Every move the species can legally learn, by any method, in the dataset's
-   * generation. Legality by *method* (egg, tutor, event) is not modelled —
-   * see the honesty rules.
+   * Every move the species, or one of its pre-evolutions, can legally learn by
+   * any method in the dataset's generation. Legality by *method* (breeding
+   * chain, tutor, event) is not modelled — see the honesty rules.
    */
   readonly learnset: (id: SpeciesId) => readonly MoveId[]
 }

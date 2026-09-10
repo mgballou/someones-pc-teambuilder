@@ -21,7 +21,7 @@ import type { PokemonSpeciesResponse } from '../pokeapi/schema'
 import { IngestError } from '../errors'
 import { normalizeAbility } from './abilities'
 import { megaStonesByHolder, normalizeItem } from './items'
-import { learnsetOf } from './learnsets'
+import { learnsetOf, withInheritedMoves } from './learnsets'
 import { isMainSeriesMove, normalizeMove } from './moves'
 import { evolvingSpeciesFrom, normalizeSpecies } from './species'
 
@@ -109,22 +109,49 @@ export async function ingest(
           evolvingSpecies,
           megaStonesByHolder: megaStones,
         }),
-        /**
-         * Filtered against the move table so the dataset can never hand the
-         * calculator a move id it cannot resolve.
-         */
-        learnset: learnsetOf(pokemon).filter((id) => knownMoves.has(id)),
+        learnset: {
+          form: pokemon.name,
+          species: pokemon.species.name,
+          isDefault: pokemon.is_default,
+          /**
+           * Filtered against the move table so the dataset can never hand the
+           * calculator a move id it cannot resolve.
+           */
+          moves: learnsetOf(pokemon).filter((id) => knownMoves.has(id)),
+        },
       }
     },
   })
+
+  /**
+   * A second pass, because a pre-evolution's learnset is not in hand while the
+   * form that inherits it is being normalized — the walk is a stream and the
+   * order is whatever PokéAPI's index says. See `withInheritedMoves`.
+   */
+  const learnsets = withInheritedMoves(
+    forms.map((form) => form.learnset),
+    preEvolutionsFrom(speciesResponses),
+  )
 
   return {
     species: forms.map((form) => form.species),
     moves,
     items,
     abilities,
-    learnsets: buildLearnsetTable(forms.map((form) => [form.species.id, form.learnset])),
+    learnsets: buildLearnsetTable(learnsets.map((entry) => [entry.form, entry.moves])),
   }
+}
+
+/** Species name to the species it evolves from, for the ones that have one. */
+export function preEvolutionsFrom(
+  responses: readonly PokemonSpeciesResponse[],
+): ReadonlyMap<string, string> {
+  const parents = new Map<string, string>()
+  for (const response of responses) {
+    const parent = response.evolves_from_species
+    if (parent !== null) parents.set(response.name, parent.name)
+  }
+  return parents
 }
 
 type WalkInput<T> = {

@@ -156,9 +156,11 @@ are worth knowing before you rely on the output.
 - **Four of the seven clauses are checked**: Species, Item, OHKO and Evasion. Sleep and Endless
   Battle are decided during a battle and nothing about a team could answer them. The Nickname
   Clause is not checked.
-- **Learnsets are absolute.** A move is listed if the species can learn it in Generation 9 by any
-  route. Egg chains, event distributions and version exclusives are not modelled, so the picker
-  does not know whether a given save file can legally produce the set.
+- **Learnsets are absolute.** A move is listed if the species, or any of its pre-evolutions, can
+  learn it in Generation 9 by any route — a Pokémon keeps what it knew before it evolved, which is
+  how Kingambit gets Pawniard's Sucker Punch. Breeding chains, event distributions and version
+  exclusives are not modelled, so the picker does not know whether a given save file can legally
+  produce the set.
 - **The damage calculator models a curated list of items and abilities**, and its rolls are
   checked match-up by match-up against `@smogon/calc` in the test suite. A result names what it
   could not account for: an item or ability outside the model, or a power that turns on a turn

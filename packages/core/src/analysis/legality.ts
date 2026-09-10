@@ -147,7 +147,7 @@ export const LEGALITY_RULES: Readonly<Record<LegalityRuleId, LegalityRule>> = {
     id: 'learnset',
     label: 'Learnset',
     description:
-      'A Pokémon may only carry moves it can learn in this generation. Egg chains, event moves and version exclusives are not modelled.',
+      'A Pokémon may only carry moves it, or one of its pre-evolutions, can learn in this generation. Breeding chains, event moves and version exclusives are not modelled.',
   },
   'ability-slot': {
     id: 'ability-slot',
