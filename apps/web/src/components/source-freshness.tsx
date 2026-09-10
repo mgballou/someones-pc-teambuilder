@@ -32,16 +32,16 @@ export function VerifiedOn({
         {freshness.kind === 'unchanging'
           ? '· defined here, so it cannot go out of date'
           : freshness.kind === 'fresh'
-            ? `· read ${dayCount(freshness.ageInDays)} ago`
-            : `· read ${dayCount(freshness.ageInDays)} ago, past its ${freshness.staleAfterDays}-day window`}
+            ? `· ${readWhen(freshness.ageInDays)}`
+            : `· ${readWhen(freshness.ageInDays)}, past its ${freshness.staleAfterDays}-day window`}
       </span>
     </>
   )
 }
 
-function dayCount(days: number): string {
-  if (days === 0) return 'today'
-  return days === 1 ? '1 day' : `${days} days`
+function readWhen(days: number): string {
+  if (days <= 0) return 'read today'
+  return days === 1 ? 'read 1 day ago' : `read ${days} days ago`
 }
 
 /** UTC, so the same render on two machines never disagrees by a day. */
