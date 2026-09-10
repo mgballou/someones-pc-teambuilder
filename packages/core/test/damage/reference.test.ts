@@ -1135,3 +1135,53 @@ describe('the charge boost', () => {
     ).toEqual([262, 310])
   })
 })
+
+/**
+ * A Ruin ability facing its own mirror.
+ *
+ * Bulbapedia, Sword of Ruin: it "decreases the Defense stat of all Pokémon on
+ * the field other than Pokémon with this Ability by 25%". Chi-Yu into Chi-Yu is
+ * therefore a match-up where neither Beads of Ruin does anything, which is what
+ * the reference has always said and what this now says too.
+ */
+describe('a Ruin ability against its own mirror', () => {
+  const CHI_YU_WALL: Combatant = { ...CHI_YU, evs: { hp: 252, spd: 252 } }
+  const BEADED_BLISSEY: Combatant = {
+    ...SPECIAL_BLISSEY,
+    ability: 'beads-of-ruin',
+    referenceAbility: 'Beads of Ruin',
+  }
+
+  it('agrees that neither Beads of Ruin lands in the mirror', () => {
+    expect(
+      agrees({
+        attacker: CHI_YU,
+        defender: CHI_YU_WALL,
+        move: 'heat-wave',
+        referenceMove: 'Heat Wave',
+      }),
+    ).toEqual([29, 35])
+  })
+
+  it('agrees that it lands when the defender does not carry it', () => {
+    expect(
+      agrees({
+        attacker: CHI_YU,
+        defender: SPECIAL_BLISSEY,
+        move: 'heat-wave',
+        referenceMove: 'Heat Wave',
+      }),
+    ).toEqual([72, 85])
+  })
+
+  it('agrees that a defender carrying it is exempt from the attacking one', () => {
+    expect(
+      agrees({
+        attacker: CHI_YU,
+        defender: BEADED_BLISSEY,
+        move: 'heat-wave',
+        referenceMove: 'Heat Wave',
+      }),
+    ).toEqual([54, 64])
+  })
+})

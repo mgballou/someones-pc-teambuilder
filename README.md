@@ -164,7 +164,11 @@ are worth knowing before you rely on the output.
 - **The damage calculator models a curated list of items and abilities**, and its rolls are
   checked match-up by match-up against `@smogon/calc` in the test suite. A result names what it
   could not account for: an item or ability outside the model, or a power that turns on a turn
-  order or a battle history the app does not hold. One gap is still silent. A few moves bend the
+  order or a battle history the app does not hold. **Intimidate is assumed to have triggered** —
+  a defender carrying it takes a stage off the attacker's Attack on every calculation, which the
+  result says out loud, because the question a team builder asks is what happens after the
+  switch. It is the one place the calculator deliberately reads a match-up differently from
+  `@smogon/calc`. One gap is still silent. A few moves bend the
   formula rather than the power — Foul Play attacks with the target's Attack, Shell Side Arm picks
   the side that hurts more — and those are read straight, with nothing said.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**

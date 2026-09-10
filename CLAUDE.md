@@ -185,6 +185,23 @@ This app makes claims about a competitive game. Several are approximations, and 
   model is `{ kind: 'unmodelled' }` and the result carries a note naming what it did not
   account for. A calculator that silently ignores Adaptability is worse than one that says it
   cannot.
+- **Two abilities are settled by convention, and the conventions are these.** They are what is
+  left after the calculator was checked match-up by match-up against `@smogon/calc`, and each
+  is a decision rather than a gap.
+  - **Intimidate is assumed to have triggered.** A defender carrying it takes a stage off the
+    attacker's Attack on every calculation, and the result says so and tells the caller to
+    clear the stage from the attacker's boosts if it is already counted there. The reference
+    leaves it off until it is switched on by hand. This calculator has no turn and no
+    switch-in, and the question a team builder is asking is what happens after the switch, so
+    the stage is applied. Never make it silent, and never make it turn on a turn count the core
+    cannot hold. Defiant, Competitive, Clear Body and Guard Dog answer Intimidate back in the
+    games, are outside the ability model, and arrive with their own note saying so.
+  - **A Ruin ability does not touch a Pokémon carrying the same Ruin ability.** Sword of Ruin
+    "decreases the Defense stat of all Pokémon on the field other than Pokémon with this
+    Ability by 25%" and "does not stack if more than one Pokémon with Sword of Ruin is on the
+    field" (Bulbapedia). Chi-Yu facing Chi-Yu is a match-up in which neither Beads of Ruin does
+    anything, and the same holds for the other three. It reads like a convention and is not
+    one — it is the rule, and the reference has it right.
 - **Speed tiers are computed from the dataset, not from usage statistics.** The app has no
   usage data. A benchmark is "max-speed Jolly Garchomp", never "the 43rd most used lead".
 

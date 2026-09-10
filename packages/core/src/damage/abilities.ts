@@ -1,3 +1,5 @@
+import { abilityId } from '../ids'
+import type { AbilityId } from '../ids'
 import type { PokemonType, TeraType } from '../pokemon-type'
 import type { BoostableStat, StatSpread } from '../stats'
 import { BOOSTABLE_STATS } from '../stats'
@@ -120,15 +122,35 @@ function pinchBoost(type: PokemonType): AbilityEntry {
   }
 }
 
-function ruinFoeDefense(category: 'physical' | 'special'): AbilityEntry {
+/**
+ * A Ruin ability lowers a stat on every Pokémon on the field *except the ones
+ * carrying that same ability*, which is why each of the four has to know its
+ * own id.
+ *
+ * Bulbapedia, Sword of Ruin: it "decreases the Defense stat of all Pokémon on
+ * the field other than Pokémon with this Ability by 25%", and "the effect does
+ * not stack if more than one Pokémon with Sword of Ruin is on the field". So
+ * Chi-Yu facing Chi-Yu is a match-up in which neither Beads of Ruin does
+ * anything at all, and the calculator that lowered both was reading the ability
+ * as a field condition rather than as what it is.
+ *
+ * The state answers this, so nothing is said about it.
+ */
+function ruinFoeDefense(self: AbilityId, category: 'physical' | 'special'): AbilityEntry {
   return {
-    foeDefenseStat: (context) => (context.category === category ? MOD_THREE_QUARTERS : null),
+    foeDefenseStat: (context) =>
+      context.category === category && context.defender.ability !== self
+        ? MOD_THREE_QUARTERS
+        : null,
   }
 }
 
-function ruinFoeAttack(category: 'physical' | 'special'): AbilityEntry {
+function ruinFoeAttack(self: AbilityId, category: 'physical' | 'special'): AbilityEntry {
   return {
-    foeAttackStat: (context) => (context.category === category ? MOD_THREE_QUARTERS : null),
+    foeAttackStat: (context) =>
+      context.category === category && context.attacker.ability !== self
+        ? MOD_THREE_QUARTERS
+        : null,
   }
 }
 
@@ -260,10 +282,10 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   unaware: { ignoresFoeBoosts: true },
 
   // The four Ruin abilities
-  'sword-of-ruin': ruinFoeDefense('physical'),
-  'beads-of-ruin': ruinFoeDefense('special'),
-  'tablets-of-ruin': ruinFoeAttack('physical'),
-  'vessel-of-ruin': ruinFoeAttack('special'),
+  'sword-of-ruin': ruinFoeDefense(abilityId('sword-of-ruin'), 'physical'),
+  'beads-of-ruin': ruinFoeDefense(abilityId('beads-of-ruin'), 'special'),
+  'tablets-of-ruin': ruinFoeAttack(abilityId('tablets-of-ruin'), 'physical'),
+  'vessel-of-ruin': ruinFoeAttack(abilityId('vessel-of-ruin'), 'special'),
 
   // Ability suppression
   'mold-breaker': { moldBreaker: true },
