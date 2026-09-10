@@ -42,7 +42,7 @@ export async function loadTeam(teamId: string): Promise<LoadedTeam> {
   if (format === undefined) notFound()
 
   const legality = validateTeam({ team, format, dex: catalog })
-  const coverage = analyzeCoverage({ team, dex: catalog })
+  const coverage = analyzeCoverage({ team, dex: catalog, format })
 
   const problemsBySet = new Map<string, string[]>()
   for (const violation of legality.violations) {

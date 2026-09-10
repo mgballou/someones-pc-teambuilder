@@ -68,6 +68,12 @@ export function resolvePower({
   defenderCurrentHp,
 }: ResolvePowerInput): ResolvedPower {
   const rule = move.variablePower
+  /**
+   * No rule here means the dataset printed a power, and nothing more. It does
+   * *not* mean the power is a constant — Knock Off and Facade print one and
+   * change it in battle. Whether the printed number is the whole story is
+   * `conditional-power.ts`'s question, and the caller asks it next.
+   */
   if (rule === null) return { kind: 'power', power: move.basePower, note: null }
 
   switch (rule.kind) {

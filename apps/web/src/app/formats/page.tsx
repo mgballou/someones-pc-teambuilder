@@ -1,15 +1,25 @@
 import { CLAUSE_DESCRIPTION, CLAUSE_LABEL } from '@spc/core'
 import { dex } from '../../lib/dex'
 import { Panel, SourceNote } from '../../components/panel'
+import { todayInUtc, VerifiedOn } from '../../components/source-freshness'
 import { formatCount } from '../../lib/format'
 
 /**
  * Formats are code, not rows, and every one shows where its rules came from.
  * This page exists so that source is inspectable rather than buried behind a
  * verdict. CLAUDE.md §Honesty rules.
+ *
+ * The verification date leads the key/value table rather than trailing the
+ * source note. It answers the question the page is asked — were these rules
+ * checked by hand, and when — and at the bottom nobody read it.
+ *
+ * The date is not left to be read alone. Each format declares how long its own
+ * authority's snapshot is worth trusting, so the row says which side of that
+ * window the reading falls on rather than leaving the arithmetic to the reader.
  */
 export default function FormatsPage() {
   const formats = dex().allFormats()
+  const today = todayInUtc()
 
   return (
     <div className="flex flex-col gap-4">
@@ -17,8 +27,9 @@ export default function FormatsPage() {
         <h1 className="text-base font-semibold tracking-tight">Formats</h1>
         <p className="mt-1 max-w-2xl text-xs leading-relaxed text-text-dim">
           Legality rulesets are maintained by hand. PokéAPI has no concept of a tier or a
-          regulation, so every ruleset below names its authority and the date it was last checked
-          against that authority.
+          regulation, so every ruleset below names its authority, the date it was last checked
+          against that authority, and whether that reading is still inside the window the authority
+          moves on.
         </p>
       </div>
 
@@ -27,6 +38,11 @@ export default function FormatsPage() {
           <li key={format.id}>
             <Panel title={format.name} subtitle={format.shortName}>
               <dl className="grid grid-cols-[8rem_1fr] gap-x-3 gap-y-1 text-xs">
+                <dt className="text-text-faint">Last verified</dt>
+                <dd>
+                  <VerifiedOn source={format.source} today={today} />
+                </dd>
+
                 <dt className="text-text-faint">Style</dt>
                 <dd className="capitalize">{format.style}</dd>
 
@@ -67,8 +83,7 @@ export default function FormatsPage() {
               )}
 
               <SourceNote>
-                Source: {format.source.authority.toUpperCase()} · {format.source.citation} · Last
-                checked {format.source.verifiedOn}.
+                Source: {format.source.authority.toUpperCase()} · {format.source.citation}
               </SourceNote>
             </Panel>
           </li>

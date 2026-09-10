@@ -1,4 +1,6 @@
-import type { PokemonType } from '../pokemon-type'
+import { abilityId } from '../ids'
+import type { AbilityId } from '../ids'
+import type { PokemonType, TeraType } from '../pokemon-type'
 import type { BoostableStat, StatSpread } from '../stats'
 import { BOOSTABLE_STATS } from '../stats'
 import { MOD_DOUBLE, MOD_HALF, MOD_ONE_AND_A_HALF, MOD_THREE_QUARTERS } from './modifier'
@@ -11,6 +13,22 @@ export type StatHook = (context: ModifierContext) => number | null
 export type EffectivenessHook = (current: number, context: ModifierContext) => number
 
 export type NoteHook = (context: ModifierContext) => string | null
+
+/**
+ * How the holder answers a move of one type, beyond the chart.
+ *
+ * Absorbing the type outright is the common case and was for a long time the
+ * only one the registry could say. Dry Skin is why that was not enough: it is
+ * a Water immunity *and* a Fire weakness, and an entry that could only carry
+ * the immunity read as complete while quietly dropping a quarter of the
+ * damage. Anything shaped like Fluffy or Heatproof is a line of data here.
+ */
+export type TypeResponse =
+  { readonly kind: 'immune' } | { readonly kind: 'base-power'; readonly modifier: number }
+
+export type TypeResponses = Readonly<Partial<Record<PokemonType, TypeResponse>>>
+
+const ABSORBS: TypeResponse = { kind: 'immune' }
 
 /**
  * One ability's damage-relevant behaviour, as data.
@@ -33,12 +51,14 @@ export type AbilityEntry = {
   readonly finalAttacker?: StatHook
   readonly finalDefender?: StatHook
   readonly alterEffectiveness?: EffectivenessHook
-  /** The holder takes nothing from this type at all. */
-  readonly immuneTo?: PokemonType
+  /** What the holder's ability does about an incoming move, read by its type. */
+  readonly typeResponse?: TypeResponses
   /** A stage the ability imposes on the attacker, the way Intimidate does. */
   readonly foeAttackStage?: { readonly stat: BoostableStat; readonly stages: number }
   readonly adaptability?: boolean
   readonly ignoresBurn?: boolean
+  /** Skill Link: a two-to-five-hit move lands all five, every time. */
+  readonly everyHitLands?: boolean
   /** Unaware: the holder reads through the other side's stat stages. */
   readonly ignoresFoeBoosts?: boolean
   readonly moldBreaker?: boolean
@@ -53,6 +73,9 @@ const MOD_FOUR_THIRDS = 5461
 
 /** 2x on a resisted hit. */
 const MOD_TINTED_LENS = MOD_DOUBLE
+
+/** 1.25x, what a Fire move gains against Dry Skin. */
+const MOD_DRY_SKIN = 5120
 
 const ONE_THIRD = 1 / 3
 
@@ -99,20 +122,40 @@ function pinchBoost(type: PokemonType): AbilityEntry {
   }
 }
 
-function ruinFoeDefense(category: 'physical' | 'special'): AbilityEntry {
+/**
+ * A Ruin ability lowers a stat on every Pokémon on the field *except the ones
+ * carrying that same ability*, which is why each of the four has to know its
+ * own id.
+ *
+ * Bulbapedia, Sword of Ruin: it "decreases the Defense stat of all Pokémon on
+ * the field other than Pokémon with this Ability by 25%", and "the effect does
+ * not stack if more than one Pokémon with Sword of Ruin is on the field". So
+ * Chi-Yu facing Chi-Yu is a match-up in which neither Beads of Ruin does
+ * anything at all, and the calculator that lowered both was reading the ability
+ * as a field condition rather than as what it is.
+ *
+ * The state answers this, so nothing is said about it.
+ */
+function ruinFoeDefense(self: AbilityId, category: 'physical' | 'special'): AbilityEntry {
   return {
-    foeDefenseStat: (context) => (context.category === category ? MOD_THREE_QUARTERS : null),
+    foeDefenseStat: (context) =>
+      context.category === category && context.defender.ability !== self
+        ? MOD_THREE_QUARTERS
+        : null,
   }
 }
 
-function ruinFoeAttack(category: 'physical' | 'special'): AbilityEntry {
+function ruinFoeAttack(self: AbilityId, category: 'physical' | 'special'): AbilityEntry {
   return {
-    foeAttackStat: (context) => (context.category === category ? MOD_THREE_QUARTERS : null),
+    foeAttackStat: (context) =>
+      context.category === category && context.attacker.ability !== self
+        ? MOD_THREE_QUARTERS
+        : null,
   }
 }
 
 function immunity(type: PokemonType): AbilityEntry {
-  return { immuneTo: type }
+  return { typeResponse: { [type]: ABSORBS } }
 }
 
 function hasModelledSecondary(context: ModifierContext): boolean {
@@ -176,7 +219,7 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
 
   // Base power
   technician: {
-    basePower: (context) => (context.basePower <= 60 ? MOD_DOUBLE : null),
+    basePower: (context) => (context.basePower <= 60 ? MOD_ONE_AND_A_HALF : null),
   },
   'sheer-force': {
     basePower: (context) => (hasModelledSecondary(context) ? MOD_PARADOX : null),
@@ -185,6 +228,9 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
         ? null
         : 'Sheer Force found no secondary effect on this move in the dataset, so no boost was applied.',
   },
+
+  // Hit count
+  'skill-link': { everyHitLands: true },
 
   // Type handling
   adaptability: { adaptability: true },
@@ -219,7 +265,9 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   // Immunities
   levitate: immunity('ground'),
   'water-absorb': immunity('water'),
-  'dry-skin': immunity('water'),
+  'dry-skin': {
+    typeResponse: { water: ABSORBS, fire: { kind: 'base-power', modifier: MOD_DRY_SKIN } },
+  },
   'storm-drain': immunity('water'),
   'volt-absorb': immunity('electric'),
   'lightning-rod': immunity('electric'),
@@ -234,10 +282,10 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   unaware: { ignoresFoeBoosts: true },
 
   // The four Ruin abilities
-  'sword-of-ruin': ruinFoeDefense('physical'),
-  'beads-of-ruin': ruinFoeDefense('special'),
-  'tablets-of-ruin': ruinFoeAttack('physical'),
-  'vessel-of-ruin': ruinFoeAttack('special'),
+  'sword-of-ruin': ruinFoeDefense(abilityId('sword-of-ruin'), 'physical'),
+  'beads-of-ruin': ruinFoeDefense(abilityId('beads-of-ruin'), 'special'),
+  'tablets-of-ruin': ruinFoeAttack(abilityId('tablets-of-ruin'), 'physical'),
+  'vessel-of-ruin': ruinFoeAttack(abilityId('vessel-of-ruin'), 'special'),
 
   // Ability suppression
   'mold-breaker': { moldBreaker: true },
@@ -258,9 +306,36 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   'unseen-fist': {},
   'clear-body': {},
   'own-tempo': {},
+  'natural-cure': {},
+  'keen-eye': {},
+  moxie: {},
+  limber: {},
 }
 
 export function abilityEntry(id: string | null): AbilityEntry | null {
   if (id === null) return null
   return ABILITY_REGISTRY[id] ?? null
+}
+
+function responseTo(entry: AbilityEntry | null, moveType: TeraType): TypeResponse | null {
+  if (entry?.typeResponse === undefined || moveType === 'stellar') return null
+  return entry.typeResponse[moveType] ?? null
+}
+
+/** True when the holder's ability absorbs this type outright. */
+export function absorbsType(entry: AbilityEntry | null, moveType: TeraType): boolean {
+  return responseTo(entry, moveType)?.kind === 'immune'
+}
+
+/**
+ * The defender's ability's contribution to the attacker's base power. Dry
+ * Skin's Fire weakness is the only entry today; the games put it in the base
+ * power chain rather than in type effectiveness, and the two round differently.
+ */
+export function foeBasePowerModifier(
+  entry: AbilityEntry | null,
+  moveType: TeraType,
+): number | null {
+  const response = responseTo(entry, moveType)
+  return response?.kind === 'base-power' ? response.modifier : null
 }

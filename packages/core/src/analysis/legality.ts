@@ -5,6 +5,11 @@
  * own declared rules — its team size, its level rule, its clauses, its gimmick
  * and its legality ruleset. Nothing reads a format id.
  *
+ * One question comes before the format's own rules: whether the generation's
+ * games hold the species at all. Regulation G did not leave Pidgeot off a list
+ * — the game does not contain it — so that answer belongs to the dataset and
+ * every format reads it.
+ *
  * Every violation names the rule that produced it and carries the format's
  * source, because legality in this app is curated rather than derived and the
  * interface has to say so next to the verdict.
@@ -15,14 +20,15 @@
  */
 
 import type { Dex } from '../dex'
-import type { Format, FormatSource, Gimmick, LevelRule } from '../format'
-import { allowsTera, hasClause } from '../format'
+import type { Clause, Format, FormatSource, Gimmick, LevelRule } from '../format'
+import { CLAUSE_DESCRIPTION, allowsTera, hasClause } from '../format'
 import type { AbilityId, ItemId, MoveId, SetId, SpeciesId } from '../ids'
 import type { TeraType } from '../pokemon-type'
 import type { PokemonSet } from '../set'
+import { isOhkoMove } from '../move'
 import { filledMoves } from '../set'
 import type { Species, SpeciesClassification } from '../species'
-import { displayName } from '../species'
+import { displayName, isAvailableIn } from '../species'
 import type { Stat } from '../stats'
 import { MAX_EV_PER_STAT, MAX_EV_TOTAL, STATS, totalEvs } from '../stats'
 import type { Team } from '../team'
@@ -31,6 +37,7 @@ import type { Team } from '../team'
 
 export const LEGALITY_RULE_IDS = [
   'team-size',
+  'availability',
   'allowlist',
   'banned-classification',
   'banned-species',
@@ -40,6 +47,8 @@ export const LEGALITY_RULE_IDS = [
   'banned-ability',
   'species-clause',
   'item-clause',
+  'ohko-clause',
+  'evasion-clause',
   'level',
   'learnset',
   'ability-slot',
@@ -67,6 +76,12 @@ export const LEGALITY_RULES: Readonly<Record<LegalityRuleId, LegalityRule>> = {
     id: 'team-size',
     label: 'Team size',
     description: 'A team holds no more than the format allows and enough to bring a full match.',
+  },
+  availability: {
+    id: 'availability',
+    label: 'Not in this generation',
+    description:
+      'A Pokémon that is not in the games this format plays cannot be brought to it, whatever the format itself bans.',
   },
   allowlist: {
     id: 'allowlist',
@@ -113,6 +128,16 @@ export const LEGALITY_RULES: Readonly<Record<LegalityRuleId, LegalityRule>> = {
     label: 'Item Clause',
     description: 'No two Pokémon may hold the same item.',
   },
+  'ohko-clause': {
+    id: 'ohko-clause',
+    label: 'OHKO Clause',
+    description: CLAUSE_DESCRIPTION.ohko,
+  },
+  'evasion-clause': {
+    id: 'evasion-clause',
+    label: 'Evasion Clause',
+    description: CLAUSE_DESCRIPTION.evasion,
+  },
   level: {
     id: 'level',
     label: 'Level',
@@ -122,7 +147,7 @@ export const LEGALITY_RULES: Readonly<Record<LegalityRuleId, LegalityRule>> = {
     id: 'learnset',
     label: 'Learnset',
     description:
-      'A Pokémon may only carry moves it can learn in this generation. Egg chains, event moves and version exclusives are not modelled.',
+      'A Pokémon may only carry moves it, or one of its pre-evolutions, can learn in this generation. Breeding chains, event moves and version exclusives are not modelled.',
   },
   'ability-slot': {
     id: 'ability-slot',
@@ -151,6 +176,42 @@ export const LEGALITY_RULES: Readonly<Record<LegalityRuleId, LegalityRule>> = {
   },
 }
 
+/* ---------------------------------------------------------------- clauses */
+
+/**
+ * The clauses `validateTeam` actually checks.
+ *
+ * A format declaring a clause is a claim, and until this list existed the claim
+ * went unchecked: both Smogon tiers declared the OHKO and Evasion clauses and
+ * ran neither, so six Sheer Cold users came back legal against a ruleset that
+ * said in writing it barred them.
+ *
+ * Written out rather than inferred from the checks below, and asserted against
+ * `CLAUSES` and `SHIPPED_FORMATS` in the tests, so that adding a clause to the
+ * union or to a format fails until someone has decided which of these two lists
+ * it belongs in.
+ */
+export const ENFORCED_CLAUSES: ReadonlySet<Clause> = new Set<Clause>([
+  'species',
+  'item',
+  'ohko',
+  'evasion',
+])
+
+/**
+ * The clauses this package declares and does not check, and why.
+ *
+ * Sleep and Endless Battle are decided during a battle by moves a team is
+ * allowed to carry, so no reading of a team could answer them. Nickname is not
+ * in that class — the nickname and the dex to check it against are both here —
+ * and it is written down as a gap rather than folded in with the other two.
+ */
+export const UNENFORCED_CLAUSES: ReadonlySet<Clause> = new Set<Clause>([
+  'sleep',
+  'endless-battle',
+  'nickname',
+])
+
 /* ------------------------------------------------------------- violations */
 
 /** What kind of record the dataset was missing. */
@@ -178,6 +239,12 @@ export type Violation =
       readonly actual: number
       readonly min: number
       readonly max: number
+    })
+  | (Attribution & {
+      readonly kind: 'species-unavailable'
+      readonly setId: SetId
+      readonly species: SpeciesId
+      readonly generation: number
     })
   | (Attribution & {
       readonly kind: 'species-not-allowed'
@@ -217,6 +284,16 @@ export type Violation =
       readonly kind: 'item-clause'
       readonly setIds: readonly SetId[]
       readonly item: ItemId
+    })
+  | (Attribution & {
+      readonly kind: 'ohko-clause'
+      readonly setId: SetId
+      readonly move: MoveId
+    })
+  | (Attribution & {
+      readonly kind: 'evasion-clause'
+      readonly setId: SetId
+      readonly move: MoveId
     })
   | (Attribution & {
       readonly kind: 'level'
@@ -278,11 +355,14 @@ export function violationSetIds(violation: Violation): readonly SetId[] {
     case 'species-clause':
     case 'item-clause':
       return violation.setIds
+    case 'species-unavailable':
     case 'species-not-allowed':
     case 'classification-banned':
     case 'species-banned':
     case 'item-banned':
     case 'move-banned':
+    case 'ohko-clause':
+    case 'evasion-clause':
     case 'ability-banned':
     case 'level':
     case 'move-not-learnable':
@@ -304,12 +384,18 @@ export function violationSetIds(violation: Violation): readonly SetId[] {
 /**
  * Whether a format's ruleset admits a species at all.
  *
- * Restricted species pass — they are capped, not banned, and the cap is a team
- * level question. Shared with the speed ladder, which builds its benchmarks
- * from the species a format actually permits.
+ * Availability first, because it is the only question the format does not get
+ * to answer: a form Generation 9 does not hold is not something Regulation G
+ * left off a list, it is something the game does not contain. Restricted
+ * species pass — they are capped, not banned, and the cap is a team level
+ * question.
+ *
+ * Shared with the speed ladder, which builds its benchmarks from the species a
+ * format actually permits, and so inherits every answer given here.
  */
 export function isSpeciesLegal(species: Species, format: Format): boolean {
   const { legality } = format
+  if (!legality.allowsUnavailableSpecies && !isAvailableIn(species, format.generation)) return false
   if (legality.allowlist !== null && !legality.allowlist.includes(species.id)) return false
   if (legality.bannedClassifications.includes(species.classification)) return false
   if (legality.bannedSpecies.includes(species.id)) return false
@@ -380,6 +466,18 @@ function checkMember({ set, format, dex, source }: MemberContext): readonly Viol
   }
 
   const label = displayName(species)
+
+  if (!legality.allowsUnavailableSpecies && !isAvailableIn(species, format.generation)) {
+    found.push({
+      kind: 'species-unavailable',
+      setId: set.id,
+      species: species.id,
+      generation: format.generation,
+      rule: 'availability',
+      source,
+      message: `${label} is not in the Generation ${format.generation} games, so it cannot be brought to ${format.name}.`,
+    })
+  }
 
   if (legality.allowlist !== null && !legality.allowlist.includes(species.id)) {
     found.push({
@@ -602,6 +700,28 @@ function checkMoves({
         rule: 'learnset',
         source,
         message: `${displayName(species)} cannot learn ${move.name} in this generation.`,
+      })
+    }
+
+    if (hasClause(format, 'ohko') && isOhkoMove(move)) {
+      found.push({
+        kind: 'ohko-clause',
+        setId: set.id,
+        move: move.id,
+        rule: 'ohko-clause',
+        source,
+        message: `${format.name} runs the OHKO Clause, and ${move.name} is a one-hit knockout move.`,
+      })
+    }
+
+    if (hasClause(format, 'evasion') && move.raisesEvasion) {
+      found.push({
+        kind: 'evasion-clause',
+        setId: set.id,
+        move: move.id,
+        rule: 'evasion-clause',
+        source,
+        message: `${format.name} runs the Evasion Clause, and ${move.name} raises evasion.`,
       })
     }
   }

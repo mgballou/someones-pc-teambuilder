@@ -27,7 +27,7 @@ describe('lookups', () => {
   })
 
   it('finds a format by id', () => {
-    expect(dex.format(formatId('vgc-2026-reg-h'))?.bringSize).toBe(4)
+    expect(dex.format(formatId('vgc-reg-h'))?.bringSize).toBe(4)
   })
 
   it('returns undefined for an id that is not there', () => {
@@ -47,8 +47,8 @@ describe('learnsets', () => {
 
 describe('curated formats', () => {
   it('fills Regulation G restricted list from the dataset', () => {
-    const regG = dex.format(formatId('vgc-2026-reg-g'))
-    expect(regG?.legality.maxRestricted).toBe(2)
+    const regG = dex.format(formatId('vgc-reg-g'))
+    expect(regG?.legality.maxRestricted).toBe(1)
   })
 
   it('carries a source on every format', () => {
@@ -58,6 +58,27 @@ describe('curated formats', () => {
 
 describe('the committed dataset', () => {
   const dataset = loadDataset()
+  const shipped = buildDex(dataset)
+
+  it('gives Kingambit the Sucker Punch it inherits from Pawniard', () => {
+    expect(shipped.learnset(speciesId('kingambit'))).toContain(moveId('sucker-punch'))
+  })
+
+  it('gives Meowscarada the Sucker Punch it inherits from Sprigatito', () => {
+    expect(shipped.learnset(speciesId('meowscarada'))).toContain(moveId('sucker-punch'))
+  })
+
+  it('withholds Round from Kingambit, whose machine Scarlet and Violet cut', () => {
+    expect(shipped.learnset(speciesId('kingambit'))).not.toContain(moveId('round'))
+  })
+
+  it('withholds Iron Tail from Garchomp, which only Champions would teach it to', () => {
+    expect(shipped.learnset(speciesId('garchomp'))).not.toContain(moveId('iron-tail'))
+  })
+
+  it('keeps the Earthquake Garchomp learns itself', () => {
+    expect(shipped.learnset(speciesId('garchomp'))).toContain(moveId('earthquake'))
+  })
 
   it('has every form', () => {
     expect(dataset.species.length).toBeGreaterThan(1300)

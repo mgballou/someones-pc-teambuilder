@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { MoveId, Nature, StatSpread } from '../../src/index'
-import { moveId, ZERO_BOOSTS } from '../../src/index'
+import { applyBoost, moveId, ZERO_BOOSTS } from '../../src/index'
 import type { DamageResult, Field, Terrain, Weather } from '../../src/damage/index'
 import {
   calculate,
@@ -22,6 +22,8 @@ const MOONBLAST = moveId('moonblast')
 const FAKE_OUT = moveId('fake-out')
 const SURGING_STRIKES = moveId('surging-strikes')
 const BODY_PRESS = moveId('body-press')
+const METEOR_BEAM = moveId('meteor-beam')
+const SOLAR_BEAM = moveId('solar-beam')
 
 type Scenario = {
   readonly attackerSpecies: string
@@ -195,10 +197,10 @@ describe('ability registry', () => {
     expect(guts.max).toBeGreaterThan(plain.max * 2)
   })
 
-  it('doubles Technician base power under sixty', () => {
+  it('raises Technician base power by half under sixty', () => {
     expect(
       run({ attackerSpecies: 'garchomp', move: FAKE_OUT, attackerAbility: 'technician' }).basePower,
-    ).toBe(80)
+    ).toBe(60)
   })
 
   it('leaves Technician out above sixty', () => {
@@ -530,5 +532,38 @@ describe('move handling', () => {
     })
     const plain = run({ attackerSpecies: 'urshifu-rapid-strike', move: moveId('sacred-sword') })
     expect(sword.rolls).toEqual(plain.rolls)
+  })
+})
+
+/**
+ * Meteor Beam and Electro Shot raise their user's Special Attack while they
+ * charge, and neither can deal damage without that having happened — a Power
+ * Herb skips the wait, not the boost. So the stage is applied rather than
+ * declared out of reach, which is what `@smogon/calc` does and what the games
+ * do. It is said on every call, because a stage nobody asked for must not be
+ * silent.
+ */
+describe('the charge boost', () => {
+  const beam = () => run({ attackerSpecies: 'glimmora', nature: 'modest', move: METEOR_BEAM })
+  const solar = () => run({ attackerSpecies: 'glimmora', nature: 'modest', move: SOLAR_BEAM })
+
+  it('raises the attacking stat', () => {
+    expect(beam().attackStat).toBeGreaterThan(solar().attackStat)
+  })
+
+  it('raises it by exactly one stage', () => {
+    expect(beam().attackStat).toBe(applyBoost(solar().attackStat, 1))
+  })
+
+  it('says that it did', () => {
+    expect(beam().notes.some((note) => note.includes('+1 SpA'))).toBe(true)
+  })
+
+  it('tells the caller not to count the stage twice', () => {
+    expect(beam().notes.some((note) => note.includes("attacker's boosts"))).toBe(true)
+  })
+
+  it('leaves an ordinary special move alone', () => {
+    expect(solar().notes.some((note) => note.includes('+1 SpA'))).toBe(false)
   })
 })

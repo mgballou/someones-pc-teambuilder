@@ -82,7 +82,7 @@ fall out of that:
 ### 3.2 Why `Dex` is an interface in `core`
 
 `core` declares the data it needs; `dex` supplies it. The calculator is therefore testable
-against a nine-species fixture rather than a 1,351-form dataset, and nothing in the domain layer
+against a hand-built fixture rather than a 1,351-form dataset, and nothing in the domain layer
 knows PokéAPI exists.
 
 ### 3.3 Why the dataset is built, not fetched
@@ -126,8 +126,15 @@ Shipping:
 
 Legality uses two mechanisms because real formats use both: **category bans** (Regulation H bans
 every legendary, mythical and paradox at once) and **name bans** (Smogon tiers ban one Pokémon
-at a time). Regulation G additionally allows two _restricted_ legendaries, which is a cap, not a
-ban.
+at a time). Regulation I additionally allows two _restricted_ legendaries and Regulation G allows
+one, which is a cap, not a ban.
+
+Before either mechanism runs, a format asks whether its generation holds the species at all.
+That question belongs to the games rather than to a ruleset: Scarlet and Violet hold 869 of the
+1,351 forms the dataset carries, and the 482 they leave out include every Mega Evolution. A
+format that had to enumerate them would be wrong within a patch, so `Species` records which
+generations hold it and `isSpeciesLegal` reads that first. Only the sandbox format sets
+`allowsUnavailableSpecies`, which is what a sandbox is for.
 
 **Legality is curated.** PokéAPI has no tiers. Every format carries a `source` — authority,
 citation, and the date it was last verified — and the interface shows it next to every verdict.
