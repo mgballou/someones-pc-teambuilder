@@ -611,6 +611,20 @@ describe('the stage rewrites', () => {
     )
   })
 
+  it('says what became of a stage Stored Power counts off the attack stat', () => {
+    expect(
+      run({
+        attackerSpecies: 'malamar',
+        nature: 'modest',
+        move: moveId('stored-power'),
+        attackerAbility: 'contrary',
+        defenderAbility: 'intimidate',
+      }).notes,
+    ).toContain(
+      "Intimidate was applied as +1 Atk rather than -1, because Contrary reverses it. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
   it('says nothing of a stage the move does not use', () => {
     expect(
       intimidated('kingambit', 'defiant', HYDRO_PUMP).notes.some((note) =>

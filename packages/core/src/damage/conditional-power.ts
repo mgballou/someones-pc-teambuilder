@@ -62,6 +62,12 @@ export type ConditionalPower = {
    * condition and the number is whole; anything else is said every time.
    */
   readonly note: (input: PowerConditionInput) => string | null
+  /**
+   * Stored Power and Power Trip count every raised stage the user holds, so a
+   * stage the calculator lands on any stat is part of their power and the
+   * result has to say what became of it — not only one on the attack stat.
+   */
+  readonly readsUserStages?: boolean
 }
 
 /** 4/3x, what Collision Course and Electro Drift gain on a super-effective hit. */
@@ -271,10 +277,12 @@ export const CONDITIONAL_POWER: Readonly<Record<string, ConditionalPower>> = {
   'stored-power': {
     effect: { kind: 'power', of: ({ attacker }) => 20 + 20 * positiveBoosts(attacker) },
     note: resolved,
+    readsUserStages: true,
   },
   'power-trip': {
     effect: { kind: 'power', of: ({ attacker }) => 20 + 20 * positiveBoosts(attacker) },
     note: resolved,
+    readsUserStages: true,
   },
 
   // --- What the hit does to the target ---

@@ -1432,3 +1432,56 @@ describe('a stage rewritten before it lands', () => {
     ).toEqual([146, 174])
   })
 })
+
+/**
+ * A stage the calculator lands is a stage for everything that reads one.
+ *
+ * The reference lands Intimidate and the charge before it counts Stored
+ * Power's stages and before Tera Blast picks a side, and so do the games. A
+ * stage that reached the attack stat but not the base power was half-applied.
+ */
+describe('a landed stage, read everywhere a stage is read', () => {
+  const INTIMIDATING_GYARADOS: Combatant = {
+    species: 'gyarados',
+    reference: 'Gyarados',
+    ability: 'intimidate',
+    referenceAbility: 'Intimidate',
+    evs: { hp: 252, spd: 252 },
+    abilityOn: true,
+  }
+
+  it('agrees that a Contrary raise off Intimidate counts toward Stored Power', () => {
+    expect(
+      agrees({
+        attacker: {
+          species: 'malamar',
+          reference: 'Malamar',
+          ability: 'contrary',
+          referenceAbility: 'Contrary',
+          evs: { spa: 252 },
+        },
+        defender: INTIMIDATING_GYARADOS,
+        move: 'stored-power',
+        referenceMove: 'Stored Power',
+      }),
+    ).toEqual([18, 22])
+  })
+
+  it('agrees that Intimidate can move Tera Blast to the special side', () => {
+    expect(
+      agrees({
+        attacker: {
+          species: 'dragonite',
+          reference: 'Dragonite',
+          ability: 'multiscale',
+          referenceAbility: 'Multiscale',
+          evs: { atk: 252, spa: 252 },
+          teraType: 'normal',
+        },
+        defender: INTIMIDATING_GYARADOS,
+        move: 'tera-blast',
+        referenceMove: 'Tera Blast',
+      }),
+    ).toEqual([46, 55])
+  })
+})
