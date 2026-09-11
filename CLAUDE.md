@@ -194,8 +194,14 @@ This app makes claims about a competitive game. Several are approximations, and 
     leaves it off until it is switched on by hand. This calculator has no turn and no
     switch-in, and the question a team builder is asking is what happens after the switch, so
     the stage is applied. Never make it silent, and never make it turn on a turn count the core
-    cannot hold. Defiant, Competitive, Clear Body and Guard Dog answer Intimidate back in the
-    games, are outside the ability model, and arrive with their own note saying so.
+    cannot hold. The attacker's own ability decides what the stage becomes, and the
+    calculator applies it and says so: Simple doubles it, Contrary reverses it, Defiant and
+    Competitive answer it with two stages of their own, Clear Body blocks it and Guard Dog
+    turns it into a raise. `stage-change.ts` runs them in the games' order, which decides one
+    corner: an attacker already at -6 Attack cannot be lowered, so Defiant, Competitive and
+    Guard Dog have nothing to answer. The reference answers anyway and reads -5. Hyper Cutter,
+    White Smoke, Full Metal Body, Mirror Armor and Scrappy also stop Intimidate in the games,
+    are outside the ability model, and arrive with their own note saying so.
   - **A Ruin ability does not touch a Pokémon carrying the same Ruin ability.** Sword of Ruin
     "decreases the Defense stat of all Pokémon on the field other than Pokémon with this
     Ability by 25%" and "does not stack if more than one Pokémon with Sword of Ruin is on the
