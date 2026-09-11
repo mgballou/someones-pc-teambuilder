@@ -26,6 +26,8 @@ import {
   MOD_THREE_QUARTERS,
 } from './modifier'
 import { moveOverride } from './moves'
+import type { StageChange, StageRewrite } from './stage-change'
+import { landStage } from './stage-change'
 import { hitCount, multiHitNote } from './multi-hit'
 import { koChance } from './ko'
 import { stabModifier } from './stab'
@@ -637,24 +639,51 @@ function resolveAttack({
   criticalHit,
   notes,
 }: AttackInput): number {
-  let stage = attacker.boosts[attackStatName]
+  const response = attackerEntry?.stageResponse ?? null
+  const holder =
+    attacker.set.ability === null
+      ? "the attacker's ability"
+      : abilityLabel(dex, attacker.set.ability)
+  let boosts = attacker.boosts
+
+  /**
+   * Intimidate lands before the charge, because it lands on entry and the
+   * charge is the attacker's own turn. The order only shows at the cap, and
+   * it is the order the reference uses too.
+   */
+  const imposed = defenderEntry?.foeAttackStage
+  if (imposed !== undefined && defenderAbility !== null) {
+    const landed = landStage({ boosts, change: imposed, cause: 'intimidate', response })
+    notes.add(
+      stageNote({
+        cause: abilityLabel(dex, defenderAbility),
+        why: null,
+        holder,
+        change: imposed,
+        rewrite: landed.rewrite,
+        attackStatName,
+      }),
+    )
+    boosts = landed.boosts
+  }
 
   const selfBoost = moveOverride(context.move.id)?.selfBoostBeforeHit
-  if (selfBoost !== undefined && selfBoost.stat === attackStatName) {
-    stage += selfBoost.stages
+  if (selfBoost !== undefined) {
+    const landed = landStage({ boosts, change: selfBoost, cause: 'own-move', response })
     notes.add(
-      `${context.move.name} was applied as ${signed(selfBoost.stages)} ${STAT_LABEL[selfBoost.stat]}, ${selfBoost.why}. Clear it from the attacker's boosts if it is already counted there.`,
+      stageNote({
+        cause: context.move.name,
+        why: selfBoost.why,
+        holder,
+        change: selfBoost,
+        rewrite: landed.rewrite,
+        attackStatName,
+      }),
     )
+    boosts = landed.boosts
   }
 
-  const imposed = defenderEntry?.foeAttackStage
-  if (imposed !== undefined && imposed.stat === attackStatName && defenderAbility !== null) {
-    stage += imposed.stages
-    notes.add(
-      `${abilityLabel(dex, defenderAbility)} was applied as ${signed(imposed.stages)} ${STAT_LABEL[imposed.stat]}. Clear it from the attacker's boosts if it is already counted there.`,
-    )
-  }
-
+  let stage = boosts[attackStatName]
   if (defenderEntry?.ignoresFoeBoosts === true) stage = 0
   else if (criticalHit && stage < 0) stage = 0
 
@@ -669,6 +698,72 @@ function resolveAttack({
 
 function signed(stages: number): string {
   return stages >= 0 ? `+${stages}` : `${stages}`
+}
+
+const CLEAR_ONE = "Clear it from the attacker's boosts if it is already counted there."
+const CLEAR_BOTH = "Clear both from the attacker's boosts if they are already counted there."
+
+type StageNoteInput = {
+  /** What made the change, by name: the defender's ability or the move. */
+  readonly cause: string
+  /** Why a move makes it, which is what tells the caller the stage is not a guess. */
+  readonly why: string | null
+  /** The attacker's ability, by name. It is what rewrites the change. */
+  readonly holder: string
+  readonly change: StageChange
+  readonly rewrite: StageRewrite | null
+  readonly attackStatName: BoostableStat
+}
+
+/**
+ * What became of a stage the calculator applied, on the stat this hit reads.
+ *
+ * Said on every call, so a stage nobody asked for is never silent. A stage on
+ * a stat the hit does not read changes nothing and says nothing — Defiant's
+ * Attack means nothing to a special move.
+ */
+function stageNote({
+  cause,
+  why,
+  holder,
+  change,
+  rewrite,
+  attackStatName,
+}: StageNoteInput): string | null {
+  const label = STAT_LABEL[change.stat]
+  const onStat = change.stat === attackStatName
+  const reason = why === null ? '' : `, which ${why}`
+  const plain = `${cause} was applied as ${signed(change.stages)} ${label}${reason}. ${CLEAR_ONE}`
+
+  if (rewrite === null) return onStat ? plain : null
+
+  switch (rewrite.kind) {
+    case 'multiplied': {
+      if (!onStat) return null
+      const verb = rewrite.factor === 2 ? 'doubles' : 'reverses'
+      const instead = why === null ? signed(change.stages) : `the ${signed(change.stages)} ${why}`
+      return `${cause} was applied as ${signed(rewrite.stages)} ${label} rather than ${instead}, because ${holder} ${verb} it. ${CLEAR_ONE}`
+    }
+    case 'blocked':
+      return onStat ? `${holder} blocks ${cause}, so no ${label} stage was applied.` : null
+    case 'raised-instead':
+      return onStat
+        ? `${cause} was applied as ${signed(rewrite.stages)} ${label} rather than ${signed(change.stages)}, because ${holder} turns it into a raise. ${CLEAR_ONE}`
+        : null
+    case 'answered': {
+      const answer = `${signed(rewrite.stages)} ${STAT_LABEL[rewrite.stat]}`
+      const answerOnStat = rewrite.stat === attackStatName
+      if (onStat && answerOnStat) {
+        return `${cause} was applied as ${signed(change.stages)} ${label} and ${holder} answered it with ${answer}. ${CLEAR_BOTH}`
+      }
+      if (answerOnStat) {
+        return `${holder} answered ${cause} with ${answer}, which was applied. ${CLEAR_ONE}`
+      }
+      return onStat ? plain : null
+    }
+    default:
+      throw ImpossibleState.unreachable(rewrite)
+  }
 }
 
 type DefenseInput = {

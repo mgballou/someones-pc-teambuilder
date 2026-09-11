@@ -117,6 +117,13 @@ export type Combatant = {
    * or the two sides are answering different questions.
    */
   readonly boostedStat?: 'auto'
+  /**
+   * The reference leaves Intimidate off until it is told the ability has
+   * triggered. The calculator here always assumes it has — see the honesty
+   * rules — so an Intimidate carrier has to say so or the two sides disagree
+   * about a stage rather than about a formula.
+   */
+  readonly abilityOn?: boolean
 }
 
 export type Scenario = {
@@ -211,6 +218,7 @@ function referencePokemon(combatant: Combatant): ReferencePokemon {
   if (combatant.teraType !== undefined) options.teraType = REFERENCE_TYPE[combatant.teraType]
   if (combatant.referenceItem !== undefined) options.item = combatant.referenceItem
   if (combatant.boostedStat !== undefined) options.boostedStat = combatant.boostedStat
+  if (combatant.abilityOn !== undefined) options.abilityOn = combatant.abilityOn
   if (combatant.status !== undefined && combatant.status !== 'none') {
     options.status = REFERENCE_STATUS[combatant.status]
   }

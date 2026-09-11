@@ -167,8 +167,12 @@ are worth knowing before you rely on the output.
   order or a battle history the app does not hold. **Intimidate is assumed to have triggered** —
   a defender carrying it takes a stage off the attacker's Attack on every calculation, which the
   result says out loud, because the question a team builder asks is what happens after the
-  switch. It is the one place the calculator deliberately reads a match-up differently from
-  `@smogon/calc`. One gap is still silent. A few moves bend the
+  switch. The attacker's ability decides what the stage becomes — Simple doubles it, Contrary
+  reverses it, Defiant and Competitive answer it, Clear Body blocks it, Guard Dog turns it into
+  a raise — and the result says that too. Intimidate is the one place the calculator
+  deliberately reads a match-up differently from `@smogon/calc`, apart from a corner the games
+  decide: an attacker already at -6 Attack cannot be lowered again, so Defiant, Competitive and
+  Guard Dog have nothing to answer. One gap is still silent. A few moves bend the
   formula rather than the power — Foul Play attacks with the target's Attack, Shell Side Arm picks
   the side that hurts more — and those are read straight, with nothing said.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
