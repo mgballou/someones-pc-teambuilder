@@ -1234,6 +1234,27 @@ describe('a stage rewritten before it lands', () => {
     referenceAbility: 'Clear Body',
     evs: { atk: 252 },
   }
+  const DRAGONITE: Combatant = {
+    species: 'dragonite',
+    reference: 'Dragonite',
+    ability: 'inner-focus',
+    referenceAbility: 'Inner Focus',
+    evs: { atk: 252 },
+  }
+  const MUDSDALE: Combatant = {
+    species: 'mudsdale',
+    reference: 'Mudsdale',
+    ability: 'own-tempo',
+    referenceAbility: 'Own Tempo',
+    evs: { atk: 252 },
+  }
+  const DONDOZO: Combatant = {
+    species: 'dondozo',
+    reference: 'Dondozo',
+    ability: 'oblivious',
+    referenceAbility: 'Oblivious',
+    evs: { atk: 252 },
+  }
   const MABOSSTIFF: Combatant = {
     species: 'mabosstiff',
     reference: 'Mabosstiff',
@@ -1372,5 +1393,42 @@ describe('a stage rewritten before it lands', () => {
         referenceMove: 'Knock Off',
       }),
     ).toEqual([33, 39])
+  })
+
+  /**
+   * Bulbapedia, Intimidate: from Generation VIII it "no longer affects Pokémon
+   * with" Oblivious, Own Tempo, Inner Focus or Scrappy.
+   */
+  it('agrees that Inner Focus blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: DRAGONITE,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([100, 118])
+  })
+
+  it('agrees that Own Tempo blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: MUDSDALE,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([140, 168])
+  })
+
+  it('agrees that Oblivious blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: DONDOZO,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'wave-crash',
+        referenceMove: 'Wave Crash',
+      }),
+    ).toEqual([146, 174])
   })
 })

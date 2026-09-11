@@ -625,6 +625,12 @@ describe('the stage rewrites', () => {
     )
   })
 
+  it('says Inner Focus blocked Intimidate', () => {
+    expect(intimidated('dragonite', 'inner-focus').notes).toContain(
+      'Inner Focus blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
   it('says Guard Dog turned Intimidate into a raise', () => {
     expect(intimidated('mabosstiff', 'guard-dog').notes).toContain(
       "Intimidate was applied as +1 Atk rather than -1, because Guard Dog turns it into a raise. Clear it from the attacker's boosts if it is already counted there.",
