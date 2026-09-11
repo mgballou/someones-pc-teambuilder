@@ -58,8 +58,9 @@ export type AbilityEntry = {
   readonly foeAttackStage?: StageChange
   /**
    * How the holder rewrites a stage change aimed at it: Simple, Contrary,
-   * Defiant, Competitive, Clear Body, Guard Dog. Read from the attacker's
-   * entry, because every stage the calculator applies lands on the attacker.
+   * Defiant, Competitive, Clear Body, Guard Dog, and the three that only stop
+   * Intimidate. Read from the attacker's entry, because every stage the
+   * calculator applies lands on the attacker.
    */
   readonly stageResponse?: StageResponse
   readonly adaptability?: boolean
@@ -332,6 +333,15 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
    * not touch damage.
    */
   'guard-dog': { stageResponse: { kind: 'raises-on-intimidate', stages: 1 } },
+  /**
+   * Bulbapedia, Intimidate: from Generation VIII it "no longer affects Pokémon
+   * with" Oblivious, Own Tempo, Inner Focus or Scrappy. Each of the first three
+   * does nothing else to a damage roll. Scrappy also lets Normal and Fighting
+   * moves hit Ghosts, which is outside the model, so it stays unmodelled.
+   */
+  'inner-focus': { stageResponse: { kind: 'blocks-intimidate' } },
+  'own-tempo': { stageResponse: { kind: 'blocks-intimidate' } },
+  oblivious: { stageResponse: { kind: 'blocks-intimidate' } },
 
   // The four Ruin abilities
   'sword-of-ruin': ruinFoeDefense(abilityId('sword-of-ruin'), 'physical'),
@@ -353,10 +363,7 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   regenerator: {},
   pressure: {},
   frisk: {},
-  'inner-focus': {},
-  oblivious: {},
   'unseen-fist': {},
-  'own-tempo': {},
   'natural-cure': {},
   'keen-eye': {},
   moxie: {},
