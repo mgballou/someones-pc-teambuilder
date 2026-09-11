@@ -569,6 +569,65 @@ const SPECIES: readonly Species[] = [
     weightKg: 100,
     heightM: 2,
   }),
+  // The stage rewrites. Each carries, as a regular ability, one of the
+  // abilities that changes a stat stage before it lands.
+  makeSpecies({
+    id: 'bibarel',
+    dexNumber: 400,
+    types: ['normal', 'water'],
+    baseStats: { hp: 79, atk: 85, def: 60, spa: 55, spd: 60, spe: 71 },
+    abilities: ['simple', 'unaware'],
+    hiddenAbility: 'moody',
+    weightKg: 31.5,
+  }),
+  makeSpecies({
+    id: 'malamar',
+    dexNumber: 687,
+    types: ['dark', 'psychic'],
+    baseStats: { hp: 86, atk: 92, def: 88, spa: 68, spd: 75, spe: 73 },
+    abilities: ['contrary', 'suction-cups'],
+    hiddenAbility: 'infiltrator',
+    weightKg: 47,
+    heightM: 1.5,
+  }),
+  makeSpecies({
+    id: 'wigglytuff',
+    dexNumber: 40,
+    types: ['normal', 'fairy'],
+    baseStats: { hp: 140, atk: 70, def: 45, spa: 85, spd: 50, spe: 45 },
+    abilities: ['cute-charm', 'competitive'],
+    hiddenAbility: 'frisk',
+    weightKg: 12,
+  }),
+  makeSpecies({
+    id: 'metagross',
+    dexNumber: 376,
+    types: ['steel', 'psychic'],
+    baseStats: { hp: 80, atk: 135, def: 130, spa: 95, spd: 90, spe: 70 },
+    abilities: ['clear-body'],
+    hiddenAbility: 'light-metal',
+    weightKg: 550,
+    heightM: 1.6,
+  }),
+  makeSpecies({
+    id: 'mabosstiff',
+    dexNumber: 943,
+    types: ['dark'],
+    baseStats: { hp: 80, atk: 120, def: 90, spa: 60, spd: 70, spe: 85 },
+    abilities: ['intimidate', 'guard-dog'],
+    hiddenAbility: 'stakeout',
+    weightKg: 61,
+  }),
+  makeSpecies({
+    id: 'mudsdale',
+    dexNumber: 750,
+    types: ['ground'],
+    baseStats: { hp: 100, atk: 125, def: 100, spa: 55, spd: 85, spe: 35 },
+    abilities: ['own-tempo', 'stamina'],
+    hiddenAbility: 'inner-focus',
+    weightKg: 920,
+    heightM: 2.5,
+  }),
   /**
    * Not in Scarlet and Violet, and ordinary in every other respect: no
    * classification bars it, no ban list names it, and it is fast enough to
@@ -1082,6 +1141,13 @@ const ABILITY_NAMES = [
   'overcoat',
   'overgrow',
   'chlorophyll',
+  'simple',
+  'contrary',
+  'competitive',
+  'clear-body',
+  'guard-dog',
+  'own-tempo',
+  'hyper-cutter',
 ] as const
 
 /** `of` stays lower case, so the fixture reads `Sword of Ruin` like the games. */

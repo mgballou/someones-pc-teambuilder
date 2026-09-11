@@ -4,6 +4,7 @@ import type { PokemonType, TeraType } from '../pokemon-type'
 import type { BoostableStat, StatSpread } from '../stats'
 import { BOOSTABLE_STATS } from '../stats'
 import { MOD_DOUBLE, MOD_HALF, MOD_ONE_AND_A_HALF, MOD_THREE_QUARTERS } from './modifier'
+import type { StageChange, StageResponse } from './stage-change'
 import type { Field, ModifierContext, SideView } from './types'
 
 /** Returns a 4096-denominator modifier, or `null` for "this hook does nothing here". */
@@ -54,7 +55,14 @@ export type AbilityEntry = {
   /** What the holder's ability does about an incoming move, read by its type. */
   readonly typeResponse?: TypeResponses
   /** A stage the ability imposes on the attacker, the way Intimidate does. */
-  readonly foeAttackStage?: { readonly stat: BoostableStat; readonly stages: number }
+  readonly foeAttackStage?: StageChange
+  /**
+   * How the holder rewrites a stage change aimed at it: Simple, Contrary,
+   * Defiant, Competitive, Clear Body, Guard Dog, and the three that only stop
+   * Intimidate. Read from the attacker's entry, because every stage the
+   * calculator applies lands on the attacker.
+   */
+  readonly stageResponse?: StageResponse
   readonly adaptability?: boolean
   readonly ignoresBurn?: boolean
   /** Skill Link: a two-to-five-hit move lands all five, every time. */
@@ -281,6 +289,60 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   intimidate: { foeAttackStage: { stat: 'atk', stages: -1 } },
   unaware: { ignoresFoeBoosts: true },
 
+  // Stage rewrites. Each changes a stage before it lands on its holder, and
+  // the calculator lands two of its own on the attacker — a defender's
+  // Intimidate and a charging move's boost — so each of these moves the number.
+  // The order they run in is in `stage-change.ts`.
+
+  /**
+   * Bulbapedia, Simple: it "directly doubles the number of stages that a stat
+   * is increased or decreased". Intimidate lands as -2 Attack and Meteor Beam
+   * as +2 Special Attack.
+   */
+  simple: { stageResponse: { kind: 'multiplies', factor: 2 } },
+  /**
+   * Bulbapedia, Contrary: "if an effect would lower a stat, it is increased
+   * instead, and if an effect would increase a stat, it is decreased instead",
+   * and "this also applies to self-inflicted changes". Intimidate lands as +1
+   * Attack and Meteor Beam as -1 Special Attack.
+   */
+  contrary: { stageResponse: { kind: 'multiplies', factor: -1 } },
+  /**
+   * Bulbapedia, Defiant: "When a stat of a Pokémon with this Ability is lowered
+   * by an opponent, its Attack is increased by two stages", and it "will not
+   * activate if the Pokémon with this Ability lowers its own stats". Intimidate
+   * lands as -1 and Defiant answers with +2, so +1 Attack in all.
+   */
+  defiant: { stageResponse: { kind: 'answers-foe-drops', stat: 'atk', stages: 2 } },
+  /**
+   * Bulbapedia, Competitive: "When a stat of a Pokémon with this Ability is
+   * lowered by an opponent, its Special Attack is increased by two stages".
+   * Intimidate still takes the Attack stage; the answer is on Special Attack.
+   */
+  competitive: { stageResponse: { kind: 'answers-foe-drops', stat: 'spa', stages: 2 } },
+  /**
+   * Bulbapedia, Clear Body: it "prevents stat reduction caused by other
+   * Pokémon's moves and Abilities (such as Scary Face and Intimidate)" and
+   * "does not prevent self-inflicted stat reductions".
+   */
+  'clear-body': { stageResponse: { kind: 'blocks-foe-drops' } },
+  /**
+   * Bulbapedia, Guard Dog: "if a Pokémon with this ability is affected by
+   * Intimidate, its Attack stat will increase by one stage, rather than
+   * decreasing by one stage." Its other effect, refusing a forced switch, does
+   * not touch damage.
+   */
+  'guard-dog': { stageResponse: { kind: 'raises-on-intimidate', stages: 1 } },
+  /**
+   * Bulbapedia, Intimidate: from Generation VIII it "no longer affects Pokémon
+   * with" Oblivious, Own Tempo, Inner Focus or Scrappy. Each of the first three
+   * does nothing else to a damage roll. Scrappy also lets Normal and Fighting
+   * moves hit Ghosts, which is outside the model, so it stays unmodelled.
+   */
+  'inner-focus': { stageResponse: { kind: 'blocks-intimidate' } },
+  'own-tempo': { stageResponse: { kind: 'blocks-intimidate' } },
+  oblivious: { stageResponse: { kind: 'blocks-intimidate' } },
+
   // The four Ruin abilities
   'sword-of-ruin': ruinFoeDefense(abilityId('sword-of-ruin'), 'physical'),
   'beads-of-ruin': ruinFoeDefense(abilityId('beads-of-ruin'), 'special'),
@@ -301,11 +363,7 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
   regenerator: {},
   pressure: {},
   frisk: {},
-  'inner-focus': {},
-  oblivious: {},
   'unseen-fist': {},
-  'clear-body': {},
-  'own-tempo': {},
   'natural-cure': {},
   'keen-eye': {},
   moxie: {},

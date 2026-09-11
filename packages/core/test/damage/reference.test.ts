@@ -1185,3 +1185,303 @@ describe('a Ruin ability against its own mirror', () => {
     ).toEqual([54, 64])
   })
 })
+
+/**
+ * The abilities that rewrite a stat stage before it lands.
+ *
+ * The calculator applies two stages of its own: a defender's Intimidate, which
+ * it assumes has triggered, and a charging move's boost. Each case tells the
+ * reference that Intimidate has triggered, because it leaves the ability off
+ * until it is told, and the question here is what the attacker's ability makes
+ * of the stage rather than whether the stage happened.
+ */
+describe('a stage rewritten before it lands', () => {
+  const INTIMIDATING_INCINEROAR: Combatant = {
+    species: 'incineroar',
+    reference: 'Incineroar',
+    ability: 'intimidate',
+    referenceAbility: 'Intimidate',
+    evs: { hp: 252, def: 252 },
+    abilityOn: true,
+  }
+  const SPECIAL_INCINEROAR: Combatant = { ...INTIMIDATING_INCINEROAR, evs: { hp: 252, spd: 252 } }
+
+  const BIBAREL: Combatant = {
+    species: 'bibarel',
+    reference: 'Bibarel',
+    ability: 'simple',
+    referenceAbility: 'Simple',
+    evs: { atk: 252, spa: 252 },
+  }
+  const MALAMAR: Combatant = {
+    species: 'malamar',
+    reference: 'Malamar',
+    ability: 'contrary',
+    referenceAbility: 'Contrary',
+    evs: { atk: 252, spa: 252 },
+  }
+  const WIGGLYTUFF: Combatant = {
+    species: 'wigglytuff',
+    reference: 'Wigglytuff',
+    ability: 'competitive',
+    referenceAbility: 'Competitive',
+    evs: { atk: 252, spa: 252 },
+  }
+  const METAGROSS: Combatant = {
+    species: 'metagross',
+    reference: 'Metagross',
+    ability: 'clear-body',
+    referenceAbility: 'Clear Body',
+    evs: { atk: 252 },
+  }
+  const DRAGONITE: Combatant = {
+    species: 'dragonite',
+    reference: 'Dragonite',
+    ability: 'inner-focus',
+    referenceAbility: 'Inner Focus',
+    evs: { atk: 252 },
+  }
+  const MUDSDALE: Combatant = {
+    species: 'mudsdale',
+    reference: 'Mudsdale',
+    ability: 'own-tempo',
+    referenceAbility: 'Own Tempo',
+    evs: { atk: 252 },
+  }
+  const DONDOZO: Combatant = {
+    species: 'dondozo',
+    reference: 'Dondozo',
+    ability: 'oblivious',
+    referenceAbility: 'Oblivious',
+    evs: { atk: 252 },
+  }
+  const MABOSSTIFF: Combatant = {
+    species: 'mabosstiff',
+    reference: 'Mabosstiff',
+    ability: 'guard-dog',
+    referenceAbility: 'Guard Dog',
+    evs: { atk: 252 },
+  }
+
+  it('agrees that an attacker with none of them takes the stage whole', () => {
+    expect(
+      agrees({
+        attacker: GARCHOMP,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([98, 116])
+  })
+
+  it('agrees that Simple doubles Intimidate', () => {
+    expect(
+      agrees({
+        attacker: BIBAREL,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'wave-crash',
+        referenceMove: 'Wave Crash',
+      }),
+    ).toEqual([66, 80])
+  })
+
+  it('agrees that Simple doubles the charge boost', () => {
+    expect(
+      agrees({
+        attacker: BIBAREL,
+        defender: SPECIAL_BLISSEY,
+        move: 'meteor-beam',
+        referenceMove: 'Meteor Beam',
+      }),
+    ).toEqual([52, 62])
+  })
+
+  it('agrees that Contrary turns Intimidate into a raise', () => {
+    expect(
+      agrees({
+        attacker: MALAMAR,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([28, 33])
+  })
+
+  it('agrees that Contrary turns the charge boost into a drop', () => {
+    expect(
+      agrees({
+        attacker: MALAMAR,
+        defender: SPECIAL_BLISSEY,
+        move: 'meteor-beam',
+        referenceMove: 'Meteor Beam',
+      }),
+    ).toEqual([20, 24])
+  })
+
+  it('agrees that Defiant answers Intimidate with two stages of Attack', () => {
+    expect(
+      agrees({
+        attacker: KINGAMBIT,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([36, 43])
+  })
+
+  it('agrees on Defiant when the attacker already carries a stage', () => {
+    expect(
+      agrees({
+        attacker: { ...KINGAMBIT, boosts: { atk: 2 } },
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([60, 72])
+  })
+
+  it('agrees that Competitive answers Intimidate with two stages of Special Attack', () => {
+    expect(
+      agrees({
+        attacker: WIGGLYTUFF,
+        defender: SPECIAL_INCINEROAR,
+        move: 'moonblast',
+        referenceMove: 'Moonblast',
+      }),
+    ).toEqual([103, 123])
+  })
+
+  it('agrees that Competitive leaves the Attack drop in place', () => {
+    expect(
+      agrees({
+        attacker: WIGGLYTUFF,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'wave-crash',
+        referenceMove: 'Wave Crash',
+      }),
+    ).toEqual([54, 64])
+  })
+
+  it('agrees that Competitive and the charge boost stack', () => {
+    expect(
+      agrees({
+        attacker: WIGGLYTUFF,
+        defender: SPECIAL_INCINEROAR,
+        move: 'meteor-beam',
+        referenceMove: 'Meteor Beam',
+      }),
+    ).toEqual([218, 258])
+  })
+
+  it('agrees that Clear Body blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: METAGROSS,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([100, 118])
+  })
+
+  it('agrees that Guard Dog turns Intimidate into a raise', () => {
+    expect(
+      agrees({
+        attacker: MABOSSTIFF,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([33, 39])
+  })
+
+  /**
+   * Bulbapedia, Intimidate: from Generation VIII it "no longer affects Pokémon
+   * with" Oblivious, Own Tempo, Inner Focus or Scrappy.
+   */
+  it('agrees that Inner Focus blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: DRAGONITE,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([100, 118])
+  })
+
+  it('agrees that Own Tempo blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: MUDSDALE,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([140, 168])
+  })
+
+  it('agrees that Oblivious blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: DONDOZO,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'wave-crash',
+        referenceMove: 'Wave Crash',
+      }),
+    ).toEqual([146, 174])
+  })
+})
+
+/**
+ * A stage the calculator lands is a stage for everything that reads one.
+ *
+ * The reference lands Intimidate and the charge before it counts Stored
+ * Power's stages and before Tera Blast picks a side, and so do the games. A
+ * stage that reached the attack stat but not the base power was half-applied.
+ */
+describe('a landed stage, read everywhere a stage is read', () => {
+  const INTIMIDATING_GYARADOS: Combatant = {
+    species: 'gyarados',
+    reference: 'Gyarados',
+    ability: 'intimidate',
+    referenceAbility: 'Intimidate',
+    evs: { hp: 252, spd: 252 },
+    abilityOn: true,
+  }
+
+  it('agrees that a Contrary raise off Intimidate counts toward Stored Power', () => {
+    expect(
+      agrees({
+        attacker: {
+          species: 'malamar',
+          reference: 'Malamar',
+          ability: 'contrary',
+          referenceAbility: 'Contrary',
+          evs: { spa: 252 },
+        },
+        defender: INTIMIDATING_GYARADOS,
+        move: 'stored-power',
+        referenceMove: 'Stored Power',
+      }),
+    ).toEqual([18, 22])
+  })
+
+  it('agrees that Intimidate can move Tera Blast to the special side', () => {
+    expect(
+      agrees({
+        attacker: {
+          species: 'dragonite',
+          reference: 'Dragonite',
+          ability: 'multiscale',
+          referenceAbility: 'Multiscale',
+          evs: { atk: 252, spa: 252 },
+          teraType: 'normal',
+        },
+        defender: INTIMIDATING_GYARADOS,
+        move: 'tera-blast',
+        referenceMove: 'Tera Blast',
+      }),
+    ).toEqual([46, 55])
+  })
+})

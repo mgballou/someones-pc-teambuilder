@@ -567,3 +567,105 @@ describe('the charge boost', () => {
     expect(solar().notes.some((note) => note.includes('+1 SpA'))).toBe(false)
   })
 })
+
+/**
+ * The abilities that rewrite a stage before it lands on their holder. The
+ * stage each one changes is one the calculator applied on its own, so the
+ * result has to say what became of it.
+ */
+describe('the stage rewrites', () => {
+  const intimidated = (species: string, ability: string, move: MoveId = EARTHQUAKE) =>
+    run({ attackerSpecies: species, move, attackerAbility: ability, defenderAbility: 'intimidate' })
+
+  const unmodelled = (result: DamageResult) =>
+    result.notes.filter((note) => note.includes('outside the damage model'))
+
+  it('says Simple doubled Intimidate', () => {
+    expect(intimidated('bibarel', 'simple').notes).toContain(
+      "Intimidate was applied as -2 Atk rather than -1, because Simple doubles it. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
+  it('says Contrary reversed the charge boost', () => {
+    expect(
+      run({
+        attackerSpecies: 'malamar',
+        nature: 'modest',
+        move: METEOR_BEAM,
+        attackerAbility: 'contrary',
+      }).notes,
+    ).toContain(
+      "Meteor Beam was applied as -1 SpA rather than the +1 it gains as it charges, because Contrary reverses it. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
+  it('says Defiant answered Intimidate on the stat in use', () => {
+    expect(intimidated('kingambit', 'defiant').notes).toContain(
+      "Intimidate was applied as -1 Atk and Defiant answered it with +2 Atk. Clear both from the attacker's boosts if they are already counted there.",
+    )
+  })
+
+  it('says Competitive answered Intimidate on the stat in use', () => {
+    expect(intimidated('wigglytuff', 'competitive', MOONBLAST).notes).toContain(
+      "Competitive answered Intimidate with +2 SpA, which was applied. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
+  it('says what became of a stage Stored Power counts off the attack stat', () => {
+    expect(
+      run({
+        attackerSpecies: 'malamar',
+        nature: 'modest',
+        move: moveId('stored-power'),
+        attackerAbility: 'contrary',
+        defenderAbility: 'intimidate',
+      }).notes,
+    ).toContain(
+      "Intimidate was applied as +1 Atk rather than -1, because Contrary reverses it. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
+  it('says nothing of a stage the move does not use', () => {
+    expect(
+      intimidated('kingambit', 'defiant', HYDRO_PUMP).notes.some((note) =>
+        note.includes('Intimidate'),
+      ),
+    ).toBe(false)
+  })
+
+  it('says Clear Body blocked Intimidate', () => {
+    expect(intimidated('metagross', 'clear-body').notes).toContain(
+      'Clear Body blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('says Inner Focus blocked Intimidate', () => {
+    expect(intimidated('dragonite', 'inner-focus').notes).toContain(
+      'Inner Focus blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('says Guard Dog turned Intimidate into a raise', () => {
+    expect(intimidated('mabosstiff', 'guard-dog').notes).toContain(
+      "Intimidate was applied as +1 Atk rather than -1, because Guard Dog turns it into a raise. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
+  it('reports none of the six as outside the model', () => {
+    const results = [
+      intimidated('bibarel', 'simple'),
+      intimidated('malamar', 'contrary'),
+      intimidated('kingambit', 'defiant'),
+      intimidated('wigglytuff', 'competitive'),
+      intimidated('metagross', 'clear-body'),
+      intimidated('mabosstiff', 'guard-dog'),
+    ]
+    expect(results.flatMap(unmodelled)).toEqual([])
+  })
+
+  it('still reports an answer to Intimidate the model does not hold', () => {
+    expect(intimidated('crawdaunt', 'hyper-cutter').notes).toContain(
+      "Crawdaunt's Hyper Cutter is outside the damage model and was not applied.",
+    )
+  })
+})

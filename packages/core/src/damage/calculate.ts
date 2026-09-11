@@ -3,12 +3,13 @@ import { requireMove, requireSpecies } from '../dex'
 import type { AbilityId, MoveId } from '../ids'
 import { abilityId } from '../ids'
 import type { Item } from '../item'
+import type { Move } from '../move'
 import { isSpreadMove } from '../move'
 import type { PokemonType, TeraType } from '../pokemon-type'
 import type { PokemonSet } from '../set'
 import type { Species } from '../species'
 import { displayName } from '../species'
-import type { BoostableStat, StatSpread } from '../stats'
+import type { BoostableStat, BoostSpread, StatSpread } from '../stats'
 import { applyBoost, computeSpread, STAT_LABEL } from '../stats'
 import type { AbilityEntry } from './abilities'
 import { abilityEntry, absorbsType, foeBasePowerModifier } from './abilities'
@@ -26,6 +27,8 @@ import {
   MOD_THREE_QUARTERS,
 } from './modifier'
 import { moveOverride } from './moves'
+import type { StageCause, StageChange, StageRewrite } from './stage-change'
+import { landStage } from './stage-change'
 import { hitCount, multiHitNote } from './multi-hit'
 import { koChance } from './ko'
 import { stabModifier } from './stab'
@@ -101,10 +104,24 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
 
   const override = moveOverride(moveRecord.id)
 
+  /**
+   * The stages the calculator lands on the attacker, settled before anything
+   * reads a stage. Tera Blast picks its side from them and Stored Power counts
+   * them, exactly as the attack stat does.
+   */
+  const stages = landAttackerStages({
+    attacker,
+    attackerEntry,
+    defenderEntry,
+    defenderAbility: defender.set.ability,
+    move: moveRecord,
+    dex,
+  })
+
   const category: 'physical' | 'special' =
     override?.categoryFromStats === true && attackerTera !== null
-      ? applyBoost(attackerStats.atk, attacker.boosts.atk) >
-        applyBoost(attackerStats.spa, attacker.boosts.spa)
+      ? applyBoost(attackerStats.atk, stages.boosts.atk) >
+        applyBoost(attackerStats.spa, stages.boosts.spa)
         ? 'physical'
         : 'special'
       : declaredCategory
@@ -121,7 +138,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     combatantSet: attacker.set,
     species: attackerSpecies,
     stats: attackerStats,
-    boosts: attacker.boosts,
+    boosts: stages.boosts,
     hpFraction: attacker.hpFraction,
     status: attacker.status,
     terastallized: attacker.terastallized,
@@ -162,7 +179,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     move: moveRecord,
     attackerWeightKg: attackerSpecies.weightKg,
     defenderWeightKg: defenderSpecies.weightKg,
-    attackerSpeed: applyBoost(attackerStats.spe, attacker.boosts.spe),
+    attackerSpeed: applyBoost(attackerStats.spe, stages.boosts.spe),
     defenderSpeed: applyBoost(defenderStats.spe, defender.boosts.spe),
     attackerHpFraction: clamp(attacker.hpFraction, 0, 1),
     defenderHpFraction: clamp(defender.hpFraction, 0, 1),
@@ -297,7 +314,8 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     defenderEntry,
     attackerItem,
     dex,
-    defenderAbility: defender.set.ability,
+    stages,
+    powerReadsStages: conditional?.readsUserStages === true,
     criticalHit,
     notes,
   })
@@ -619,7 +637,9 @@ type AttackInput = {
   readonly defenderEntry: AbilityEntry | null
   readonly attackerItem: Item | null
   readonly dex: Dex
-  readonly defenderAbility: AbilityId | null
+  readonly stages: AttackerStages
+  /** The move's power counts every stage the user holds, as Stored Power's does. */
+  readonly powerReadsStages: boolean
   readonly criticalHit: boolean
   readonly notes: NoteLog
 }
@@ -633,28 +653,26 @@ function resolveAttack({
   defenderEntry,
   attackerItem,
   dex,
-  defenderAbility,
+  stages,
+  powerReadsStages,
   criticalHit,
   notes,
 }: AttackInput): number {
-  let stage = attacker.boosts[attackStatName]
-
-  const selfBoost = moveOverride(context.move.id)?.selfBoostBeforeHit
-  if (selfBoost !== undefined && selfBoost.stat === attackStatName) {
-    stage += selfBoost.stages
+  const holder =
+    attacker.set.ability === null
+      ? "the attacker's ability"
+      : abilityLabel(dex, attacker.set.ability)
+  for (const landing of stages.landings) {
     notes.add(
-      `${context.move.name} was applied as ${signed(selfBoost.stages)} ${STAT_LABEL[selfBoost.stat]}, ${selfBoost.why}. Clear it from the attacker's boosts if it is already counted there.`,
+      stageNote({
+        ...landing,
+        holder,
+        reads: (stat) => powerReadsStages || stat === attackStatName,
+      }),
     )
   }
 
-  const imposed = defenderEntry?.foeAttackStage
-  if (imposed !== undefined && imposed.stat === attackStatName && defenderAbility !== null) {
-    stage += imposed.stages
-    notes.add(
-      `${abilityLabel(dex, defenderAbility)} was applied as ${signed(imposed.stages)} ${STAT_LABEL[imposed.stat]}. Clear it from the attacker's boosts if it is already counted there.`,
-    )
-  }
-
+  let stage = stages.boosts[attackStatName]
   if (defenderEntry?.ignoresFoeBoosts === true) stage = 0
   else if (criticalHit && stage < 0) stage = 0
 
@@ -667,8 +685,139 @@ function resolveAttack({
   return Math.max(1, applyModifier(applyBoost(attackerStats[attackStatName], stage), modifier))
 }
 
+type AttackerStages = {
+  readonly boosts: BoostSpread
+  /** Each stage the calculator landed, and what the attacker's ability made of it. */
+  readonly landings: readonly StageLanding[]
+}
+
+type StageSource = {
+  /** What made the change, by name: the defender's ability or the move. */
+  readonly by: string
+  /** Why a move makes it, which is what tells the caller the stage is not a guess. */
+  readonly why: string | null
+  readonly change: StageChange
+  readonly cause: StageCause
+}
+
+type StageLanding = StageSource & { readonly rewrite: StageRewrite | null }
+
+type AttackerStagesInput = {
+  readonly attacker: Attacker
+  readonly attackerEntry: AbilityEntry | null
+  readonly defenderEntry: AbilityEntry | null
+  readonly defenderAbility: AbilityId | null
+  readonly move: Move
+  readonly dex: Dex
+}
+
+/**
+ * Intimidate lands before the charge, because it lands on entry and the charge
+ * is the attacker's own turn. The order only shows at the cap, and it is the
+ * order the reference uses too.
+ */
+function landAttackerStages({
+  attacker,
+  attackerEntry,
+  defenderEntry,
+  defenderAbility,
+  move,
+  dex,
+}: AttackerStagesInput): AttackerStages {
+  const imposed = defenderEntry?.foeAttackStage
+  const selfBoost = moveOverride(move.id)?.selfBoostBeforeHit
+  const intimidation: readonly StageSource[] =
+    imposed === undefined || defenderAbility === null
+      ? []
+      : [
+          {
+            by: abilityLabel(dex, defenderAbility),
+            why: null,
+            change: imposed,
+            cause: 'intimidate',
+          },
+        ]
+  const charge: readonly StageSource[] =
+    selfBoost === undefined
+      ? []
+      : [{ by: move.name, why: selfBoost.why, change: selfBoost, cause: 'own-move' }]
+
+  const response = attackerEntry?.stageResponse ?? null
+  return [...intimidation, ...charge].reduce<AttackerStages>(
+    (landed, source) => {
+      const next = landStage({
+        boosts: landed.boosts,
+        change: source.change,
+        cause: source.cause,
+        response,
+      })
+      return {
+        boosts: next.boosts,
+        landings: [...landed.landings, { ...source, rewrite: next.rewrite }],
+      }
+    },
+    { boosts: attacker.boosts, landings: [] },
+  )
+}
+
 function signed(stages: number): string {
   return stages >= 0 ? `+${stages}` : `${stages}`
+}
+
+const CLEAR_ONE = "Clear it from the attacker's boosts if it is already counted there."
+const CLEAR_BOTH = "Clear both from the attacker's boosts if they are already counted there."
+
+type StageNoteInput = StageLanding & {
+  /** The attacker's ability, by name. It is what rewrites the change. */
+  readonly holder: string
+  /** Whether this hit reads the stage on a stat: the attack stat, or all of them. */
+  readonly reads: (stat: BoostableStat) => boolean
+}
+
+/**
+ * What became of a stage the calculator applied, on a stat this hit reads: the
+ * attack stat, or every stat when the move's power counts them.
+ *
+ * Said on every call, so a stage nobody asked for is never silent. A stage on
+ * a stat the hit does not read changes nothing and says nothing — Defiant's
+ * Attack means nothing to Hydro Pump, though it is 20 base power to Stored
+ * Power.
+ */
+function stageNote({ by, why, holder, change, rewrite, reads }: StageNoteInput): string | null {
+  const label = STAT_LABEL[change.stat]
+  const onStat = reads(change.stat)
+  const reason = why === null ? '' : `, which ${why}`
+  const plain = `${by} was applied as ${signed(change.stages)} ${label}${reason}. ${CLEAR_ONE}`
+
+  if (rewrite === null) return onStat ? plain : null
+
+  switch (rewrite.kind) {
+    case 'multiplied': {
+      if (!onStat) return null
+      const verb = rewrite.factor === 2 ? 'doubles' : 'reverses'
+      const instead = why === null ? signed(change.stages) : `the ${signed(change.stages)} ${why}`
+      return `${by} was applied as ${signed(rewrite.stages)} ${label} rather than ${instead}, because ${holder} ${verb} it. ${CLEAR_ONE}`
+    }
+    case 'blocked':
+      return onStat ? `${holder} blocks ${by}, so no ${label} stage was applied.` : null
+    case 'raised-instead':
+      return onStat
+        ? `${by} was applied as ${signed(rewrite.stages)} ${label} rather than ${signed(change.stages)}, because ${holder} turns it into a raise. ${CLEAR_ONE}`
+        : null
+    case 'answered': {
+      const answer = `${signed(rewrite.stages)} ${STAT_LABEL[rewrite.stat]}`
+      const answerOnStat = reads(rewrite.stat)
+      if (onStat && answerOnStat) {
+        return `${by} was applied as ${signed(change.stages)} ${label} and ${holder} answered it with ${answer}. ${CLEAR_BOTH}`
+      }
+      if (answerOnStat) {
+        return `${holder} answered ${by} with ${answer}, which was applied. ${CLEAR_ONE}`
+      }
+      return onStat ? plain : null
+    }
+    default:
+      throw ImpossibleState.unreachable(rewrite)
+  }
 }
 
 type DefenseInput = {
