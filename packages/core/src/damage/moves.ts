@@ -39,6 +39,17 @@ export type MoveOverride = {
   readonly basePowerFromTera?: Readonly<Partial<Record<TeraType, number>>>
   /** Tera Blast picks its category from the user's higher attacking stat. */
   readonly categoryFromStats?: boolean
+  /**
+   * Shell Side Arm picks the side that would do more to this target, comparing
+   * what the physical and the special formula would deal. The comparison reads
+   * stat stages and nothing else, which is what the games read.
+   */
+  readonly categoryFromDamage?: boolean
+  /**
+   * Foul Play attacks with the target's Attack, and with the target's stages on
+   * it. Nothing the user did to its own Attack is part of the hit.
+   */
+  readonly attackFromDefender?: boolean
   /** Facade is not halved by burn. */
   readonly ignoresBurn?: boolean
   /** Earthquake and friends are halved on Grassy Terrain. */
@@ -82,6 +93,8 @@ const TERRAIN_PULSE_TYPE: Readonly<Partial<Record<Field['terrain'], PokemonType>
 
 export const MOVE_OVERRIDES: Readonly<Record<string, MoveOverride>> = {
   'body-press': { attackStat: 'def' },
+  'foul-play': { attackFromDefender: true },
+  'shell-side-arm': { categoryFromDamage: true },
   psyshock: { defenseStat: 'def' },
   psystrike: { defenseStat: 'def' },
   'secret-sword': { defenseStat: 'def' },
