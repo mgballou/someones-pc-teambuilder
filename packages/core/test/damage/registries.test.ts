@@ -401,6 +401,39 @@ describe('ability registry', () => {
       }).immune,
     ).toBe(false)
   })
+
+  /**
+   * Mold Breaker reaches the execution of a move, and Intimidate happened on
+   * entry. Two calls, one with Mold Breaker and one without, have to land the
+   * same stage.
+   */
+  describe('Mold Breaker and Intimidate', () => {
+    const breaking = (ability: string | null) =>
+      run({
+        attackerSpecies: 'garchomp',
+        move: EARTHQUAKE,
+        attackerAbility: ability,
+        defenderAbility: 'intimidate',
+      })
+
+    it('leaves the stage where an ordinary attacker finds it', () => {
+      expect(breaking('mold-breaker').rolls).toEqual(breaking(null).rolls)
+    })
+
+    it('says Intimidate was applied rather than suppressed', () => {
+      expect(
+        breaking('mold-breaker').notes.some((note) =>
+          note.startsWith('Intimidate was applied as -1 Atk'),
+        ),
+      ).toBe(true)
+    })
+
+    it('claims no suppression it did not do', () => {
+      expect(breaking('mold-breaker').notes.some((note) => note.includes('Mold Breaker'))).toBe(
+        false,
+      )
+    })
+  })
 })
 
 describe('the field', () => {

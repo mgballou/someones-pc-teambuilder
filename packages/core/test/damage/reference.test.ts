@@ -1431,6 +1431,24 @@ describe('a stage rewritten before it lands', () => {
       }),
     ).toEqual([146, 174])
   })
+
+  /**
+   * Mold Breaker ignores an ability "for the execution of that move"
+   * (Bulbapedia), and Intimidate happened on entry, before there was a move.
+   * Showdown's `intimidate` is an `onStart` hook carrying no `breakable` flag,
+   * so Mold Breaker has nothing to ignore and the stage stands. This is the
+   * match-up that found it.
+   */
+  it('agrees that Mold Breaker does not stop Intimidate', () => {
+    expect(
+      agrees({
+        attacker: OGERPON_HEARTHFLAME,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([10, 12])
+  })
 })
 
 /**

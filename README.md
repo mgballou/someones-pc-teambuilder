@@ -169,12 +169,14 @@ are worth knowing before you rely on the output.
   out loud, because the question a team builder asks is what happens after the switch. The
   attacker's ability decides what the stage becomes — Simple doubles it, Contrary reverses it,
   Defiant and Competitive answer it, Clear Body, Inner Focus, Own Tempo and Oblivious block it,
-  Guard Dog turns it into a raise — and the result says that too. Intimidate is the one place the
-  calculator deliberately reads a match-up differently from `@smogon/calc`, apart from a corner the
-  games decide: an attacker already at -6 Attack cannot be lowered again, so Defiant, Competitive
-  and Guard Dog have nothing to answer. One gap is still silent. A few moves bend the formula rather
-  than the power — Foul Play attacks with the target's Attack, Shell Side Arm picks the side that
-  hurts more — and those are read straight, with nothing said.
+  Guard Dog turns it into a raise — and the result says that too. A Mold Breaker attacker does not
+  stop it, because Mold Breaker reaches the execution of a move and Intimidate happened on entry.
+  Intimidate is the one place the calculator deliberately reads a match-up differently from
+  `@smogon/calc`, apart from a corner the games decide: an attacker already at -6 Attack cannot be
+  lowered again, so Defiant, Competitive and Guard Dog have nothing to answer. One gap is still
+  silent. A few moves bend the formula rather than the power — Foul Play attacks with the target's
+  Attack, Shell Side Arm picks the side that hurts more — and those are read straight, with nothing
+  said.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
   They are not filtered by usage statistics.
 - **Coverage scores against whole typings, not one type at a time**, and ability immunities move

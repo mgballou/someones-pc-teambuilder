@@ -480,6 +480,22 @@ type SuppressInput = {
   readonly notes: NoteLog
 }
 
+/**
+ * The defender's ability as the attacker's move sees it.
+ *
+ * Mold Breaker reaches only as far as the move. Bulbapedia: "When a Pokémon
+ * with Mold Breaker uses a move, the effects of all Pokémon's ignorable
+ * Abilities are ignored for the execution of that move." Showdown's
+ * `moldbreaker` is that sentence as code — its whole body is
+ * `onModifyMove(move) { move.ignoreAbility = true }`.
+ *
+ * A stage the defender's Intimidate already landed is not part of that
+ * execution. Showdown's `intimidate` is an `onStart` hook that fires when its
+ * holder enters, and it carries no `breakable` flag, so it is not an ignorable
+ * Ability at all. The stage was on the attacker before the move was chosen, so
+ * it survives, and an ability that does nothing else is not suppressed and says
+ * nothing about it.
+ */
 function suppressDefenderAbility({
   dex,
   attackerEntry,
@@ -491,10 +507,13 @@ function suppressDefenderAbility({
   if (attackerEntry?.moldBreaker !== true) return defenderEntry
   if (defenderAbility === null || defenderEntry === null) return defenderEntry
   if (dex.ability(defenderAbility)?.suppressable === false) return defenderEntry
+  const { foeAttackStage, ...withinTheMove } = defenderEntry
+  const onlyTheStage = foeAttackStage !== undefined && Object.keys(withinTheMove).length === 0
+  if (onlyTheStage) return defenderEntry
   notes.add(
     `${displayName(defenderSpecies)}'s ${abilityLabel(dex, defenderAbility)} was suppressed by the attacker's Mold Breaker.`,
   )
-  return null
+  return foeAttackStage === undefined ? null : { foeAttackStage }
 }
 
 function resolveTera(
