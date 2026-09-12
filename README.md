@@ -174,9 +174,12 @@ are worth knowing before you rely on the output.
   a move and Intimidate happened on entry. Intimidate is the one place the calculator deliberately
   reads a match-up differently from `@smogon/calc`, apart from a corner the games decide: an
   attacker already at -6 Attack cannot be lowered again, so Defiant, Competitive and Guard Dog have
-  nothing to answer. One gap is still silent. A few moves bend the formula rather than the power —
-  Foul Play attacks with the target's Attack, Shell Side Arm picks the side that hurts more — and
-  those are read straight, with nothing said.
+  nothing to answer. **The moves that bend the formula are read the way the games read them.** Foul
+  Play attacks with the target's Attack and the target's stages; Shell Side Arm takes whichever side
+  would do more to this target, counting stat stages and nothing else. Both say what they read, and
+  Shell Side Arm says when the two sides come out level, which the games settle with a coin flip and
+  nothing here can. Foul Play names what it leaves out too: the user's own Intimidate would take a
+  stage off the Attack it reads, and only a stage landed on the attacker is modelled.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
   They are not filtered by usage statistics.
 - **Coverage scores against whole typings, not one type at a time**, and ability immunities move
