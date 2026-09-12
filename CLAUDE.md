@@ -199,9 +199,11 @@ This app makes claims about a competitive game. Several are approximations, and 
     own, Clear Body, Inner Focus, Own Tempo and Oblivious block it, and Guard Dog turns it into a
     raise. `stage-change.ts` runs them in the games' order, which decides one corner: an attacker
     already at -6 Attack cannot be lowered, so Defiant, Competitive and Guard Dog have nothing to
-    answer. The reference answers anyway and reads -5. Hyper Cutter, White Smoke, Full Metal Body,
-    Mirror Armor and Scrappy also stop Intimidate in the games, are outside the ability model, and
-    arrive with their own note saying so.
+    answer. The reference answers anyway and reads -5. A Mold Breaker attacker does not stop it:
+    Mold Breaker reaches the execution of a move and Intimidate happened on entry, so the stage
+    stands. Hyper Cutter, White Smoke, Full Metal Body, Mirror Armor and Scrappy also stop
+    Intimidate in the games, are outside the ability model, and arrive with their own note saying
+    so.
   - **A Ruin ability does not touch a Pokémon carrying the same Ruin ability.** Sword of Ruin
     "decreases the Defense stat of all Pokémon on the field other than Pokémon with this
     Ability by 25%" and "does not stack if more than one Pokémon with Sword of Ruin is on the
