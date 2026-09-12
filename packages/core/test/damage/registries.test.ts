@@ -684,7 +684,25 @@ describe('the stage rewrites', () => {
     )
   })
 
-  it('reports none of the six as outside the model', () => {
+  it('says Hyper Cutter blocked Intimidate', () => {
+    expect(intimidated('crawdaunt', 'hyper-cutter').notes).toContain(
+      'Hyper Cutter blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('says White Smoke blocked Intimidate', () => {
+    expect(intimidated('torkoal', 'white-smoke').notes).toContain(
+      'White Smoke blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('says Full Metal Body blocked Intimidate', () => {
+    expect(intimidated('solgaleo', 'full-metal-body').notes).toContain(
+      'Full Metal Body blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('reports none of the nine as outside the model', () => {
     const results = [
       intimidated('bibarel', 'simple'),
       intimidated('malamar', 'contrary'),
@@ -692,13 +710,22 @@ describe('the stage rewrites', () => {
       intimidated('wigglytuff', 'competitive'),
       intimidated('metagross', 'clear-body'),
       intimidated('mabosstiff', 'guard-dog'),
+      intimidated('crawdaunt', 'hyper-cutter'),
+      intimidated('torkoal', 'white-smoke'),
+      intimidated('solgaleo', 'full-metal-body'),
     ]
     expect(results.flatMap(unmodelled)).toEqual([])
   })
 
+  /**
+   * Mirror Armor sends a drop back at whoever caused it rather than stopping
+   * it, so the games leave its holder's Attack alone. The reference does not
+   * model that, and the model would rather say it is missing than diverge
+   * quietly.
+   */
   it('still reports an answer to Intimidate the model does not hold', () => {
-    expect(intimidated('crawdaunt', 'hyper-cutter').notes).toContain(
-      "Crawdaunt's Hyper Cutter is outside the damage model and was not applied.",
+    expect(intimidated('corviknight', 'mirror-armor').notes).toContain(
+      "Corviknight's Mirror Armor is outside the damage model and was not applied.",
     )
   })
 })

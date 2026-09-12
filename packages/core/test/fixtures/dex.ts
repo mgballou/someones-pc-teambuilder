@@ -628,6 +628,26 @@ const SPECIES: readonly Species[] = [
     weightKg: 920,
     heightM: 2.5,
   }),
+  makeSpecies({
+    id: 'torkoal',
+    dexNumber: 324,
+    types: ['fire'],
+    baseStats: { hp: 70, atk: 85, def: 140, spa: 85, spd: 70, spe: 20 },
+    abilities: ['white-smoke', 'drought'],
+    hiddenAbility: 'shell-armor',
+    weightKg: 80.4,
+    heightM: 0.5,
+  }),
+  makeSpecies({
+    id: 'solgaleo',
+    dexNumber: 791,
+    types: ['psychic', 'steel'],
+    baseStats: { hp: 137, atk: 137, def: 107, spa: 113, spd: 89, spe: 97 },
+    abilities: ['full-metal-body'],
+    weightKg: 230,
+    heightM: 3.4,
+    classification: 'restricted',
+  }),
   /**
    * Not in Scarlet and Violet, and ordinary in every other respect: no
    * classification bars it, no ban list names it, and it is fast enough to
@@ -1148,6 +1168,9 @@ const ABILITY_NAMES = [
   'guard-dog',
   'own-tempo',
   'hyper-cutter',
+  'white-smoke',
+  'full-metal-body',
+  'mirror-armor',
 ] as const
 
 /** `of` stays lower case, so the fixture reads `Sword of Ruin` like the games. */

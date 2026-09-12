@@ -1262,6 +1262,27 @@ describe('a stage rewritten before it lands', () => {
     referenceAbility: 'Guard Dog',
     evs: { atk: 252 },
   }
+  const HYPER_CUTTER_CRAWDAUNT: Combatant = {
+    species: 'crawdaunt',
+    reference: 'Crawdaunt',
+    ability: 'hyper-cutter',
+    referenceAbility: 'Hyper Cutter',
+    evs: { atk: 252 },
+  }
+  const TORKOAL: Combatant = {
+    species: 'torkoal',
+    reference: 'Torkoal',
+    ability: 'white-smoke',
+    referenceAbility: 'White Smoke',
+    evs: { atk: 252 },
+  }
+  const SOLGALEO: Combatant = {
+    species: 'solgaleo',
+    reference: 'Solgaleo',
+    ability: 'full-metal-body',
+    referenceAbility: 'Full Metal Body',
+    evs: { atk: 252 },
+  }
 
   it('agrees that an attacker with none of them takes the stage whole', () => {
     expect(
@@ -1430,6 +1451,51 @@ describe('a stage rewritten before it lands', () => {
         referenceMove: 'Wave Crash',
       }),
     ).toEqual([146, 174])
+  })
+
+  /**
+   * Bulbapedia, Hyper Cutter: it "prevents other Pokémon from lowering the
+   * Attack stat stage of the Pokémon with this Ability".
+   */
+  it('agrees that Hyper Cutter blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: HYPER_CUTTER_CRAWDAUNT,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([22, 27])
+  })
+
+  /**
+   * Bulbapedia, White Smoke: it "prevents stat reduction caused by other
+   * Pokémon's moves and Abilities (such as Scary Face and Intimidate)".
+   */
+  it('agrees that White Smoke blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: TORKOAL,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([74, 88])
+  })
+
+  /**
+   * Bulbapedia, Full Metal Body: the same sentence, and it cannot itself be
+   * ignored the way Clear Body and White Smoke can.
+   */
+  it('agrees that Full Metal Body blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: SOLGALEO,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([102, 120])
   })
 
   /**
