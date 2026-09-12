@@ -833,6 +833,16 @@ const MOVES: readonly Move[] = [
     basePower: 80,
     flags: { contact: true },
   }),
+  makeMove({
+    id: 'foul-play',
+    type: 'dark',
+    category: 'physical',
+    basePower: 95,
+    pp: 15,
+    flags: { contact: true },
+  }),
+  // Printed special. It gains contact in the games on the turns it goes physical.
+  makeMove({ id: 'shell-side-arm', type: 'poison', category: 'special', basePower: 90 }),
   makeMove({ id: 'thunderbolt', type: 'electric', category: 'special', basePower: 90 }),
   makeMove({ id: 'flamethrower', type: 'fire', category: 'special', basePower: 90 }),
   makeMove({
