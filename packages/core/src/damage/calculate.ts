@@ -699,11 +699,14 @@ type SideDamageInput = {
 
 /**
  * What one side of the formula would deal, taken far enough for the two sides
- * to be compared.
+ * to be compared. The chain is the one Shell Side Arm's own description spells
+ * out, quoted in `moves.ts`, down to the order of the divisions.
  *
  * Compared as damage rather than as two ratios, because that is where the games
  * compare them: two ratios that differ can still floor to the same number, and
- * a tie is settled by a coin flip rather than by the larger ratio.
+ * the games settle that with a coin flip rather than with the larger ratio.
+ * `@smogon/calc` compares the ratios, so that is the one corner where the two
+ * can part, and no differential case sits in it.
  */
 function sideDamage({ level, basePower, attack, defense }: SideDamageInput): number {
   return Math.floor(

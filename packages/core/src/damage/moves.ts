@@ -41,8 +41,17 @@ export type MoveOverride = {
   readonly categoryFromStats?: boolean
   /**
    * Shell Side Arm picks the side that would do more to this target, comparing
-   * what the physical and the special formula would deal. The comparison reads
-   * stat stages and nothing else, which is what the games read.
+   * what the physical and the special formula would deal.
+   *
+   * Showdown's own description of the move is the rule, in full: "This move
+   * becomes a physical attack that makes contact if the value of ((((2 * the
+   * user's level / 5 + 2) * 90 * X) / Y) / 50), where X is the user's Attack
+   * stat and Y is the target's Defense stat, is greater than the same value
+   * where X is the user's Special Attack stat and Y is the target's Special
+   * Defense stat. No stat modifiers other than stat stage changes are
+   * considered for this purpose. If the two values are equal, this move chooses
+   * a damage category at random." `chooseCategory` is that sentence, and the
+   * random half is the one thing it cannot be — see the note it carries.
    */
   readonly categoryFromDamage?: boolean
   /**
