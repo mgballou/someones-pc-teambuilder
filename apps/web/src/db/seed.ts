@@ -46,7 +46,8 @@ const TEAMS: readonly SeedTeam[] = [
   {
     name: 'Reg H Rain',
     format: 'vgc-reg-h',
-    notes: 'Pelipper sets the rain, Archaludon uses it. Amoonguss and Incineroar cover the speed.',
+    notes:
+      'Pelipper sets the rain, Archaludon and Barraskewda use it. Amoonguss and Incineroar cover the speed.',
     members: [
       {
         species: 'pelipper',
@@ -97,13 +98,14 @@ const TEAMS: readonly SeedTeam[] = [
         moves: ['grassy-glide', 'wood-hammer', 'fake-out', 'protect'],
       },
       {
-        species: 'dragonite',
-        ability: 'inner-focus',
+        species: 'barraskewda',
+        ability: 'swift-swim',
         item: 'choice-band',
         nature: 'adamant',
         evs: { hp: 4, atk: 252, spe: 252 },
-        tera: 'normal',
-        moves: ['extreme-speed', 'outrage', 'aerial-ace', 'ice-spinner'],
+        tera: 'water',
+        moves: ['liquidation', 'close-combat', 'aqua-jet', 'psychic-fangs'],
+        notes: 'Swift Swim is the whole point. Set the rain on the speed panel and it doubles.',
       },
     ],
   },

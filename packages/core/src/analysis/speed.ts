@@ -25,6 +25,12 @@
  * - **Trick Room inverts the turn.** `trickRoomLadder` is the same entries the
  *   other way up, because in doubles that is not an edge case.
  *
+ * And one thing the panel above it used to leave out: **the field is a
+ * parameter and a person can set it**. Chlorophyll, Swift Swim, Sand Rush,
+ * Slush Rush and Surge Surfer double Speed while their condition is standing,
+ * and every one of them was listed as unmodelled because nothing could switch
+ * the weather on. They are `FIELD_SPEED_ABILITIES` now.
+ *
  * What is left is named in `notes` rather than dropped.
  */
 
@@ -43,13 +49,64 @@ import type { Team } from '../team'
 import { isSpeciesLegal } from './legality'
 
 /**
+ * What a field-reading ability is waiting for. A union rather than a weather
+ * id with `'electric'` smuggled into it, so the one terrain ability in the
+ * model does not have to pretend to be weather.
+ */
+type FieldTrigger =
+  | { readonly kind: 'weather'; readonly weather: Weather }
+  | { readonly kind: 'terrain'; readonly terrain: Terrain }
+
+function isStanding(trigger: FieldTrigger, field: SpeedField): boolean {
+  switch (trigger.kind) {
+    case 'weather':
+      return field.weather === trigger.weather
+    case 'terrain':
+      return field.terrain === trigger.terrain
+    default: {
+      const exhaustive: never = trigger
+      return exhaustive
+    }
+  }
+}
+
+function triggerText(trigger: FieldTrigger): string {
+  switch (trigger.kind) {
+    case 'weather':
+      return WEATHER_LABELS[trigger.weather].toLowerCase()
+    case 'terrain':
+      return TERRAIN_LABELS[trigger.terrain]
+    default: {
+      const exhaustive: never = trigger
+      return exhaustive
+    }
+  }
+}
+
+/**
  * The two abilities that raise the holder's highest stat, and what switches
  * each one on. Held as data rather than as a list of ids, because the trigger
  * is the half this file used to be missing.
  */
-const PARADOX_TRIGGERS: Readonly<Record<string, 'sun' | 'electric'>> = {
-  protosynthesis: 'sun',
-  'quark-drive': 'electric',
+const PARADOX_TRIGGERS: Readonly<Record<string, FieldTrigger>> = {
+  protosynthesis: { kind: 'weather', weather: 'sun' },
+  'quark-drive': { kind: 'terrain', terrain: 'electric' },
+}
+
+/**
+ * The five abilities that double Speed for as long as the field holds their
+ * condition, and nothing else.
+ *
+ * No item switches one of these on — there is no Booster Energy for
+ * Chlorophyll — so an entry is its trigger and nothing more. Adding a sixth is
+ * a line here.
+ */
+const FIELD_SPEED_ABILITIES: Readonly<Record<string, FieldTrigger>> = {
+  chlorophyll: { kind: 'weather', weather: 'sun' },
+  'swift-swim': { kind: 'weather', weather: 'rain' },
+  'sand-rush': { kind: 'weather', weather: 'sand' },
+  'slush-rush': { kind: 'weather', weather: 'snow' },
+  'surge-surfer': { kind: 'terrain', terrain: 'electric' },
 }
 
 /** The item that switches those abilities on without the weather or terrain. */
@@ -64,7 +121,9 @@ const CHOICE_SCARF: ItemId = itemId('choice-scarf')
  *
  * Not `Field` from the calculator: screens, sides and battle style decide
  * damage and never decide a turn order. Weather and terrain do, because they
- * are what a Paradox ability waits for.
+ * are what a Paradox ability and the five doublers wait for. The two members
+ * are the calculator's own `Weather` and `Terrain`, so there is one vocabulary
+ * for the field in this codebase and not two.
  */
 export type SpeedField = {
   readonly weather: Weather
@@ -73,6 +132,43 @@ export type SpeedField = {
 
 /** No sun, no terrain. What a team builder is looking at before a game starts. */
 export const CLEAR_FIELD: SpeedField = { weather: 'none', terrain: 'none' }
+
+const WEATHER_LABELS: Readonly<Record<Weather, string>> = {
+  none: 'None',
+  sun: 'Sun',
+  rain: 'Rain',
+  sand: 'Sand',
+  snow: 'Snow',
+}
+
+const TERRAIN_LABELS: Readonly<Record<Terrain, string>> = {
+  none: 'None',
+  electric: 'Electric Terrain',
+  grassy: 'Grassy Terrain',
+  psychic: 'Psychic Terrain',
+  misty: 'Misty Terrain',
+}
+
+export function weatherLabel(weather: Weather): string {
+  return WEATHER_LABELS[weather]
+}
+
+export function terrainLabel(terrain: Terrain): string {
+  return TERRAIN_LABELS[terrain]
+}
+
+/**
+ * The field as a person would say it: "sun", "rain and Grassy Terrain", or
+ * "a clear field". The panel prints it beside the ladder, because a ladder
+ * read in the rain and a ladder read clear are two different ladders and only
+ * one of them is on the screen.
+ */
+export function speedFieldText(field: SpeedField): string {
+  const standing: string[] = []
+  if (field.weather !== 'none') standing.push(WEATHER_LABELS[field.weather].toLowerCase())
+  if (field.terrain !== 'none') standing.push(TERRAIN_LABELS[field.terrain])
+  return standing.length === 0 ? 'a clear field' : standing.join(' and ')
+}
 
 /* --------------------------------------------------------------- modifiers */
 
@@ -92,6 +188,7 @@ export type SpeedModifier =
   | { readonly kind: 'boost'; readonly stages: number }
   | { readonly kind: 'paralysis' }
   | { readonly kind: 'booster' }
+  | { readonly kind: 'field-ability' }
 
 export const SPEED_MODIFIERS: readonly SpeedModifier[] = [
   { kind: 'none' },
@@ -100,6 +197,7 @@ export const SPEED_MODIFIERS: readonly SpeedModifier[] = [
   { kind: 'boost', stages: 1 },
   { kind: 'boost', stages: 2 },
   { kind: 'booster' },
+  { kind: 'field-ability' },
   { kind: 'paralysis' },
 ]
 
@@ -117,6 +215,8 @@ export function speedModifierLabel(modifier: SpeedModifier): string {
       return 'Paralyzed'
     case 'booster':
       return 'Booster Energy'
+    case 'field-ability':
+      return 'Field ability'
     default: {
       const exhaustive: never = modifier
       return exhaustive
@@ -143,6 +243,8 @@ function applyModifier(speed: number, modifier: SpeedModifier): number {
       return scale(speed, 1, 2)
     case 'booster':
       return scale(speed, 3, 2)
+    case 'field-ability':
+      return speed * 2
     default: {
       const exhaustive: never = modifier
       return exhaustive
@@ -250,7 +352,7 @@ export const BENCHMARK_BASIS: BenchmarkBasis = {
  * is the difference between a ladder that is partial and a ladder that lies.
  */
 export const UNMODELLED_SPEED_EFFECTS: readonly string[] = [
-  'Weather and terrain Speed abilities — Chlorophyll, Swift Swim, Sand Rush, Slush Rush, Surge Surfer',
+  'What sets the weather and the terrain — the field here is the one you chose, not one read off the team',
   'Abilities that need a turn or a trigger — Speed Boost, Unburden, Quick Feet, Steam Engine',
   'Items that halve Speed — Iron Ball, Macho Brace, the Power items',
   'Sticky Web, Tailwind running out, and move priority, which settles a turn before Speed is read',
@@ -261,6 +363,7 @@ export type SpeedNote =
   | { readonly kind: 'speed-tie'; readonly speed: number; readonly count: number }
   | { readonly kind: 'paradox-dormant'; readonly setId: SetId; readonly ability: AbilityId }
   | { readonly kind: 'booster-without-ability'; readonly setId: SetId }
+  | { readonly kind: 'field-ability-dormant'; readonly setId: SetId; readonly ability: AbilityId }
   | { readonly kind: 'unmodelled'; readonly effects: readonly string[] }
 
 export function speedNoteText(note: SpeedNote): string {
@@ -271,6 +374,11 @@ export function speedNoteText(note: SpeedNote): string {
       return `${note.ability} is dormant: no Booster Energy, and nothing on the field to switch it on. The ladder reads this set unboosted.`
     case 'booster-without-ability':
       return 'Booster Energy with no Protosynthesis or Quark Drive to spend it. The item does nothing here, and the ladder reads this set unboosted.'
+    case 'field-ability-dormant': {
+      const trigger = FIELD_SPEED_ABILITIES[note.ability]
+      const waitingFor = trigger === undefined ? 'its condition' : triggerText(trigger)
+      return `${note.ability} is dormant: the field has no ${waitingFor} in it. The ladder reads this set at its unmodified Speed.`
+    }
     case 'unmodelled':
       return `Not accounted for: ${note.effects.join('; ')}.`
     default: {
@@ -304,8 +412,10 @@ export type AnalyzeSpeedInput = {
   /** How many benchmarks the ladder holds. */
   readonly benchmarkCount?: number
   /**
-   * The weather and terrain to read Paradox abilities against. Clear by
-   * default, which is what a builder is looking at before a game starts.
+   * The weather and terrain to read the field-reading abilities against —
+   * Protosynthesis, Quark Drive, and the five that double Speed outright.
+   * Clear by default, which is what a builder is looking at before a game
+   * starts.
    */
   readonly field?: SpeedField
 }
@@ -423,14 +533,24 @@ function memberSpeed({
   const scarfed = set.item === CHOICE_SCARF
   const booster = boosterState({ set, species, format, field })
   const boosted = booster.kind === 'active'
+  const fieldAbility = fieldAbilityState({ set, field })
+  const doubled = fieldAbility.kind === 'active'
 
   const modifiers = SPEED_MODIFIERS.map((modifier) => ({
     modifier,
     speed: applyModifier(speed, modifier),
-    available: isAvailable({ modifier, scarfed, boosted }),
+    available: isAvailable({ modifier, scarfed, boosted, doubled }),
   }))
 
+  /**
+   * The doubling goes on first, and the order is not arbitrary. Each step here
+   * truncates, so a Swift Swim set under a Choice Scarf reads `floor(2s * 3/2)`
+   * — which is `3s` exactly — where the other order reads `floor(s * 3/2) * 2`
+   * and loses a point on every odd number. The games chain their modifiers and
+   * round once; putting the exact multiplier first gets the same answer here.
+   */
   let effective = speed
+  if (doubled) effective = applyModifier(effective, { kind: 'field-ability' })
   if (scarfed) effective = applyModifier(effective, { kind: 'choice-scarf' })
   if (boosted) effective = applyModifier(effective, { kind: 'booster' })
 
@@ -444,7 +564,7 @@ function memberSpeed({
       effective,
       modifiers,
     },
-    notes: boosterNotes(set.id, booster),
+    notes: [...boosterNotes(set.id, booster), ...fieldAbilityNotes(set.id, fieldAbility)],
   }
 }
 
@@ -452,10 +572,12 @@ function isAvailable({
   modifier,
   scarfed,
   boosted,
+  doubled,
 }: {
   readonly modifier: SpeedModifier
   readonly scarfed: boolean
   readonly boosted: boolean
+  readonly doubled: boolean
 }): boolean {
   switch (modifier.kind) {
     case 'none':
@@ -467,8 +589,54 @@ function isAvailable({
       return scarfed
     case 'booster':
       return boosted
+    case 'field-ability':
+      return doubled
     default: {
       const exhaustive: never = modifier
+      return exhaustive
+    }
+  }
+}
+
+/* ------------------------------------------------ the field-reading abilities */
+
+/**
+ * Whether one of the five doublers is doing anything.
+ *
+ * `dormant` is the case that earns the type: Chlorophyll on a clear field is
+ * not the same as no Chlorophyll at all, and a builder who set the weather
+ * somewhere else deserves to be told which way the ladder was read.
+ */
+type FieldAbilityState =
+  | { readonly kind: 'active'; readonly ability: AbilityId }
+  | { readonly kind: 'dormant'; readonly ability: AbilityId }
+  | { readonly kind: 'none' }
+
+function fieldAbilityState({
+  set,
+  field,
+}: {
+  readonly set: PokemonSet
+  readonly field: SpeedField
+}): FieldAbilityState {
+  const ability = set.ability
+  if (ability === null) return { kind: 'none' }
+
+  const trigger = FIELD_SPEED_ABILITIES[ability]
+  if (trigger === undefined) return { kind: 'none' }
+
+  return isStanding(trigger, field) ? { kind: 'active', ability } : { kind: 'dormant', ability }
+}
+
+function fieldAbilityNotes(setId: SetId, state: FieldAbilityState): readonly SpeedNote[] {
+  switch (state.kind) {
+    case 'dormant':
+      return [{ kind: 'field-ability-dormant', setId, ability: state.ability }]
+    case 'active':
+    case 'none':
+      return []
+    default: {
+      const exhaustive: never = state
       return exhaustive
     }
   }
@@ -519,8 +687,7 @@ function boosterState({
     return holdsBooster ? { kind: 'item-without-ability' } : { kind: 'none' }
   }
 
-  const switchedOn =
-    holdsBooster || (trigger === 'sun' ? field.weather === 'sun' : field.terrain === 'electric')
+  const switchedOn = holdsBooster || isStanding(trigger, field)
   if (!switchedOn) return { kind: 'dormant', ability }
 
   return highestStat({ set, species, format }) === 'spe'

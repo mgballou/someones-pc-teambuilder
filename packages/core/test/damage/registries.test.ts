@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { MoveId, Nature, StatSpread } from '../../src/index'
+import type { BoostSpread, MoveId, Nature, StatSpread } from '../../src/index'
 import { applyBoost, moveId, ZERO_BOOSTS } from '../../src/index'
 import type { DamageResult, Field, Terrain, Weather } from '../../src/damage/index'
 import {
@@ -24,6 +24,8 @@ const SURGING_STRIKES = moveId('surging-strikes')
 const BODY_PRESS = moveId('body-press')
 const METEOR_BEAM = moveId('meteor-beam')
 const SOLAR_BEAM = moveId('solar-beam')
+const FOUL_PLAY = moveId('foul-play')
+const SHELL_SIDE_ARM = moveId('shell-side-arm')
 
 type Scenario = {
   readonly attackerSpecies: string
@@ -41,7 +43,8 @@ type Scenario = {
   readonly reflect?: boolean
   readonly style?: Field['style']
   readonly status?: 'burn' | 'none'
-  readonly defenseBoost?: number
+  readonly attackerBoosts?: Partial<BoostSpread>
+  readonly defenderBoosts?: Partial<BoostSpread>
 }
 
 function run({
@@ -60,7 +63,8 @@ function run({
   reflect = false,
   style = 'singles',
   status = 'none',
-  defenseBoost = 0,
+  attackerBoosts = {},
+  defenderBoosts = {},
 }: Scenario): DamageResult {
   return calculate({
     attacker: newAttacker({
@@ -71,6 +75,7 @@ function run({
         item: attackerItem,
         ability: attackerAbility,
       }),
+      boosts: { ...ZERO_BOOSTS, ...attackerBoosts },
       status,
     }),
     defender: newDefender({
@@ -81,7 +86,7 @@ function run({
         ability: defenderAbility,
       }),
       hpFraction: defenderHpFraction,
-      boosts: { ...ZERO_BOOSTS, def: defenseBoost },
+      boosts: { ...ZERO_BOOSTS, ...defenderBoosts },
     }),
     move,
     field: {
@@ -384,7 +389,7 @@ describe('ability registry', () => {
       attackerSpecies: 'garchomp',
       move: EARTHQUAKE,
       attackerAbility: 'unaware',
-      defenseBoost: 2,
+      defenderBoosts: { def: 2 },
     })
     const plain = run({ attackerSpecies: 'garchomp', move: EARTHQUAKE })
     expect(unaware.rolls).toEqual(plain.rolls)
@@ -400,6 +405,39 @@ describe('ability registry', () => {
         defenderAbility: 'levitate',
       }).immune,
     ).toBe(false)
+  })
+
+  /**
+   * Mold Breaker reaches the execution of a move, and Intimidate happened on
+   * entry. Two calls, one with Mold Breaker and one without, have to land the
+   * same stage.
+   */
+  describe('Mold Breaker and Intimidate', () => {
+    const breaking = (ability: string | null) =>
+      run({
+        attackerSpecies: 'garchomp',
+        move: EARTHQUAKE,
+        attackerAbility: ability,
+        defenderAbility: 'intimidate',
+      })
+
+    it('leaves the stage where an ordinary attacker finds it', () => {
+      expect(breaking('mold-breaker').rolls).toEqual(breaking(null).rolls)
+    })
+
+    it('says Intimidate was applied rather than suppressed', () => {
+      expect(
+        breaking('mold-breaker').notes.some((note) =>
+          note.startsWith('Intimidate was applied as -1 Atk'),
+        ),
+      ).toBe(true)
+    })
+
+    it('claims no suppression it did not do', () => {
+      expect(breaking('mold-breaker').notes.some((note) => note.includes('Mold Breaker'))).toBe(
+        false,
+      )
+    })
   })
 })
 
@@ -528,10 +566,121 @@ describe('move handling', () => {
     const sword = run({
       attackerSpecies: 'urshifu-rapid-strike',
       move: moveId('sacred-sword'),
-      defenseBoost: 2,
+      defenderBoosts: { def: 2 },
     })
     const plain = run({ attackerSpecies: 'urshifu-rapid-strike', move: moveId('sacred-sword') })
     expect(sword.rolls).toEqual(plain.rolls)
+  })
+})
+
+/**
+ * The moves that bend the formula rather than the power. Foul Play swaps whose
+ * Attack the hit reads; Shell Side Arm swaps which side of the formula it
+ * lands on. Both were read straight before this, and a result that reads the
+ * wrong stat and says nothing is the defect the honesty rules exist for.
+ */
+describe("Foul Play, which attacks with the target's Attack", () => {
+  const foul = (scenario: Partial<Scenario> = {}) =>
+    run({ attackerSpecies: 'blissey', move: FOUL_PLAY, ...scenario })
+
+  it("reads the target's Attack rather than its own", () => {
+    expect(foul().attackStat).toBe(120)
+  })
+
+  it("reads a stage on the target's Attack", () => {
+    expect(foul({ defenderBoosts: { atk: 2 } }).attackStat).toBe(240)
+  })
+
+  it("leaves a stage on the user's own Attack out of it", () => {
+    expect(foul({ attackerBoosts: { atk: 2 } }).rolls).toEqual(foul().rolls)
+  })
+
+  it('says whose Attack it read', () => {
+    expect(foul().notes).toContain(
+      "Foul Play attacked with Dondozo's Atk and its stages, not Blissey's.",
+    )
+  })
+
+  it("says that the user's own Intimidate never reached that Attack", () => {
+    expect(foul({ attackerSpecies: 'incineroar', attackerAbility: 'intimidate' }).notes).toContain(
+      'Intimidate would take -1 Atk off Dondozo, which Foul Play reads. Only a stage landed on the attacker is modelled, so this one was not applied.',
+    )
+  })
+
+  it('says nothing of the kind when the user carries no such ability', () => {
+    expect(foul().notes.some((note) => note.includes('would take'))).toBe(false)
+  })
+
+  it("reads through the target's own stage for Unaware", () => {
+    expect(foul({ defenderAbility: 'unaware', defenderBoosts: { atk: 2 } }).attackStat).toBe(120)
+  })
+})
+
+/**
+ * Shell Side Arm takes whichever side would do more to this target. The
+ * comparison counts stat stages and no other modifier, which is what the games
+ * count, and a tie is a coin flip the core cannot make.
+ */
+describe('Shell Side Arm, which picks the side that does more', () => {
+  const arm = (scenario: Partial<Scenario> = {}) =>
+    run({ attackerSpecies: 'rotom-wash', nature: 'modest', move: SHELL_SIDE_ARM, ...scenario })
+
+  it('stays special against a target with the sturdier Defense', () => {
+    expect(arm().defenseStat).toBe(85)
+  })
+
+  it('goes physical against a target with the sturdier Special Defense', () => {
+    expect(
+      arm({
+        attackerSpecies: 'urshifu-rapid-strike',
+        nature: 'adamant',
+        defenderSpecies: 'blissey',
+      }).defenseStat,
+    ).toBe(30)
+  })
+
+  it("lets a stage on the user's Attack move it to the physical side", () => {
+    expect(arm({ attackerBoosts: { atk: 6 } }).defenseStat).toBe(135)
+  })
+
+  it("lets a stage on the target's Special Defense move it there too", () => {
+    expect(arm({ defenderBoosts: { spd: 4 } }).defenseStat).toBe(135)
+  })
+
+  it('says which side it took', () => {
+    expect(arm().notes).toContain(
+      'Shell Side Arm hit specially, the side that does more here. The comparison counts stat stages and nothing else, which is what the games count.',
+    )
+  })
+
+  it('says so on the physical side as well', () => {
+    expect(arm({ attackerBoosts: { atk: 6 } }).notes).toContain(
+      'Shell Side Arm hit physically, the side that does more here. The comparison counts stat stages and nothing else, which is what the games count.',
+    )
+  })
+
+  it('keeps a level pair on the side the move is printed with', () => {
+    expect(
+      arm({
+        attackerSpecies: 'talonflame',
+        nature: 'hardy',
+        attackerEvs: { spa: 56 },
+        defenderSpecies: 'dusclops',
+      }).defenseStat,
+    ).toBe(150)
+  })
+
+  it('says that a level pair is a coin flip it cannot make', () => {
+    expect(
+      arm({
+        attackerSpecies: 'talonflame',
+        nature: 'hardy',
+        attackerEvs: { spa: 56 },
+        defenderSpecies: 'dusclops',
+      }).notes,
+    ).toContain(
+      "Shell Side Arm's two sides come out level here, which the games settle with a coin flip. Nothing in the core can flip one, so it was read as special, the category it is printed with.",
+    )
   })
 })
 
@@ -651,7 +800,25 @@ describe('the stage rewrites', () => {
     )
   })
 
-  it('reports none of the six as outside the model', () => {
+  it('says Hyper Cutter blocked Intimidate', () => {
+    expect(intimidated('crawdaunt', 'hyper-cutter').notes).toContain(
+      'Hyper Cutter blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('says White Smoke blocked Intimidate', () => {
+    expect(intimidated('torkoal', 'white-smoke').notes).toContain(
+      'White Smoke blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('says Full Metal Body blocked Intimidate', () => {
+    expect(intimidated('solgaleo', 'full-metal-body').notes).toContain(
+      'Full Metal Body blocks Intimidate, so no Atk stage was applied.',
+    )
+  })
+
+  it('reports none of the nine as outside the model', () => {
     const results = [
       intimidated('bibarel', 'simple'),
       intimidated('malamar', 'contrary'),
@@ -659,13 +826,22 @@ describe('the stage rewrites', () => {
       intimidated('wigglytuff', 'competitive'),
       intimidated('metagross', 'clear-body'),
       intimidated('mabosstiff', 'guard-dog'),
+      intimidated('crawdaunt', 'hyper-cutter'),
+      intimidated('torkoal', 'white-smoke'),
+      intimidated('solgaleo', 'full-metal-body'),
     ]
     expect(results.flatMap(unmodelled)).toEqual([])
   })
 
+  /**
+   * Mirror Armor sends a drop back at whoever caused it rather than stopping
+   * it, so the games leave its holder's Attack alone. The reference does not
+   * model that, and the model would rather say it is missing than diverge
+   * quietly.
+   */
   it('still reports an answer to Intimidate the model does not hold', () => {
-    expect(intimidated('crawdaunt', 'hyper-cutter').notes).toContain(
-      "Crawdaunt's Hyper Cutter is outside the damage model and was not applied.",
+    expect(intimidated('corviknight', 'mirror-armor').notes).toContain(
+      "Corviknight's Mirror Armor is outside the damage model and was not applied.",
     )
   })
 })

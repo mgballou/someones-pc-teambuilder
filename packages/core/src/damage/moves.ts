@@ -39,6 +39,26 @@ export type MoveOverride = {
   readonly basePowerFromTera?: Readonly<Partial<Record<TeraType, number>>>
   /** Tera Blast picks its category from the user's higher attacking stat. */
   readonly categoryFromStats?: boolean
+  /**
+   * Shell Side Arm picks the side that would do more to this target, comparing
+   * what the physical and the special formula would deal.
+   *
+   * Showdown's own description of the move is the rule, in full: "This move
+   * becomes a physical attack that makes contact if the value of ((((2 * the
+   * user's level / 5 + 2) * 90 * X) / Y) / 50), where X is the user's Attack
+   * stat and Y is the target's Defense stat, is greater than the same value
+   * where X is the user's Special Attack stat and Y is the target's Special
+   * Defense stat. No stat modifiers other than stat stage changes are
+   * considered for this purpose. If the two values are equal, this move chooses
+   * a damage category at random." `chooseCategory` is that sentence, and the
+   * random half is the one thing it cannot be — see the note it carries.
+   */
+  readonly categoryFromDamage?: boolean
+  /**
+   * Foul Play attacks with the target's Attack, and with the target's stages on
+   * it. Nothing the user did to its own Attack is part of the hit.
+   */
+  readonly attackFromDefender?: boolean
   /** Facade is not halved by burn. */
   readonly ignoresBurn?: boolean
   /** Earthquake and friends are halved on Grassy Terrain. */
@@ -82,6 +102,8 @@ const TERRAIN_PULSE_TYPE: Readonly<Partial<Record<Field['terrain'], PokemonType>
 
 export const MOVE_OVERRIDES: Readonly<Record<string, MoveOverride>> = {
   'body-press': { attackStat: 'def' },
+  'foul-play': { attackFromDefender: true },
+  'shell-side-arm': { categoryFromDamage: true },
   psyshock: { defenseStat: 'def' },
   psystrike: { defenseStat: 'def' },
   'secret-sword': { defenseStat: 'def' },

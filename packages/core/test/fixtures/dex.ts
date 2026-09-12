@@ -628,6 +628,26 @@ const SPECIES: readonly Species[] = [
     weightKg: 920,
     heightM: 2.5,
   }),
+  makeSpecies({
+    id: 'torkoal',
+    dexNumber: 324,
+    types: ['fire'],
+    baseStats: { hp: 70, atk: 85, def: 140, spa: 85, spd: 70, spe: 20 },
+    abilities: ['white-smoke', 'drought'],
+    hiddenAbility: 'shell-armor',
+    weightKg: 80.4,
+    heightM: 0.5,
+  }),
+  makeSpecies({
+    id: 'solgaleo',
+    dexNumber: 791,
+    types: ['psychic', 'steel'],
+    baseStats: { hp: 137, atk: 137, def: 107, spa: 113, spd: 89, spe: 97 },
+    abilities: ['full-metal-body'],
+    weightKg: 230,
+    heightM: 3.4,
+    classification: 'restricted',
+  }),
   /**
    * Not in Scarlet and Violet, and ordinary in every other respect: no
    * classification bars it, no ban list names it, and it is fast enough to
@@ -642,6 +662,46 @@ const SPECIES: readonly Species[] = [
     hiddenAbility: 'big-pecks',
     weightKg: 39.5,
     heightM: 1.5,
+    availableIn: [],
+  }),
+  // The field-reading Speed abilities. Chlorophyll rides on Venusaur and Sand
+  // Rush on Dracozolt, both already here; these three are the carriers for the
+  // rest, and none of them is fast enough to displace a benchmark.
+  makeSpecies({
+    id: 'kingdra',
+    dexNumber: 230,
+    types: ['water', 'dragon'],
+    baseStats: { hp: 75, atk: 95, def: 95, spa: 95, spd: 95, spe: 85 },
+    abilities: ['swift-swim', 'sniper'],
+    hiddenAbility: 'damp',
+    weightKg: 152,
+    heightM: 1.8,
+  }),
+  makeSpecies({
+    id: 'cetitan',
+    dexNumber: 975,
+    types: ['ice'],
+    baseStats: { hp: 170, atk: 113, def: 65, spa: 45, spd: 55, spe: 73 },
+    abilities: ['thick-fat', 'slush-rush'],
+    hiddenAbility: 'sheer-force',
+    weightKg: 700,
+    heightM: 4.5,
+  }),
+  /**
+   * Surge Surfer has exactly one holder and Scarlet and Violet do not hold it,
+   * so this is a form the ladder will never draw as a benchmark. A team can
+   * still carry it in the sandbox format, which is all a Speed test needs.
+   */
+  makeSpecies({
+    id: 'raichu-alola',
+    dexNumber: 26,
+    baseSpecies: 'raichu',
+    formName: 'Alola',
+    types: ['electric', 'psychic'],
+    baseStats: { hp: 60, atk: 85, def: 50, spa: 95, spd: 85, spe: 110 },
+    abilities: ['surge-surfer'],
+    weightKg: 21,
+    heightM: 0.7,
     availableIn: [],
   }),
   makeSpecies({
@@ -813,6 +873,16 @@ const MOVES: readonly Move[] = [
     basePower: 80,
     flags: { contact: true },
   }),
+  makeMove({
+    id: 'foul-play',
+    type: 'dark',
+    category: 'physical',
+    basePower: 95,
+    pp: 15,
+    flags: { contact: true },
+  }),
+  // Printed special. It gains contact in the games on the turns it goes physical.
+  makeMove({ id: 'shell-side-arm', type: 'poison', category: 'special', basePower: 90 }),
   makeMove({ id: 'thunderbolt', type: 'electric', category: 'special', basePower: 90 }),
   makeMove({ id: 'flamethrower', type: 'fire', category: 'special', basePower: 90 }),
   makeMove({
@@ -1141,6 +1211,10 @@ const ABILITY_NAMES = [
   'overcoat',
   'overgrow',
   'chlorophyll',
+  'swift-swim',
+  'sniper',
+  'slush-rush',
+  'surge-surfer',
   'simple',
   'contrary',
   'competitive',
@@ -1148,6 +1222,9 @@ const ABILITY_NAMES = [
   'guard-dog',
   'own-tempo',
   'hyper-cutter',
+  'white-smoke',
+  'full-metal-body',
+  'mirror-armor',
 ] as const
 
 /** `of` stays lower case, so the fixture reads `Sword of Ruin` like the games. */

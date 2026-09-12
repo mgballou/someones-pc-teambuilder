@@ -1262,6 +1262,27 @@ describe('a stage rewritten before it lands', () => {
     referenceAbility: 'Guard Dog',
     evs: { atk: 252 },
   }
+  const HYPER_CUTTER_CRAWDAUNT: Combatant = {
+    species: 'crawdaunt',
+    reference: 'Crawdaunt',
+    ability: 'hyper-cutter',
+    referenceAbility: 'Hyper Cutter',
+    evs: { atk: 252 },
+  }
+  const TORKOAL: Combatant = {
+    species: 'torkoal',
+    reference: 'Torkoal',
+    ability: 'white-smoke',
+    referenceAbility: 'White Smoke',
+    evs: { atk: 252 },
+  }
+  const SOLGALEO: Combatant = {
+    species: 'solgaleo',
+    reference: 'Solgaleo',
+    ability: 'full-metal-body',
+    referenceAbility: 'Full Metal Body',
+    evs: { atk: 252 },
+  }
 
   it('agrees that an attacker with none of them takes the stage whole', () => {
     expect(
@@ -1431,6 +1452,69 @@ describe('a stage rewritten before it lands', () => {
       }),
     ).toEqual([146, 174])
   })
+
+  /**
+   * Bulbapedia, Hyper Cutter: it "prevents other Pokémon from lowering the
+   * Attack stat stage of the Pokémon with this Ability".
+   */
+  it('agrees that Hyper Cutter blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: HYPER_CUTTER_CRAWDAUNT,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([22, 27])
+  })
+
+  /**
+   * Bulbapedia, White Smoke: it "prevents stat reduction caused by other
+   * Pokémon's moves and Abilities (such as Scary Face and Intimidate)".
+   */
+  it('agrees that White Smoke blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: TORKOAL,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([74, 88])
+  })
+
+  /**
+   * Bulbapedia, Full Metal Body: the same sentence, and it cannot itself be
+   * ignored the way Clear Body and White Smoke can.
+   */
+  it('agrees that Full Metal Body blocks Intimidate', () => {
+    expect(
+      agrees({
+        attacker: SOLGALEO,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'earthquake',
+        referenceMove: 'Earthquake',
+      }),
+    ).toEqual([102, 120])
+  })
+
+  /**
+   * Mold Breaker ignores an ability "for the execution of that move"
+   * (Bulbapedia), and Intimidate happened on entry, before there was a move.
+   * Showdown's `intimidate` is an `onStart` hook carrying no `breakable` flag,
+   * so Mold Breaker has nothing to ignore and the stage stands. This is the
+   * match-up that found it.
+   */
+  it('agrees that Mold Breaker does not stop Intimidate', () => {
+    expect(
+      agrees({
+        attacker: OGERPON_HEARTHFLAME,
+        defender: INTIMIDATING_INCINEROAR,
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([10, 12])
+  })
 })
 
 /**
@@ -1483,5 +1567,155 @@ describe('a landed stage, read everywhere a stage is read', () => {
         referenceMove: 'Tera Blast',
       }),
     ).toEqual([46, 55])
+  })
+})
+
+/**
+ * The two moves that bend the formula rather than the power. Foul Play reads
+ * the target's Attack and the target's stages; Shell Side Arm compares what the
+ * two sides would deal and takes the larger, counting stat stages and nothing
+ * else. The reference agrees with both, which is what says the swap landed in
+ * the right place in the chain rather than merely somewhere.
+ */
+describe("Foul Play, off the target's Attack", () => {
+  it("agrees that Blissey hits with Garchomp's Attack", () => {
+    expect(
+      agrees({
+        attacker: BARE_BLISSEY,
+        defender: GARCHOMP,
+        move: 'foul-play',
+        referenceMove: 'Foul Play',
+      }),
+    ).toEqual([57, 68])
+  })
+
+  it("agrees that a stage on the target's Attack is read", () => {
+    expect(
+      agrees({
+        attacker: BARE_BLISSEY,
+        defender: { ...GARCHOMP, boosts: { atk: 2 } },
+        move: 'foul-play',
+        referenceMove: 'Foul Play',
+      }),
+    ).toEqual([113, 134])
+  })
+
+  it("agrees that a stage on the user's own Attack is not", () => {
+    expect(
+      agrees({
+        attacker: { ...BARE_BLISSEY, boosts: { atk: 2 } },
+        defender: GARCHOMP,
+        move: 'foul-play',
+        referenceMove: 'Foul Play',
+      }),
+    ).toEqual([57, 68])
+  })
+
+  it("agrees that Unaware reads through the target's own stage", () => {
+    expect(
+      agrees({
+        attacker: BARE_BLISSEY,
+        defender: {
+          species: 'dondozo',
+          reference: 'Dondozo',
+          ability: 'unaware',
+          referenceAbility: 'Unaware',
+          evs: { atk: 252 },
+          boosts: { atk: 2 },
+        },
+        move: 'foul-play',
+        referenceMove: 'Foul Play',
+      }),
+    ).toEqual([41, 49])
+  })
+})
+
+describe('Shell Side Arm, off the side that does more', () => {
+  const ROTOM: Combatant = {
+    species: 'rotom-wash',
+    reference: 'Rotom-Wash',
+    ability: 'levitate',
+    referenceAbility: 'Levitate',
+    evs: { spa: 252 },
+  }
+
+  const DONDOZO: Combatant = {
+    species: 'dondozo',
+    reference: 'Dondozo',
+    ability: 'oblivious',
+    referenceAbility: 'Oblivious',
+    evs: { hp: 252 },
+  }
+
+  it('agrees that it goes physical into a Blissey built for Defense', () => {
+    expect(
+      agrees({
+        attacker: {
+          species: 'urshifu-rapid-strike',
+          reference: 'Urshifu-Rapid-Strike',
+          ability: 'unseen-fist',
+          referenceAbility: 'Unseen Fist',
+          evs: { atk: 252 },
+        },
+        defender: BLISSEY,
+        move: 'shell-side-arm',
+        referenceMove: 'Shell Side Arm',
+      }),
+    ).toEqual([100, 118])
+  })
+
+  it('agrees that it stays special into Dondozo', () => {
+    expect(
+      agrees({
+        attacker: ROTOM,
+        defender: DONDOZO,
+        move: 'shell-side-arm',
+        referenceMove: 'Shell Side Arm',
+      }),
+    ).toEqual([63, 75])
+  })
+
+  it("agrees that a stage on the user's Attack moves it to the physical side", () => {
+    expect(
+      agrees({
+        attacker: { ...ROTOM, boosts: { atk: 6 } },
+        defender: DONDOZO,
+        move: 'shell-side-arm',
+        referenceMove: 'Shell Side Arm',
+      }),
+    ).toEqual([85, 101])
+  })
+
+  it("agrees that a stage on the target's Special Defense moves it there too", () => {
+    expect(
+      agrees({
+        attacker: ROTOM,
+        defender: { ...DONDOZO, boosts: { spd: 4 } },
+        move: 'shell-side-arm',
+        referenceMove: 'Shell Side Arm',
+      }),
+    ).toEqual([22, 26])
+  })
+
+  it('agrees that two level sides leave it special', () => {
+    expect(
+      agrees({
+        attacker: {
+          species: 'talonflame',
+          reference: 'Talonflame',
+          ability: 'flame-body',
+          referenceAbility: 'Flame Body',
+          evs: { spa: 56 },
+        },
+        defender: {
+          species: 'dusclops',
+          reference: 'Dusclops',
+          ability: 'pressure',
+          referenceAbility: 'Pressure',
+        },
+        move: 'shell-side-arm',
+        referenceMove: 'Shell Side Arm',
+      }),
+    ).toEqual([11, 14])
   })
 })
