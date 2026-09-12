@@ -1,16 +1,21 @@
-import { analyzeSpeed, speedModifierLabel, speedNoteText } from '@spc/core'
+import { analyzeSpeed, speedFieldText, speedModifierLabel, speedNoteText } from '@spc/core'
 import type { LadderEntry } from '@spc/core'
 import { loadTeam } from '../../../../lib/team-view'
 import { dex } from '../../../../lib/dex'
+import { fieldFromQuery } from '../../../../lib/speed-field'
 import { Panel, EmptyState, SourceNote } from '../../../../components/panel'
+import { SpeedFieldControls } from '../../../../components/speed-field-controls'
 
 export default async function SpeedPage({
   params,
+  searchParams,
 }: {
   readonly params: Promise<{ readonly teamId: string }>
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const { teamId } = await params
   const { team, format } = await loadTeam(teamId)
+  const field = fieldFromQuery(await searchParams)
 
   if (team.members.length === 0) {
     return (
@@ -20,7 +25,7 @@ export default async function SpeedPage({
     )
   }
 
-  const report = analyzeSpeed({ team, format, dex: dex() })
+  const report = analyzeSpeed({ team, format, dex: dex(), field })
   const fastest = report.ladder[0]
   const ceiling = fastest === undefined ? 1 : Math.max(fastest.speed, 1)
   const tiedSpeeds = new Set(report.ties.map((tie) => tie.speed))
@@ -80,8 +85,23 @@ export default async function SpeedPage({
 
   return (
     <div className="grid gap-4 xl:grid-cols-[22rem_1fr]">
-      <div className="flex flex-col gap-4">
-        <Panel title="Ladder" subtitle={`Level ${report.level}, fastest first`}>
+      {/* `min-w-0` or the members table's own width sets the column's, and the
+          whole panel scrolls sideways on a phone instead of the table. */}
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel title="Field" subtitle="What the ladder is read under">
+          <SpeedFieldControls field={report.field} />
+
+          <SourceNote>
+            Nothing on the team sets this. A Pelipper on the bench does not put rain here — the
+            field is the one you choose, and Chlorophyll, Swift Swim, Sand Rush, Slush Rush, Surge
+            Surfer, Protosynthesis and Quark Drive are read against it.
+          </SourceNote>
+        </Panel>
+
+        <Panel
+          title="Ladder"
+          subtitle={`Level ${report.level}, fastest first, read against ${speedFieldText(report.field)}`}
+        >
           <Ladder entries={report.ladder} />
 
           <SourceNote>{report.basis.note}</SourceNote>
@@ -97,7 +117,7 @@ export default async function SpeedPage({
         </Panel>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-4">
         <Panel title="Members" subtitle="Speed under each modifier">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -156,8 +176,9 @@ export default async function SpeedPage({
 
           <SourceNote>
             A dimmed number is one this set cannot currently reach — a Scarf line on a Pokémon
-            holding something else, or a Booster line without both the ability and something to
-            switch it on. Read against a clear field: no weather, no terrain.
+            holding something else, a Booster line without both the ability and something to switch
+            it on, or a Field line on a Pokémon with no weather or terrain ability. Read against{' '}
+            {speedFieldText(report.field)}.
           </SourceNote>
         </Panel>
 

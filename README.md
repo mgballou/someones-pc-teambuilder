@@ -32,7 +32,7 @@ Four analysis panels, each a pure function of the team as it stands:
 | Panel        | What it answers                                                                    |
 | ------------ | ---------------------------------------------------------------------------------- |
 | **Damage**   | The Gen 9 chain, rounding where the games round. Sixteen rolls, spread, Tera STAB. |
-| **Speed**    | Where each member sits against benchmarks, with Scarf, Tailwind and Booster.       |
+| **Speed**    | Where each member sits against benchmarks, under a weather and terrain you set.    |
 | **Coverage** | What the team's moves hit, and what several members share a weakness to.           |
 | **Legality** | Every violated rule, named, with the source of that rule beside it.                |
 
@@ -182,6 +182,10 @@ are worth knowing before you rely on the output.
   stage off the Attack it reads, and only a stage landed on the attacker is modelled.
 - **Speed benchmarks come from base stats at maximum investment with a Speed-raising nature.**
   They are not filtered by usage statistics.
+- **The speed panel's field is the one you choose, not one read off the team.** Weather and
+  terrain are controls on the panel, and Chlorophyll, Swift Swim, Sand Rush, Slush Rush, Surge
+  Surfer, Protosynthesis and Quark Drive are read against them. A Pelipper in the box does not put
+  rain on the ladder, and the panel says so rather than guessing.
 - **Coverage scores against whole typings, not one type at a time**, and ability immunities move
   the defensive grid. Four things it does not do: it reads each move at its printed type, so Tera
   Blast's type change is not modelled; an ability that changes a hit without changing the chart,
