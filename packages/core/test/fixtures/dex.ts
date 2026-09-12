@@ -664,6 +664,46 @@ const SPECIES: readonly Species[] = [
     heightM: 1.5,
     availableIn: [],
   }),
+  // The field-reading Speed abilities. Chlorophyll rides on Venusaur and Sand
+  // Rush on Dracozolt, both already here; these three are the carriers for the
+  // rest, and none of them is fast enough to displace a benchmark.
+  makeSpecies({
+    id: 'kingdra',
+    dexNumber: 230,
+    types: ['water', 'dragon'],
+    baseStats: { hp: 75, atk: 95, def: 95, spa: 95, spd: 95, spe: 85 },
+    abilities: ['swift-swim', 'sniper'],
+    hiddenAbility: 'damp',
+    weightKg: 152,
+    heightM: 1.8,
+  }),
+  makeSpecies({
+    id: 'cetitan',
+    dexNumber: 975,
+    types: ['ice'],
+    baseStats: { hp: 170, atk: 113, def: 65, spa: 45, spd: 55, spe: 73 },
+    abilities: ['thick-fat', 'slush-rush'],
+    hiddenAbility: 'sheer-force',
+    weightKg: 700,
+    heightM: 4.5,
+  }),
+  /**
+   * Surge Surfer has exactly one holder and Scarlet and Violet do not hold it,
+   * so this is a form the ladder will never draw as a benchmark. A team can
+   * still carry it in the sandbox format, which is all a Speed test needs.
+   */
+  makeSpecies({
+    id: 'raichu-alola',
+    dexNumber: 26,
+    baseSpecies: 'raichu',
+    formName: 'Alola',
+    types: ['electric', 'psychic'],
+    baseStats: { hp: 60, atk: 85, def: 50, spa: 95, spd: 85, spe: 110 },
+    abilities: ['surge-surfer'],
+    weightKg: 21,
+    heightM: 0.7,
+    availableIn: [],
+  }),
   makeSpecies({
     id: 'mewtwo',
     dexNumber: 150,
@@ -1171,6 +1211,10 @@ const ABILITY_NAMES = [
   'overcoat',
   'overgrow',
   'chlorophyll',
+  'swift-swim',
+  'sniper',
+  'slush-rush',
+  'surge-surfer',
   'simple',
   'contrary',
   'competitive',
