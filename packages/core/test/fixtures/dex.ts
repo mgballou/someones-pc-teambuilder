@@ -702,7 +702,7 @@ const SPECIES: readonly Species[] = [
   /**
    * Surge Surfer has exactly one holder and Scarlet and Violet do not hold it,
    * so this is a form the ladder will never draw as a benchmark. A team can
-   * still carry it in the sandbox format, which is all a Speed test needs.
+   * still carry it, which is all a Speed test needs.
    */
   makeSpecies({
     id: 'raichu-alola',

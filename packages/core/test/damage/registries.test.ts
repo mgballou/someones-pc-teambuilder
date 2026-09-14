@@ -596,15 +596,47 @@ describe("Foul Play, which attacks with the target's Attack", () => {
   })
 
   it('says whose Attack it read', () => {
-    expect(foul().notes).toContain(
-      "Foul Play attacked with Dondozo's Atk and its stages, not Blissey's.",
-    )
+    expect(foul().notes).toContain("Foul Play attacked with Dondozo's Atk, not Blissey's.")
   })
 
   it("says that the user's own Intimidate never reached that Attack", () => {
     expect(foul({ attackerSpecies: 'incineroar', attackerAbility: 'intimidate' }).notes).toContain(
       'Intimidate would take -1 Atk off Dondozo, which Foul Play reads. Only a stage landed on the attacker is modelled, so this one was not applied.',
     )
+  })
+
+  it("says what the target's own ability would have made of that Intimidate", () => {
+    expect(
+      foul({
+        attackerSpecies: 'incineroar',
+        attackerAbility: 'intimidate',
+        defenderSpecies: 'mabosstiff',
+        defenderAbility: 'guard-dog',
+      }).notes,
+    ).toContain(
+      "Intimidate would move Mabosstiff's Atk stage from +0 to +1, which Foul Play reads. Only a stage landed on the attacker is modelled, so this one was not applied.",
+    )
+  })
+
+  it('says nothing of an Intimidate the target blocks', () => {
+    expect(
+      foul({
+        attackerSpecies: 'incineroar',
+        attackerAbility: 'intimidate',
+        defenderSpecies: 'metagross',
+        defenderAbility: 'clear-body',
+      }).notes.some((note) => note.includes('would')),
+    ).toBe(false)
+  })
+
+  it('says nothing of an Intimidate the target reads through with Unaware', () => {
+    expect(
+      foul({
+        attackerSpecies: 'incineroar',
+        attackerAbility: 'intimidate',
+        defenderAbility: 'unaware',
+      }).notes.some((note) => note.includes('would')),
+    ).toBe(false)
   })
 
   it('says nothing of the kind when the user carries no such ability', () => {

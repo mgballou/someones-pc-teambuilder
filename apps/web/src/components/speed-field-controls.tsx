@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { startTransition, useOptimistic } from 'react'
 import { TERRAINS, WEATHERS, terrainLabel, weatherLabel } from '@spc/core'
-import type { SpeedField, Terrain, Weather } from '@spc/core'
+import type { SpeedField } from '@spc/core'
 import { Select } from './select'
 
 /**
@@ -33,13 +33,19 @@ export function SpeedFieldControls({ field }: { readonly field: SpeedField }) {
       <Select
         label="Weather"
         value={shown.weather}
-        onChange={(value) => go({ ...shown, weather: value as Weather })}
+        onChange={(value) => {
+          const weather = WEATHERS.find((option) => option === value)
+          if (weather !== undefined) go({ ...shown, weather })
+        }}
         options={WEATHERS.map((option) => ({ value: option, label: weatherLabel(option) }))}
       />
       <Select
         label="Terrain"
         value={shown.terrain}
-        onChange={(value) => go({ ...shown, terrain: value as Terrain })}
+        onChange={(value) => {
+          const terrain = TERRAINS.find((option) => option === value)
+          if (terrain !== undefined) go({ ...shown, terrain })
+        }}
         options={TERRAINS.map((option) => ({ value: option, label: terrainLabel(option) }))}
       />
     </div>

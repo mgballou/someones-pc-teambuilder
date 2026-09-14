@@ -148,7 +148,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     : { stats: attackerStats, boosts: stages.boosts }
   if (readsDefenderAttack) {
     notes.add(
-      `${moveRecord.name} attacked with ${displayName(defenderSpecies)}'s ${STAT_LABEL[attackStatName]} and its stages, not ${displayName(attackerSpecies)}'s.`,
+      `${moveRecord.name} attacked with ${displayName(defenderSpecies)}'s ${STAT_LABEL[attackStatName]}, not ${displayName(attackerSpecies)}'s.`,
     )
     notes.add(
       foeStageNote({
@@ -156,6 +156,8 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
         move: moveRecord,
         attackerEntry,
         attackerAbility: attacker.set.ability,
+        defenderEntry,
+        defenderBoosts: defender.boosts,
         defenderSpecies,
       }),
     )
@@ -851,6 +853,8 @@ type FoeStageNoteInput = {
   readonly move: Move
   readonly attackerEntry: AbilityEntry | null
   readonly attackerAbility: AbilityId | null
+  readonly defenderEntry: AbilityEntry | null
+  readonly defenderBoosts: BoostSpread
   readonly defenderSpecies: Species
 }
 
@@ -859,17 +863,42 @@ type FoeStageNoteInput = {
  * which is the stat Foul Play then reads. The calculator only ever lands a
  * stage on the attacker — see the honesty rules — so here it says what it left
  * out rather than reading the target's Attack as untouched and saying nothing.
+ *
+ * It says what the stage would have come to through the target's own ability,
+ * and nothing at all when that is no change: Clear Body blocks the drop, a
+ * stage at -6 cannot fall, and Unaware reads none of it.
  */
 function foeStageNote({
   dex,
   move,
   attackerEntry,
   attackerAbility,
+  defenderEntry,
+  defenderBoosts,
   defenderSpecies,
 }: FoeStageNoteInput): string | null {
   const change = attackerEntry?.foeAttackStage
   if (change === undefined || attackerAbility === null) return null
-  return `${abilityLabel(dex, attackerAbility)} would take ${signed(change.stages)} ${STAT_LABEL[change.stat]} off ${displayName(defenderSpecies)}, which ${move.name} reads. Only a stage landed on the attacker is modelled, so this one was not applied.`
+  if (defenderEntry?.ignoresFoeBoosts === true) return null
+
+  const landed = landStage({
+    boosts: defenderBoosts,
+    change,
+    cause: 'intimidate',
+    response: defenderEntry?.stageResponse ?? null,
+  })
+  const before = defenderBoosts[change.stat]
+  const after = landed.boosts[change.stat]
+  if (after === before) return null
+
+  const by = abilityLabel(dex, attackerAbility)
+  const label = STAT_LABEL[change.stat]
+  const target = displayName(defenderSpecies)
+  const unmodelled = 'Only a stage landed on the attacker is modelled, so this one was not applied.'
+  if (landed.rewrite === null && after - before === change.stages) {
+    return `${by} would take ${signed(change.stages)} ${label} off ${target}, which ${move.name} reads. ${unmodelled}`
+  }
+  return `${by} would move ${target}'s ${label} stage from ${signed(before)} to ${signed(after)}, which ${move.name} reads. ${unmodelled}`
 }
 
 type AttackerStages = {
