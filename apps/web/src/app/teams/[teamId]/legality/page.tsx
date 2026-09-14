@@ -2,6 +2,7 @@ import { validateTeam, LEGALITY_RULES } from '@spc/core'
 import { loadTeam } from '../../../../lib/team-view'
 import { dex } from '../../../../lib/dex'
 import { Panel, SourceNote } from '../../../../components/panel'
+import { todayInUtc, VerifiedOn } from '../../../../components/source-freshness'
 
 /**
  * Not a badge saying "illegal" — the violated rule, named, with the source of
@@ -58,7 +59,9 @@ export default async function LegalityPage({
           <dt className="text-text-faint">Authority</dt>
           <dd className="uppercase">{format.source.authority}</dd>
           <dt className="text-text-faint">Checked</dt>
-          <dd className="num">{format.source.verifiedOn}</dd>
+          <dd>
+            <VerifiedOn source={format.source} today={todayInUtc()} />
+          </dd>
         </dl>
 
         <SourceNote>

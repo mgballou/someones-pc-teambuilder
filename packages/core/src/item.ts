@@ -16,7 +16,11 @@ export type Item = {
   readonly isBerry: boolean
   /** Base power when thrown with Fling. Zero when Fling cannot use it. */
   readonly flingPower: number
-  /** The species this item locks to, for Mega Stones and signature items. */
+  /**
+   * The forms this item is bound to: a Mega Stone's holder, a signature item's
+   * holders, and the forms a held item sets, like Arceus and its plates. An
+   * item cannot be knocked off a form it is bound to.
+   */
   readonly restrictedTo: readonly SpeciesId[]
   readonly effect: ItemEffect
   readonly description: string

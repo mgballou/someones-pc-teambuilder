@@ -2,6 +2,9 @@ import { eq } from 'drizzle-orm'
 import type { PokemonSet, SetId, StatSpread } from '@spc/core'
 import { EMPTY_EVS, PERFECT_IVS, abilityId, formatId, itemId, moveId, speciesId } from '@spc/core'
 import { dex as loadDex } from '@spc/dex'
+// Loads apps/web/.env.local, and has to stay above './client', which reads
+// DATABASE_URL while it is being evaluated.
+import '../env'
 import { db } from './client'
 import { pokemonSets, teams, users } from './schema'
 import { hashPassword } from '../auth/password'
@@ -42,7 +45,7 @@ type SeedTeam = {
 const TEAMS: readonly SeedTeam[] = [
   {
     name: 'Reg H Rain',
-    format: 'vgc-2026-reg-h',
+    format: 'vgc-reg-h',
     notes: 'Pelipper sets the rain, Archaludon uses it. Amoonguss and Incineroar cover the speed.',
     members: [
       {
@@ -168,7 +171,7 @@ const TEAMS: readonly SeedTeam[] = [
   },
   {
     name: 'Reg G Miraidon',
-    format: 'vgc-2026-reg-g',
+    format: 'vgc-reg-g',
     notes: 'One restricted. Electric terrain plus Tailwind, Farigiraf blocks priority.',
     members: [
       {

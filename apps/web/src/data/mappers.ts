@@ -1,5 +1,13 @@
 import type { PokemonSet, SetId, Team, TeamId } from '@spc/core'
-import { abilityId, EMPTY_EVS, formatId, itemId, PERFECT_IVS, speciesId } from '@spc/core'
+import {
+  abilityId,
+  currentFormatId,
+  EMPTY_EVS,
+  formatId,
+  itemId,
+  PERFECT_IVS,
+  speciesId,
+} from '@spc/core'
 import type { PokemonSetRow, TeamRow } from '../db/schema'
 
 /**
@@ -70,7 +78,7 @@ export function toDomainTeam({ team, members }: TeamWithMembers): Team {
   return {
     id: team.id as TeamId,
     name: team.name,
-    format: formatId(team.formatId),
+    format: currentFormatId(formatId(team.formatId)),
     members: ordered.map(toDomainSet),
     notes: team.notes,
     tags: team.tags,

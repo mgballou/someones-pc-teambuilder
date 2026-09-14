@@ -34,6 +34,7 @@ function move(rule: VariablePower | null, basePower = 60): Move {
     drain: 0,
     recoil: 0,
     statChanges: [],
+    raisesEvasion: false,
     generation: 9,
     variablePower: rule,
     description: '',

@@ -25,8 +25,8 @@ export default async function LandingPage() {
         <Row term="Formats" detail="VGC Regulations G, H and I. Smogon Gen 9 OU and Ubers." />
         <Row term="Damage" detail="Gen 9 formula, all sixteen rolls, spread and Tera handled." />
         <Row term="Speed" detail="Tiers against benchmarks, with Scarf, Tailwind and Booster." />
-        <Row term="Coverage" detail="What your moves hit, and what four of your six die to." />
-        <Row term="Import" detail="Showdown paste in and out. Nothing is locked in here." />
+        <Row term="Coverage" detail="Visualize Offensive and Defensive type effectiveness." />
+        <Row term="Import" detail="Showdown paste in and out." />
       </ul>
 
       <div className="mt-8 flex items-center gap-3">

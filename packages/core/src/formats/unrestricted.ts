@@ -13,7 +13,9 @@
 
 import { EMPTY_LEGALITY, type Format } from '../format'
 import { formatId } from '../ids'
-import { VERIFIED_ON } from './vgc'
+
+/** The day this sandbox was defined. It answers to nobody, so it never ages. */
+const DEFINED_ON = '2026-08-16'
 
 export const unrestricted: Format = {
   id: formatId('unrestricted'),
@@ -26,7 +28,13 @@ export const unrestricted: Format = {
   level: { kind: 'capped', max: 100 },
   gimmick: 'terastal',
   clauses: [],
-  legality: EMPTY_LEGALITY,
+  /**
+   * The one format that admits a species Generation 9 does not hold. Reading
+   * Mega Rayquaza's damage against a Pidgeot is exactly what a sandbox is for,
+   * and the honest place to say so is here, as a rule this format declares,
+   * rather than as a special case inside the legality check.
+   */
+  legality: { ...EMPTY_LEGALITY, allowsUnavailableSpecies: true },
   source: {
     authority: 'custom',
     citation: [
@@ -34,6 +42,12 @@ export const unrestricted: Format = {
       'and no clause applies, so a legality verdict here says only that a set is internally',
       'coherent. It is not a format anyone plays.',
     ].join(' '),
-    verifiedOn: VERIFIED_ON,
+    verifiedOn: DEFINED_ON,
+    /**
+     * Never stale. The other formats age because an outside authority moves
+     * without telling this app; this one is defined here, so there is nothing
+     * for it to fall behind, and saying "last checked" of it would be theatre.
+     */
+    staleAfterDays: null,
   },
 }

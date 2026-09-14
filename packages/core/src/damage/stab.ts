@@ -48,7 +48,11 @@ export function stabModifier({
 
   const tera = teraType === moveType
 
+  // Adaptability reads the holder's *current* typing, and Terastallizing
+  // replaces that typing with the Tera type. So a move of an original type the
+  // Tera type did not match keeps ordinary STAB and loses the ability.
   if (tera && original) return adaptability ? MOD_ADAPTABLE_TERA : MOD_DOUBLE
-  if (tera || original) return adaptability ? MOD_DOUBLE : MOD_ONE_AND_A_HALF
+  if (tera) return adaptability ? MOD_DOUBLE : MOD_ONE_AND_A_HALF
+  if (original) return MOD_ONE_AND_A_HALF
   return MOD_ONE
 }

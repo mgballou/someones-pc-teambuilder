@@ -234,6 +234,60 @@ export const SIGNATURE_ITEMS: Readonly<Record<string, SignatureItem>> = {
   'chill-drive': { note: 'Turns Genesect Ice and changes Techno Blast.', holders: ['genesect'] },
 }
 
+const ARCEUS = ['arceus'] as const
+const SILVALLY = ['silvally'] as const
+
+/**
+ * Items whose effect is modelled or unmodelled on its own terms, but which also
+ * set the form of one species, and so cannot be taken from that species.
+ * `pokemon` names, as `SignatureItem.holders`.
+ *
+ * A plate is a 1.2x type item on anything, and part of Arceus on Arceus.
+ * Showdown's `onTakeItem` refuses each of these on its own holder, and
+ * `@smogon/calc` withholds Knock Off's boost against the same pairs.
+ */
+export const FORM_BOUND_ITEMS: Readonly<Record<string, readonly string[]>> = {
+  'adamant-crystal': ['dialga', 'dialga-origin'],
+  'lustrous-globe': ['palkia', 'palkia-origin'],
+  'griseous-core': ['giratina-altered', 'giratina-origin'],
+  'flame-plate': ARCEUS,
+  'splash-plate': ARCEUS,
+  'zap-plate': ARCEUS,
+  'meadow-plate': ARCEUS,
+  'icicle-plate': ARCEUS,
+  'fist-plate': ARCEUS,
+  'toxic-plate': ARCEUS,
+  'earth-plate': ARCEUS,
+  'sky-plate': ARCEUS,
+  'mind-plate': ARCEUS,
+  'insect-plate': ARCEUS,
+  'stone-plate': ARCEUS,
+  'spooky-plate': ARCEUS,
+  'draco-plate': ARCEUS,
+  'dread-plate': ARCEUS,
+  'iron-plate': ARCEUS,
+  'pixie-plate': ARCEUS,
+  'blank-plate': ARCEUS,
+  'legend-plate': ARCEUS,
+  'fighting-memory': SILVALLY,
+  'flying-memory': SILVALLY,
+  'poison-memory': SILVALLY,
+  'ground-memory': SILVALLY,
+  'rock-memory': SILVALLY,
+  'bug-memory': SILVALLY,
+  'ghost-memory': SILVALLY,
+  'steel-memory': SILVALLY,
+  'fire-memory': SILVALLY,
+  'water-memory': SILVALLY,
+  'grass-memory': SILVALLY,
+  'electric-memory': SILVALLY,
+  'psychic-memory': SILVALLY,
+  'ice-memory': SILVALLY,
+  'dragon-memory': SILVALLY,
+  'dark-memory': SILVALLY,
+  'fairy-memory': SILVALLY,
+}
+
 /**
  * The rest of the modelled effects, keyed by item name.
  *

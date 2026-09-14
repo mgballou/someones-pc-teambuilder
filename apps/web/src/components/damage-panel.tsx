@@ -367,7 +367,7 @@ export function DamagePanel({
 
               {result.notes.length > 0 && (
                 <SourceNote>
-                  <span className="font-medium">Not accounted for:</span> {result.notes.join(' ')}
+                  <span className="font-medium">What this assumed:</span> {result.notes.join(' ')}
                 </SourceNote>
               )}
             </div>

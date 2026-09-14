@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { validateTeam } from '../../src/analysis/index'
+import { ENFORCED_CLAUSES, UNENFORCED_CLAUSES, validateTeam } from '../../src/analysis/index'
 import type { Violation } from '../../src/analysis/index'
 import {
   gen9Ou,
   regulationG,
   regulationH,
   regulationI,
+  SHIPPED_FORMATS,
   unrestricted,
 } from '../../src/formats/index'
-import { reorderMember } from '../../src/index'
+import { CLAUSES, reorderMember } from '../../src/index'
 import type { Format, SetId, Team } from '../../src/index'
 import { fixtureDex } from '../fixtures/dex'
 import { CLEAN_SIX, makeTeam } from './support'
@@ -221,6 +222,152 @@ describe('validateTeam', () => {
     ])
 
     expect(violationsOfKind(team, gen9Ou, 'species-banned')[0]?.species).toBe('flutter-mane')
+  })
+})
+
+describe('a species Generation 9 does not hold', () => {
+  const withPidgeot = (format: Format): Team =>
+    makeTeam(format, [
+      ...CLEAN_SIX.slice(0, 5),
+      { id: 'z-pidgeot', species: 'pidgeot', ability: 'keen-eye', item: 'sitrus-berry' },
+    ])
+
+  it('is rejected by Regulation G, which bans it under no rule of its own', () => {
+    expect(
+      validateTeam({ team: withPidgeot(regulationG), format: regulationG, dex: fixtureDex }).legal,
+    ).toBe(false)
+  })
+
+  it('names the availability rule rather than a ban list', () => {
+    expect(
+      violationsOfKind(withPidgeot(regulationG), regulationG, 'species-unavailable')[0]?.rule,
+    ).toBe('availability')
+  })
+
+  it('reports the generation it is absent from', () => {
+    expect(
+      violationsOfKind(withPidgeot(regulationG), regulationG, 'species-unavailable')[0]?.generation,
+    ).toBe(9)
+  })
+
+  it('is rejected by every regulation and tier alike', () => {
+    const verdicts = [regulationG, regulationH, regulationI, gen9Ou].map(
+      (format) => validateTeam({ team: withPidgeot(format), format, dex: fixtureDex }).legal,
+    )
+
+    expect(verdicts).toEqual([false, false, false, false])
+  })
+
+  it('is admitted by the sandbox, which exists for match-ups no format allows', () => {
+    expect(
+      violationsOfKind(withPidgeot(unrestricted), unrestricted, 'species-unavailable'),
+    ).toEqual([])
+  })
+
+  it('keeps a Mega Evolution out of Regulation G', () => {
+    const team = makeTeam(regulationG, [
+      ...CLEAN_SIX.slice(0, 5),
+      {
+        id: 'z-mewtwo-mega-y',
+        species: 'mewtwo-mega-y',
+        ability: 'insomnia',
+        item: 'sitrus-berry',
+      },
+    ])
+
+    expect(violationsOfKind(team, regulationG, 'species-unavailable')[0]?.species).toBe(
+      'mewtwo-mega-y',
+    )
+  })
+
+  it('is not what rejects a restricted Pokémon that Generation 9 does hold', () => {
+    const team = makeTeam(regulationG, [
+      ...CLEAN_SIX.slice(0, 5),
+      { id: 'z-mewtwo', species: 'mewtwo', ability: 'pressure', item: 'sitrus-berry' },
+    ])
+
+    expect(violationsOfKind(team, regulationG, 'species-unavailable')).toEqual([])
+  })
+})
+
+describe('the OHKO Clause', () => {
+  const sheerCold = (format: Format): Team =>
+    makeTeam(format, [
+      {
+        ...CLEAN_SIX[0]!,
+        moves: ['sheer-cold', 'earthquake', 'protect', 'swords-dance'],
+        level: 100,
+      },
+      ...CLEAN_SIX.slice(1, 6).map((seed) => ({ ...seed, level: 100 })),
+    ])
+
+  it('rejects a one-hit knockout move in a format that declares it', () => {
+    expect(validateTeam({ team: sheerCold(gen9Ou), format: gen9Ou, dex: fixtureDex }).legal).toBe(
+      false,
+    )
+  })
+
+  it('names the move it rejected', () => {
+    expect(violationsOfKind(sheerCold(gen9Ou), gen9Ou, 'ohko-clause')[0]?.move).toBe('sheer-cold')
+  })
+
+  it('leaves the same move alone in a format that declares no such clause', () => {
+    expect(violationsOfKind(sheerCold(regulationG), regulationG, 'ohko-clause')).toEqual([])
+  })
+})
+
+describe('the Evasion Clause', () => {
+  const minimize = (format: Format): Team =>
+    makeTeam(format, [
+      {
+        ...CLEAN_SIX[0]!,
+        moves: ['minimize', 'earthquake', 'protect', 'swords-dance'],
+        level: 100,
+      },
+      ...CLEAN_SIX.slice(1, 6).map((seed) => ({ ...seed, level: 100 })),
+    ])
+
+  it('rejects an evasion-raising move in a format that declares it', () => {
+    expect(validateTeam({ team: minimize(gen9Ou), format: gen9Ou, dex: fixtureDex }).legal).toBe(
+      false,
+    )
+  })
+
+  it('names the move it rejected', () => {
+    expect(violationsOfKind(minimize(gen9Ou), gen9Ou, 'evasion-clause')[0]?.move).toBe('minimize')
+  })
+
+  it('leaves the same move alone in a format that declares no such clause', () => {
+    expect(violationsOfKind(minimize(regulationG), regulationG, 'evasion-clause')).toEqual([])
+  })
+})
+
+describe('the clauses this package claims to check', () => {
+  it('is the set validateTeam enforces', () => {
+    expect([...ENFORCED_CLAUSES].sort()).toEqual(['evasion', 'item', 'ohko', 'species'])
+  })
+
+  it('accounts for every clause a shipped format declares', () => {
+    const declared = new Set(SHIPPED_FORMATS.flatMap((format) => format.clauses))
+    const unaccounted = [...declared].filter(
+      (clause) => !ENFORCED_CLAUSES.has(clause) && !UNENFORCED_CLAUSES.has(clause),
+    )
+
+    expect(unaccounted).toEqual([])
+  })
+
+  it('accounts for every clause the union holds', () => {
+    const unaccounted = CLAUSES.filter(
+      (clause) => !ENFORCED_CLAUSES.has(clause) && !UNENFORCED_CLAUSES.has(clause),
+    )
+
+    expect(unaccounted).toEqual([])
+  })
+
+  it('never claims a clause it also records as unchecked', () => {
+    const both = [...ENFORCED_CLAUSES].filter((clause) => UNENFORCED_CLAUSES.has(clause))
+
+    expect(both).toEqual([])
   })
 })
 

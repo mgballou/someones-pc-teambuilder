@@ -1,7 +1,9 @@
 node_modules/
 .next/
 dist/
-coverage/
+/coverage/
+apps/*/coverage/
+packages/*/coverage/
 *.tsbuildinfo
 .env
 .env.local
@@ -9,4 +11,5 @@ coverage/
 .DS_Store
 playwright-report/
 test-results/
+.playwright-mcp/
 .vercel

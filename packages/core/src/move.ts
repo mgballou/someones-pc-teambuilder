@@ -82,6 +82,16 @@ export type Move = {
   /** Fraction of damage dealt taken as recoil, as a ratio. */
   readonly recoil: number
   readonly statChanges: readonly MoveStatChange[]
+  /**
+   * True when the move raises the user's own evasion.
+   *
+   * A separate field rather than an entry in `statChanges`, because
+   * `BoostableStat` is the five stats the damage chain multiplies and evasion
+   * is not one of them. It is here because the Evasion Clause is a team rule
+   * and a clause that cannot be checked is a clause the format should not
+   * claim to run.
+   */
+  readonly raisesEvasion: boolean
   readonly generation: number
   /** Present when the move's power is not a constant. See `VariablePower`. */
   readonly variablePower: VariablePower | null
@@ -106,6 +116,16 @@ export type VariablePower =
   | { readonly kind: 'ohko' }
   | { readonly kind: 'counter' }
   | { readonly kind: 'other' }
+
+/**
+ * A one-hit knockout move: Fissure, Guillotine, Horn Drill, Sheer Cold.
+ *
+ * Read off the dataset rather than a list of four names, so a move added to
+ * the category is caught by the ingest instead of by a player losing a game.
+ */
+export function isOhkoMove(move: Move): boolean {
+  return move.variablePower !== null && move.variablePower.kind === 'ohko'
+}
 
 export function isDamaging(move: Move): boolean {
   return move.category !== 'status'

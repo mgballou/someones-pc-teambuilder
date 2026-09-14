@@ -17,6 +17,7 @@ import { abilityId, isPokemonType, speciesId } from '@spc/core'
 import { IngestError } from '../errors'
 import type { PokemonResponse, PokemonSpeciesResponse } from '../pokeapi/schema'
 import { englishName } from '../pokeapi/schema'
+import { availableGenerations } from './availability'
 import {
   PARADOX_SPECIES,
   RESTRICTED_SPECIES,
@@ -63,6 +64,7 @@ export function normalizeSpecies({
     weightKg: pokemon.weight / 10,
     heightM: pokemon.height / 10,
     generation: generationNumber(species.generation.name),
+    availableIn: availableGenerations(pokemon),
     classification: classify({ species, form }),
     canEvolve: canEvolve({ pokemon, species, form, evolvingSpecies }),
     gimmicks: {
@@ -150,13 +152,23 @@ type ClassifyInput = {
 }
 
 /**
- * Restricted beats mythical beats paradox beats legendary beats form.
+ * Form beats species; then restricted beats mythical beats paradox beats
+ * legendary.
  *
- * The order matters in one direction only: Mewtwo-Mega is restricted first and
- * a mega second, because a format's banlist reads the first fact and the
- * gimmick reads `gimmicks.megaStones` anyway.
+ * The form tests used to sit last, so the base species' answer won.
+ * Mewtwo-Mega-Y came out `restricted`, Latios-Mega `sub-legendary` and
+ * Diancie-Mega `mythical`. Twelve of the ninety-seven Mega forms were
+ * classified as something other than `mega`, a ban list naming `mega` missed
+ * all twelve, and four Mega Evolutions were legal in Regulation G.
+ *
+ * A Mega form's restricted-ness belongs to the species it megas from, and
+ * `restrictedSpecies` is a list of ids that has never held a Mega id. Its
+ * mega-ness belongs to the form, and is the one fact here about this record
+ * rather than about its base.
  */
 function classify({ species, form }: ClassifyInput): SpeciesClassification {
+  if (form.mega) return 'mega'
+  if (form.totem) return 'totem'
   if (RESTRICTED_SPECIES.has(species.name)) return 'restricted'
   if (species.is_mythical) return 'mythical'
   if (PARADOX_SPECIES.has(species.name)) return 'paradox'
@@ -164,8 +176,6 @@ function classify({ species, form }: ClassifyInput): SpeciesClassification {
   if (species.is_legendary) {
     return SUB_LEGENDARY_SPECIES.has(species.name) ? 'sub-legendary' : 'legendary'
   }
-  if (form.mega) return 'mega'
-  if (form.totem) return 'totem'
   return 'ordinary'
 }
 

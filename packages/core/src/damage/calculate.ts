@@ -5,14 +5,15 @@ import { abilityId } from '../ids'
 import type { Item } from '../item'
 import { isSpreadMove } from '../move'
 import type { PokemonType, TeraType } from '../pokemon-type'
-import { effectivenessAgainst, effectivenessOf } from '../pokemon-type'
 import type { PokemonSet } from '../set'
 import type { Species } from '../species'
 import { displayName } from '../species'
 import type { BoostableStat, StatSpread } from '../stats'
 import { applyBoost, computeSpread, STAT_LABEL } from '../stats'
 import type { AbilityEntry } from './abilities'
-import { abilityEntry } from './abilities'
+import { abilityEntry, absorbsType, foeBasePowerModifier } from './abilities'
+import { conditionalPower } from './conditional-power'
+import { moveEffectiveness, readingAgainst, typeReadings } from './effectiveness'
 import { UncalculableMove, ImpossibleState } from './errors'
 import type { ItemHandler, ItemHook, ItemRole } from './items'
 import { ITEM_REGISTRY } from './items'
@@ -25,6 +26,7 @@ import {
   MOD_THREE_QUARTERS,
 } from './modifier'
 import { moveOverride } from './moves'
+import { hitCount, multiHitNote } from './multi-hit'
 import { koChance } from './ko'
 import { stabModifier } from './stab'
 import type {
@@ -99,9 +101,6 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
 
   const override = moveOverride(moveRecord.id)
 
-  const moveType: TeraType =
-    override?.typeFromTera === true && attackerTera !== null ? attackerTera : moveRecord.type
-
   const category: 'physical' | 'special' =
     override?.categoryFromStats === true && attackerTera !== null
       ? applyBoost(attackerStats.atk, attacker.boosts.atk) >
@@ -143,6 +142,17 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     types: defenderTypes,
   })
 
+  /**
+   * The type is settled after the views because Terrain Pulse asks whether its
+   * user is standing on the ground, and `grounded` is something a view knows.
+   */
+  const moveType: TeraType =
+    override?.typeFromTera === true && attackerTera !== null
+      ? attackerTera
+      : (override?.typeFromSpecies?.[attackerSpecies.id] ??
+        override?.typeFromField?.({ field, attacker: attackerView }) ??
+        moveRecord.type)
+
   const criticalHit = attacker.criticalHit || moveRecord.critRatio >= 3
   if (criticalHit && !attacker.criticalHit) {
     notes.add(`${moveRecord.name} always lands a critical hit, so one was applied.`)
@@ -161,7 +171,51 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   })
   if (power.note !== null) notes.add(power.note)
 
-  const rawPower = power.kind === 'power' ? power.power : 0
+  const teraPower = attackerTera === null ? undefined : override?.basePowerFromTera?.[attackerTera]
+  const printedPower = power.kind === 'power' ? (teraPower ?? power.power) : 0
+
+  const chartEffectiveness = moveEffectiveness({
+    moveId: moveRecord.id,
+    moveType,
+    defenderTypes,
+    defenderTerastallized: defender.terastallized,
+  })
+
+  const everyHitLands = attackerEntry?.everyHitLands === true
+  const hits = hitCount({
+    multiHit: moveRecord.multiHit,
+    everyHitLands,
+    requested: attacker.hits,
+  })
+  notes.add(
+    multiHitNote({
+      move: moveRecord,
+      hits,
+      everyHitLands,
+      chosenByCaller: attacker.hits !== null,
+    }),
+  )
+  const conditional = conditionalPower(moveRecord.id)
+  const conditionInput = {
+    move: moveRecord,
+    attacker: attackerView,
+    defender: defenderView,
+    field,
+    effectiveness: chartEffectiveness,
+    hit: 1,
+  }
+  if (conditional !== null) notes.add(conditional.note(conditionInput))
+
+  /**
+   * One power per hit. They only differ for Triple Axel and Triple Kick, and
+   * they are computed per hit rather than once because Technician reads the
+   * base power and so has to be asked the same question three times.
+   */
+  const rawPowers: readonly number[] = Array.from({ length: hits }, (_unused, index) => {
+    if (conditional?.effect.kind !== 'power') return printedPower
+    return conditional.effect.of({ ...conditionInput, hit: index + 1 })
+  })
+  const rawPower = rawPowers[0] ?? printedPower
 
   const provisional: ModifierContext = {
     move: moveRecord,
@@ -170,7 +224,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     attackStatName,
     defenseStatName,
     basePower: rawPower,
-    effectiveness: effectivenessOfMove(moveType, defenderTypes, defender.terastallized),
+    effectiveness: chartEffectiveness,
     attacker: attackerView,
     defender: defenderView,
     field,
@@ -194,29 +248,45 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   addRegistryNotes({ context, attackerEntry, defenderEntry, attackerItem, defenderItem, notes })
 
   if (effectiveness === 0) {
-    return immuneResult({ context, maxHp, currentHp, notes })
+    return immuneResult({ context, maxHp, currentHp, hits, notes })
   }
 
   if (power.kind === 'exact') {
     return exactResult({ context, damage: power.damage, maxHp, currentHp, notes })
   }
 
-  const basePower = Math.max(
-    1,
-    applyModifier(
-      rawPower,
-      chainModifiers([
-        attackerEntry?.basePower?.(context) ?? null,
-        itemModifier(attackerItem, (handler) => handler.basePower, context),
-        terrainPowerModifier(field.terrain, context),
-        override?.halvedByGrassyTerrain === true &&
-        field.terrain === 'grassy' &&
-        defenderView.grounded
-          ? MOD_HALF
-          : null,
-      ]),
-    ),
-  )
+  const basePowers = rawPowers.map((raw, index) => {
+    const hitContext: ModifierContext = { ...context, basePower: raw }
+    return Math.max(
+      1,
+      applyModifier(
+        raw,
+        chainModifiers([
+          conditional?.effect.kind === 'modifier'
+            ? conditional.effect.of({ ...conditionInput, hit: index + 1 })
+            : null,
+          /**
+           * Helping Hand is a base-power modifier, not a final one. It sits
+           * ahead of the 85-100 random factor in the games, so applying it at
+           * the end re-quantizes the whole spread: the rolls come out stepped
+           * and both ends move. It goes here, after the move's own rule and
+           * before the terrain bonus, which is where the reference puts it.
+           */
+          field.attackerSide.helpingHand ? MOD_ONE_AND_A_HALF : null,
+          attackerEntry?.basePower?.(hitContext) ?? null,
+          foeBasePowerModifier(defenderEntry, moveType),
+          itemModifier(attackerItem, (handler) => handler.basePower, hitContext),
+          terrainPowerModifier(field.terrain, hitContext),
+          override?.halvedByGrassyTerrain === true &&
+          field.terrain === 'grassy' &&
+          defenderView.grounded
+            ? MOD_HALF
+            : null,
+        ]),
+      ),
+    )
+  })
+  const basePower = basePowers[0] ?? 1
 
   const attackStat = resolveAttack({
     context,
@@ -268,7 +338,6 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     override?.ignoresBurn !== true
 
   const finalMod = chainModifiers([
-    field.attackerSide.helpingHand ? MOD_ONE_AND_A_HALF : null,
     screenModifier({ field, category, criticalHit, notes }),
     defenderEntry?.finalDefender?.(context) ?? null,
     field.defenderSide.friendGuard ? MOD_THREE_QUARTERS : null,
@@ -278,27 +347,29 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   ])
 
   const levelFactor = Math.floor((2 * attacker.set.level) / 5 + 2)
-  const baseDamage =
-    Math.floor(Math.floor((levelFactor * basePower * attackStat) / defenseStat) / 50) + 2
+  const baseDamages = basePowers.map(
+    (hitPower) =>
+      Math.floor(Math.floor((levelFactor * hitPower * attackStat) / defenseStat) / 50) + 2,
+  )
 
-  const hits = moveRecord.multiHit?.max ?? 1
-  if (moveRecord.multiHit !== null && moveRecord.multiHit.min !== moveRecord.multiHit.max) {
-    notes.add(
-      `${moveRecord.name} was calculated at ${hits} hits. It can land as few as ${moveRecord.multiHit.min}.`,
-    )
-  }
-
-  const rolls = RANDOM_FACTORS.map((factor) => {
-    let damage = baseDamage
-    if (spread) damage = applyModifier(damage, MOD_THREE_QUARTERS)
-    damage = applyModifier(damage, weatherMod)
-    if (criticalHit) damage = Math.floor(damage * 1.5)
-    damage = Math.floor((damage * factor) / 100)
-    damage = applyModifier(damage, stab)
-    damage = Math.floor(damage * effectiveness)
-    if (burned) damage = Math.floor(damage * 0.5)
-    return Math.max(1, applyModifier(damage, finalMod)) * hits
-  })
+  /**
+   * A roll is the sum across hits, which for every move but Triple Axel and
+   * Triple Kick is one number added to itself. Summing rather than multiplying
+   * is what lets a hit carry its own base power.
+   */
+  const rolls = RANDOM_FACTORS.map((factor) =>
+    baseDamages.reduce((total, baseDamage) => {
+      let damage = baseDamage
+      if (spread) damage = applyModifier(damage, MOD_THREE_QUARTERS)
+      damage = applyModifier(damage, weatherMod)
+      if (criticalHit) damage = Math.floor(damage * 1.5)
+      damage = Math.floor((damage * factor) / 100)
+      damage = applyModifier(damage, stab)
+      damage = Math.floor(damage * effectiveness)
+      if (burned) damage = Math.floor(damage * 0.5)
+      return total + Math.max(1, applyModifier(damage, finalMod))
+    }, 0),
+  )
 
   return {
     rolls,
@@ -485,15 +556,6 @@ function itemModifier(
 
 // --- Type effectiveness -----------------------------------------------------
 
-function effectivenessOfMove(
-  moveType: TeraType,
-  defenderTypes: readonly PokemonType[],
-  defenderTerastallized: boolean,
-): number {
-  if (moveType === 'stellar') return defenderTerastallized ? 2 : 1
-  return effectivenessAgainst(moveType, defenderTypes)
-}
-
 type EffectivenessInput = {
   readonly provisional: ModifierContext
   readonly defenderEntry: AbilityEntry | null
@@ -515,7 +577,7 @@ function resolveEffectiveness({
   moveType,
   notes,
 }: EffectivenessInput): number {
-  if (defenderEntry?.immuneTo === moveType && defenderAbility !== null) {
+  if (absorbsType(defenderEntry, moveType) && defenderAbility !== null) {
     notes.add(
       `${abilityLabel(dex, defenderAbility)} makes ${displayName(defenderSpecies)} immune to ${typeLabel(moveType)}.`,
     )
@@ -528,7 +590,8 @@ function resolveEffectiveness({
       : defenderEntry.alterEffectiveness(provisional.effectiveness, provisional)
 
   if (altered === 0) {
-    const blocking = defenderTypes.find((type) => effectivenessOf(moveType, type) === 0)
+    const readings = typeReadings(provisional.move.id)
+    const blocking = defenderTypes.find((type) => readingAgainst(readings, moveType, type) === 0)
     if (blocking === undefined && defenderAbility !== null) {
       notes.add(
         `${abilityLabel(dex, defenderAbility)} blocks ${typeLabel(moveType)} against ${displayName(defenderSpecies)}.`,
@@ -575,6 +638,14 @@ function resolveAttack({
   notes,
 }: AttackInput): number {
   let stage = attacker.boosts[attackStatName]
+
+  const selfBoost = moveOverride(context.move.id)?.selfBoostBeforeHit
+  if (selfBoost !== undefined && selfBoost.stat === attackStatName) {
+    stage += selfBoost.stages
+    notes.add(
+      `${context.move.name} was applied as ${signed(selfBoost.stages)} ${STAT_LABEL[selfBoost.stat]}, ${selfBoost.why}. Clear it from the attacker's boosts if it is already counted there.`,
+    )
+  }
 
   const imposed = defenderEntry?.foeAttackStage
   if (imposed !== undefined && imposed.stat === attackStatName && defenderAbility !== null) {
@@ -767,7 +838,13 @@ type TerminalResultInput = {
   readonly notes: NoteLog
 }
 
-function immuneResult({ context, maxHp, currentHp, notes }: TerminalResultInput): DamageResult {
+function immuneResult({
+  context,
+  maxHp,
+  currentHp,
+  hits,
+  notes,
+}: TerminalResultInput & { readonly hits: number }): DamageResult {
   const rolls = RANDOM_FACTORS.map(() => 0)
   return {
     rolls,
@@ -781,7 +858,7 @@ function immuneResult({ context, maxHp, currentHp, notes }: TerminalResultInput)
     basePower: 0,
     attackStat: 0,
     defenseStat: 0,
-    hits: context.move.multiHit?.max ?? 1,
+    hits,
     criticalHit: context.criticalHit,
     immune: true,
     ko: koChance({ rolls, currentHp }),

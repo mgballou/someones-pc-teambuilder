@@ -5,6 +5,11 @@
  * few, and says nothing about *why*. The calculator needs the rule, not the
  * absence of a number, so the rule is written down here and everything else
  * that arrives with a null power falls through to `{ kind: 'other' }`.
+ *
+ * This table is only half the subject. A move that *does* print a power can
+ * still have that power changed in battle — Knock Off, Facade, Weather Ball —
+ * and those are `CONDITIONAL_POWER` in `@spc/core`, not entries here. Falling
+ * out of this table means "PokéAPI printed a number", and nothing else.
  */
 
 import type { VariablePower } from '@spc/core'

@@ -27,9 +27,40 @@ export function titleCase(slug: string): string {
     .join('-')
 }
 
+/**
+ * Words a name keeps in lower case unless they start it.
+ *
+ * `Beads Of Ruin` is not what the ability is called, and capitalizing every
+ * word is how the dataset came to say it. Only prepositions and conjunctions
+ * are here: `up`, `out`, `on` and `in` are particles in this vocabulary — Bulk
+ * Up, Wimp Out, Lock On — and are capitalized in the games, so they stay out.
+ */
+const MINOR_WORDS: ReadonlySet<string> = new Set([
+  'a',
+  'an',
+  'and',
+  'as',
+  'at',
+  'by',
+  'for',
+  'from',
+  'into',
+  'nor',
+  'of',
+  'or',
+  'the',
+  'to',
+  'with',
+])
+
 /** `swords-dance` -> `Swords Dance`, for moves and items rather than forms. */
 export function titleWords(slug: string): string {
-  return titleCase(slug).split('-').join(' ')
+  return titleCase(slug)
+    .split('-')
+    .map((word, index) =>
+      index > 0 && MINOR_WORDS.has(word.toLowerCase()) ? word.toLowerCase() : word,
+    )
+    .join(' ')
 }
 
 /**

@@ -13,16 +13,10 @@ import { Button } from './button'
 import { TypeBadge } from './type-badge'
 import { spriteUrl } from '../lib/sprites'
 import { ItemPicker } from './item-picker'
+import { MovePicker, type MoveOption } from './move-picker'
 
 export type AbilityOption = { readonly id: string; readonly name: string }
-export type MoveOption = {
-  readonly id: string
-  readonly name: string
-  readonly type: string
-  readonly category: string
-  readonly basePower: number
-  readonly accuracy: number | null
-}
+export type { MoveOption }
 
 /**
  * The full editor. Building something new happens here; adjusting something
@@ -214,33 +208,24 @@ export function SetEditor({
         <Panel title="Moves" subtitle={`${MAX_MOVES} slots`}>
           <div className="flex flex-col gap-1.5">
             {[0, 1, 2, 3].map((index) => (
-              <select
+              <MovePicker
                 key={index}
-                value={draft.moves?.[index] ?? ''}
-                onChange={(event) => {
+                slot={index + 1}
+                value={draft.moves?.[index] ?? null}
+                moves={moves}
+                onChange={(id) => {
                   const next = [...(draft.moves ?? [null, null, null, null])]
-                  next[index] = event.target.value === '' ? null : event.target.value
+                  next[index] = id
                   patch({ moves: next })
                 }}
-                aria-label={`Move ${index + 1}`}
-                className="well w-full px-2 py-1 text-xs outline-none"
-              >
-                <option value="">Empty slot</option>
-                {moves.map((move) => (
-                  <option key={move.id} value={move.id}>
-                    {move.name} · {move.category.slice(0, 3)} ·{' '}
-                    {move.basePower === 0 ? '—' : move.basePower} ·{' '}
-                    {move.accuracy === null ? '∞' : move.accuracy}
-                  </option>
-                ))}
-              </select>
+              />
             ))}
           </div>
 
           <p className="mt-2 text-[0.6875rem] leading-relaxed text-text-faint">
-            Learnsets are by generation, not by method. Egg chains, event-only moves and version
-            exclusives are not modelled, so this list is broader than what one save file can legally
-            produce.
+            Learnsets are by generation, not by method, and include what the Pokémon&rsquo;s
+            pre-evolutions can learn. Breeding chains, event-only moves and version exclusives are
+            not modelled, so this list is broader than what one save file can legally produce.
           </p>
         </Panel>
       </div>

@@ -25,6 +25,30 @@ describe('accuracy', () => {
   })
 })
 
+/**
+ * The Evasion Clause is a team rule, and both Smogon formats declared it and
+ * checked nothing. `BoostableStat` is the five stats the damage chain
+ * multiplies, so evasion cannot ride in `statChanges` and needs a field of its
+ * own.
+ */
+describe('raisesEvasion', () => {
+  it('is true for a move that raises its own evasion', async () => {
+    expect((await move('minimize')).raisesEvasion).toBe(true)
+  })
+
+  it('is false for a move that raises a different stat on the user', async () => {
+    expect((await move('swords-dance')).raisesEvasion).toBe(false)
+  })
+
+  it('is false for an ordinary attack', async () => {
+    expect((await move('earthquake')).raisesEvasion).toBe(false)
+  })
+
+  it('keeps evasion out of statChanges, which is the five battle stats', async () => {
+    expect((await move('minimize')).statChanges).toEqual([])
+  })
+})
+
 describe('targets', () => {
   it('maps all-other-pokemon onto all-adjacent', async () => {
     expect((await move('earthquake')).target).toBe('all-adjacent')

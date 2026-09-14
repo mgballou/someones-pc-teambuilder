@@ -77,6 +77,12 @@ export type Attacker = Combatant & {
   /** How many Pokémon this hit lands on. Above one takes the spread reduction. */
   readonly targets: number
   readonly criticalHit: boolean
+  /**
+   * How many times a multi-hit move lands, when the caller has picked one.
+   * Null means the calculator picks — see `multi-hit.ts`. A count the move
+   * cannot land is clamped to one it can.
+   */
+  readonly hits: number | null
 }
 
 export type Defender = Combatant
@@ -92,6 +98,7 @@ export type CombatantInput = {
 export type AttackerInput = CombatantInput & {
   readonly targets?: number
   readonly criticalHit?: boolean
+  readonly hits?: number | null
 }
 
 export function newAttacker({
@@ -102,8 +109,9 @@ export function newAttacker({
   terastallized = false,
   targets = 1,
   criticalHit = false,
+  hits = null,
 }: AttackerInput): Attacker {
-  return { set, boosts, hpFraction, status, terastallized, targets, criticalHit }
+  return { set, boosts, hpFraction, status, terastallized, targets, criticalHit, hits }
 }
 
 export function newDefender({

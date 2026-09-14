@@ -87,6 +87,6 @@ export const VARIED_SETS: readonly PokemonSet[] = [
 ]
 
 export const SIX_SET_TEAM: Team = {
-  ...newTeam({ id: asTeamId('varied'), name: 'Varied', format: formatId('vgc-2026-reg-h') }),
+  ...newTeam({ id: asTeamId('varied'), name: 'Varied', format: formatId('vgc-reg-h') }),
   members: VARIED_SETS,
 }

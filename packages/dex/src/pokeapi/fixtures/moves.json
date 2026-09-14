@@ -306,5 +306,52 @@
     "meta": null,
     "stat_changes": [],
     "effect_entries": []
+  },
+  "minimize": {
+    "id": 107,
+    "name": "minimize",
+    "accuracy": null,
+    "power": null,
+    "pp": 10,
+    "priority": 0,
+    "damage_class": {
+      "name": "status"
+    },
+    "type": {
+      "name": "normal"
+    },
+    "target": {
+      "name": "user"
+    },
+    "generation": {
+      "name": "generation-i"
+    },
+    "effect_chance": null,
+    "meta": {
+      "category": {
+        "name": "net-good-stats"
+      },
+      "crit_rate": 0,
+      "drain": 0,
+      "healing": 0,
+      "min_hits": null,
+      "max_hits": null
+    },
+    "stat_changes": [
+      {
+        "change": 2,
+        "stat": {
+          "name": "evasion"
+        }
+      }
+    ],
+    "effect_entries": [
+      {
+        "short_effect": "Raises the user’s evasion by two stages.",
+        "language": {
+          "name": "en"
+        }
+      }
+    ]
   }
 }

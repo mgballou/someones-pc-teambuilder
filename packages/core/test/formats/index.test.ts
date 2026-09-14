@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  currentFormatId,
   gen9Ou,
   gen9Ubers,
   regulationG,
@@ -8,10 +9,11 @@ import {
   SHIPPED_FORMATS,
   shippedFormat,
   unrestricted,
-  VERIFIED_ON,
+  SMOGON_VERIFIED_ON,
+  VGC_VERIFIED_ON,
   VGC_RESTRICTED_SPECIES,
 } from '../../src/formats/index'
-import { abilityId, itemId } from '../../src/index'
+import { abilityId, itemId, sourceFreshness } from '../../src/index'
 import type { FormatId } from '../../src/index'
 
 describe('the shipped registry', () => {
@@ -33,6 +35,14 @@ describe('the shipped registry', () => {
     expect(shippedFormat('gen9-nu' as FormatId)).toBeUndefined()
   })
 
+  it('reads a regulation id stored with its old year as the id it carries now', () => {
+    expect(currentFormatId('vgc-2026-reg-h' as FormatId)).toBe(regulationH.id)
+  })
+
+  it('leaves a current id as it is', () => {
+    expect(currentFormatId(gen9Ou.id)).toBe(gen9Ou.id)
+  })
+
   it('gives every format a team of six', () => {
     expect(SHIPPED_FORMATS.every((format) => format.teamSize === 6)).toBe(true)
   })
@@ -46,7 +56,25 @@ describe('the shipped registry', () => {
   })
 
   it('dates every citation', () => {
-    expect(SHIPPED_FORMATS.every((format) => format.source.verifiedOn === VERIFIED_ON)).toBe(true)
+    expect(
+      SHIPPED_FORMATS.every((format) => /^\d{4}-\d{2}-\d{2}$/.test(format.source.verifiedOn)),
+    ).toBe(true)
+  })
+
+  it('dates the VGC regulations apart from the Smogon tiers', () => {
+    expect(regulationG.source.verifiedOn).not.toBe(gen9Ou.source.verifiedOn)
+  })
+
+  it('reads every VGC regulation on one day', () => {
+    const vgc = [regulationG, regulationH, regulationI]
+
+    expect(vgc.every((format) => format.source.verifiedOn === VGC_VERIFIED_ON)).toBe(true)
+  })
+
+  it('reads both Smogon tiers on one day', () => {
+    expect(
+      [gen9Ou, gen9Ubers].every((format) => format.source.verifiedOn === SMOGON_VERIFIED_ON),
+    ).toBe(true)
   })
 
   it('says in every citation that the ruleset is curated rather than live', () => {
@@ -100,12 +128,22 @@ describe('the VGC regulations', () => {
     expect(regulationH.legality.bannedSpecies).toContain('ursaluna-bloodmoon')
   })
 
-  it('allows two restricted Pokémon in Regulation G', () => {
-    expect(regulationG.legality.maxRestricted).toBe(2)
+  it('allows one restricted Pokémon in Regulation G', () => {
+    expect(regulationG.legality.maxRestricted).toBe(1)
   })
 
-  it('allows one restricted Pokémon in Regulation I', () => {
-    expect(regulationI.legality.maxRestricted).toBe(1)
+  it('allows two restricted Pokémon in Regulation I', () => {
+    expect(regulationI.legality.maxRestricted).toBe(2)
+  })
+
+  it('names no season, because a regulation letter runs in more than one', () => {
+    const vgc = [regulationG, regulationH, regulationI]
+
+    expect(vgc.every((format) => !/\d{4}/.test(format.name))).toBe(true)
+  })
+
+  it('says in the citation when the regulation was the live one', () => {
+    expect(regulationI.source.citation).toContain('1 April 2026')
   })
 
   it('gives Regulation G and Regulation I the same restricted list', () => {
@@ -188,7 +226,14 @@ describe('the sandbox', () => {
       restrictedSpecies: [],
       maxRestricted: 0,
       allowlist: null,
+      allowsUnavailableSpecies: true,
     })
+  })
+
+  it('is the only shipped format that admits a species Generation 9 lacks', () => {
+    expect(SHIPPED_FORMATS.filter((format) => format.legality.allowsUnavailableSpecies)).toEqual([
+      unrestricted,
+    ])
   })
 
   it('applies no clause', () => {
@@ -197,5 +242,46 @@ describe('the sandbox', () => {
 
   it('claims no outside authority', () => {
     expect(unrestricted.source.authority).toBe('custom')
+  })
+
+  it('never goes stale, because it answers to nobody', () => {
+    expect(sourceFreshness(unrestricted.source, '2099-01-01')).toEqual({ kind: 'unchanging' })
+  })
+})
+
+describe('freshness', () => {
+  it('calls a reading fresh on the day it was taken', () => {
+    expect(sourceFreshness(gen9Ou.source, SMOGON_VERIFIED_ON).kind).toBe('fresh')
+  })
+
+  it('calls a reading fresh on the last day of its window', () => {
+    expect(sourceFreshness(gen9Ou.source, '2026-09-16').kind).toBe('fresh')
+  })
+
+  it('calls a reading stale one day past its window', () => {
+    expect(sourceFreshness(gen9Ou.source, '2026-09-17').kind).toBe('stale')
+  })
+
+  it('reports how old the reading is', () => {
+    const report = sourceFreshness(gen9Ou.source, '2026-09-17')
+
+    expect(report.kind === 'stale' && report.ageInDays).toBe(32)
+  })
+
+  it('gives the VGC regulations a shorter window than the Smogon tiers', () => {
+    const vgc = sourceFreshness(regulationG.source, VGC_VERIFIED_ON)
+    const smogon = sourceFreshness(gen9Ou.source, SMOGON_VERIFIED_ON)
+
+    expect(
+      vgc.kind === 'fresh' && smogon.kind === 'fresh' && vgc.staleAfterDays < smogon.staleAfterDays,
+    ).toBe(true)
+  })
+
+  it('counts a day across a month boundary', () => {
+    expect(sourceFreshness(gen9Ou.source, '2026-08-17').kind).toBe('fresh')
+  })
+
+  it('rejects a date that is not an ISO day', () => {
+    expect(() => sourceFreshness(gen9Ou.source, '16 August 2026')).toThrow('Expected an ISO date')
   })
 })

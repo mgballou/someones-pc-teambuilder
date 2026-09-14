@@ -35,14 +35,31 @@ export function applyModifier(value: number, modifier: number): number {
 }
 
 /**
+ * Round to nearest, ties going *up*.
+ *
+ * The chain rounds the other way from `pokeRound`, and the two are not
+ * interchangeable. The games combine modifiers with `(a * b + 0x800) >> 12`,
+ * which adds half a unit before truncating and so sends a tie upwards.
+ * `chain(2048, 4915)` — any screen or Multiscale followed by an Expert Belt —
+ * is 2457 under the wrong rounding and 2458 under this one, and it is one of
+ * eleven pairs the tables in this directory can already produce.
+ *
+ * The shift is written as a divide because `chained * modifier` passes 2^31
+ * once seven doubling modifiers are on the chain, where `>>` wraps and the
+ * reference implementation returns its lower bound.
+ */
+function chainRound(product: number): number {
+  return Math.floor((product + MOD_DENOMINATOR / 2) / MOD_DENOMINATOR)
+}
+
+/**
  * Combine modifiers the way the games do: multiply into a running product,
  * rounding at each step, and apply the product once. Applying each modifier to
  * the value in turn is a different — and wrong — number.
  */
 export function chainModifiers(modifiers: readonly (number | null)[]): number {
   return modifiers.reduce<number>(
-    (chained, modifier) =>
-      modifier === null ? chained : pokeRound((chained * modifier) / MOD_DENOMINATOR),
+    (chained, modifier) => (modifier === null ? chained : chainRound(chained * modifier)),
     MOD_ONE,
   )
 }
