@@ -15,6 +15,7 @@ import type { ItemResponse } from '../pokeapi/schema'
 import { englishEffect } from '../pokeapi/schema'
 import {
   CURATED_ITEM_EFFECTS,
+  FORM_BOUND_ITEMS,
   MEGA_STONES,
   RESIST_BERRY_ITEMS,
   SIGNATURE_ITEMS,
@@ -83,7 +84,7 @@ function restrictedTo(name: string): readonly SpeciesId[] {
   if (mega !== undefined) return [speciesId(mega.holder)]
   const signature = SIGNATURE_ITEMS[name]
   if (signature !== undefined) return signature.holders.map(speciesId)
-  return []
+  return (FORM_BOUND_ITEMS[name] ?? []).map(speciesId)
 }
 
 /**

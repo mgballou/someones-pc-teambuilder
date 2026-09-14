@@ -92,6 +92,17 @@ describe('the committed dataset', () => {
     expect(dataset.items.length).toBeGreaterThan(2000)
   })
 
+  it('binds a plate to Arceus', () => {
+    expect(shipped.item(itemId('flame-plate'))?.restrictedTo).toEqual([speciesId('arceus')])
+  })
+
+  it('binds the Adamant Crystal to both Dialga forms', () => {
+    expect(shipped.item(itemId('adamant-crystal'))?.restrictedTo).toEqual([
+      speciesId('dialga'),
+      speciesId('dialga-origin'),
+    ])
+  })
+
   it('has every ability', () => {
     expect(dataset.abilities.length).toBeGreaterThan(350)
   })

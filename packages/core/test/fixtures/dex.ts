@@ -447,6 +447,18 @@ const SPECIES: readonly Species[] = [
     heightM: 1.2,
     classification: 'sub-legendary',
   }),
+  makeSpecies({
+    id: 'dialga-origin',
+    dexNumber: 483,
+    baseSpecies: 'dialga',
+    formName: 'Origin',
+    types: ['steel', 'dragon'],
+    baseStats: { hp: 100, atk: 100, def: 120, spa: 150, spd: 120, spe: 90 },
+    abilities: ['pressure'],
+    weightKg: 848.7,
+    heightM: 7,
+    classification: 'restricted',
+  }),
   // The conditional-power cases. Each of these is the carrier the hostile
   // review's own reproduction named, so a differential test can rebuild it.
   makeSpecies({
@@ -985,7 +997,13 @@ const MOVES: readonly Move[] = [
   }),
 ]
 
-type ItemSeed = { id: string; effect: Item['effect']; isBerry?: boolean; flingPower?: number }
+type ItemSeed = {
+  id: string
+  effect: Item['effect']
+  isBerry?: boolean
+  flingPower?: number
+  restrictedTo?: readonly string[]
+}
 
 function makeItem(seed: ItemSeed): Item {
   return {
@@ -996,7 +1014,7 @@ function makeItem(seed: ItemSeed): Item {
       .join(' '),
     isBerry: seed.isBerry ?? false,
     flingPower: seed.flingPower ?? 0,
-    restrictedTo: [],
+    restrictedTo: (seed.restrictedTo ?? []).map(speciesId),
     effect: seed.effect,
     description: '',
   }
@@ -1020,6 +1038,11 @@ const ITEMS: readonly Item[] = [
   makeItem({ id: 'rocky-helmet', effect: { kind: 'utility' } }),
   makeItem({ id: 'focus-sash', effect: { kind: 'utility' } }),
   makeItem({ id: 'safety-goggles', effect: { kind: 'utility' } }),
+  makeItem({
+    id: 'adamant-crystal',
+    effect: { kind: 'unmodelled' },
+    restrictedTo: ['dialga', 'dialga-origin'],
+  }),
   // Present so tests can exercise the "this item is outside the model" note.
   makeItem({ id: 'punching-glove', effect: { kind: 'unmodelled' } }),
 ]

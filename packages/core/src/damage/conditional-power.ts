@@ -105,17 +105,19 @@ const PARADOX_ABILITIES = [abilityId('protosynthesis'), abilityId('quark-drive')
  * Whether there is an item on this Pokémon for Knock Off to take, and so also
  * whether Acrobatics counts it as empty-handed.
  *
- * A signature item is part of the form wearing it — Ogerpon's masks, the
- * Rusted Sword — and cannot be removed. Booster Energy is spent the instant a
- * Paradox ability takes it, so by the time anything is calculating there is
- * nothing left to knock off; `paradoxActive` in `abilities.ts` reads a held
- * Booster Energy the same way.
+ * An item bound to its holder's form — Ogerpon's masks, the Rusted Sword,
+ * Dialga-Origin's Adamant Crystal, a plate on Arceus — cannot be removed from
+ * that holder. The same item on anything else can: a Flame Plate on Garchomp
+ * is only a plate. Booster Energy is spent the instant a Paradox ability takes
+ * it, so by the time anything is calculating there is nothing left to knock
+ * off; `paradoxActive` in `abilities.ts` reads a held Booster Energy the same
+ * way.
  */
 function hasRemovableItem(view: SideView): boolean {
   const item = view.item
   if (item === null) return false
-  if (item.restrictedTo.length > 0) return false
-  if (item.effect.kind === 'signature' || item.effect.kind === 'mega-stone') return false
+  const bound = item.restrictedTo
+  if (bound.includes(view.species.id) || bound.includes(view.species.baseSpecies)) return false
   if (item.effect.kind === 'booster-energy' && view.ability !== null) {
     return !PARADOX_ABILITIES.includes(view.ability)
   }

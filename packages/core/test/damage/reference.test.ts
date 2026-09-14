@@ -603,6 +603,25 @@ describe('Knock Off against a target that is holding something', () => {
       }),
     ).toEqual([111, 132])
   })
+
+  it('agrees that it is printed power into a Dialga-Origin holding its Adamant Crystal', () => {
+    expect(
+      agrees({
+        attacker: KINGAMBIT,
+        defender: {
+          species: 'dialga-origin',
+          reference: 'Dialga-Origin',
+          ability: 'pressure',
+          referenceAbility: 'Pressure',
+          evs: { hp: 252, def: 252 },
+          item: 'adamant-crystal',
+          referenceItem: 'Adamant Crystal',
+        },
+        move: 'knock-off',
+        referenceMove: 'Knock Off',
+      }),
+    ).toEqual([42, 49])
+  })
 })
 
 describe('Facade off a status', () => {

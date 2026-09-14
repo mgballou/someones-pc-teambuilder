@@ -99,6 +99,23 @@ describe('a condition the state answers', () => {
     ).toBe(65)
   })
 
+  it('leaves Knock Off alone against a Dialga-Origin holding its Adamant Crystal', () => {
+    expect(
+      power({
+        attackerSpecies: 'kingambit',
+        move: 'knock-off',
+        defenderSpecies: 'dialga-origin',
+        defenderItem: 'adamant-crystal',
+      }),
+    ).toBe(65)
+  })
+
+  it('reads Knock Off at 97 against a form-bound item on a holder it does not bind', () => {
+    expect(
+      power({ attackerSpecies: 'kingambit', move: 'knock-off', defenderItem: 'adamant-crystal' }),
+    ).toBe(97)
+  })
+
   it('counts a spent Booster Energy as no item for Acrobatics', () => {
     expect(
       power({
