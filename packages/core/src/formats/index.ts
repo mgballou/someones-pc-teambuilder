@@ -42,3 +42,20 @@ const BY_ID: ReadonlyMap<string, Format> = new Map(
 export function shippedFormat(id: FormatId): Format | undefined {
   return BY_ID.get(id)
 }
+
+/**
+ * Ids a shipped format used to carry, and the id it carries now.
+ *
+ * The VGC regulations were first shipped with the year in their ids. A team
+ * saved then stores the old id, and still has to open.
+ */
+const RENAMED: ReadonlyMap<string, FormatId> = new Map([
+  ['vgc-2026-reg-g', regulationG.id],
+  ['vgc-2026-reg-h', regulationH.id],
+  ['vgc-2026-reg-i', regulationI.id],
+])
+
+/** The id a format carries now, for an id that may have been stored under an old one. */
+export function currentFormatId(id: FormatId): FormatId {
+  return RENAMED.get(id) ?? id
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  currentFormatId,
   gen9Ou,
   gen9Ubers,
   regulationG,
@@ -32,6 +33,14 @@ describe('the shipped registry', () => {
 
   it('returns nothing for an id it does not hold', () => {
     expect(shippedFormat('gen9-nu' as FormatId)).toBeUndefined()
+  })
+
+  it('reads a regulation id stored with its old year as the id it carries now', () => {
+    expect(currentFormatId('vgc-2026-reg-h' as FormatId)).toBe(regulationH.id)
+  })
+
+  it('leaves a current id as it is', () => {
+    expect(currentFormatId(gen9Ou.id)).toBe(gen9Ou.id)
   })
 
   it('gives every format a team of six', () => {
