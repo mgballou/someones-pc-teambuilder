@@ -26,6 +26,7 @@ import {
   MOD_ONE_AND_A_HALF,
   MOD_THREE_QUARTERS,
 } from './modifier'
+import type { MoveOverride } from './moves'
 import { moveOverride } from './moves'
 import type { StageCause, StageChange, StageRewrite } from './stage-change'
 import { landStage, MAX_STAGE, MIN_STAGE } from './stage-change'
@@ -118,18 +119,49 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     dex,
   })
 
-  const category: 'physical' | 'special' =
-    override?.categoryFromStats === true && attackerTera !== null
-      ? applyBoost(attackerStats.atk, stages.boosts.atk) >
-        applyBoost(attackerStats.spa, stages.boosts.spa)
-        ? 'physical'
-        : 'special'
-      : declaredCategory
+  const category: 'physical' | 'special' = chooseCategory({
+    declared: declaredCategory,
+    override,
+    move: moveRecord,
+    terastallized: attackerTera !== null,
+    level: attacker.set.level,
+    attackerStats,
+    attackerBoosts: stages.boosts,
+    defenderStats,
+    defenderBoosts: defender.boosts,
+    notes,
+  })
 
   const attackStatName: BoostableStat =
     override?.attackStat ?? (category === 'physical' ? 'atk' : 'spa')
   const defenseStatName: BoostableStat =
     override?.defenseStat ?? (category === 'physical' ? 'def' : 'spd')
+
+  /**
+   * Whose Attack the hit reads. Foul Play reads the target's, and the target's
+   * stages with it, so a stage the calculator landed on the attacker is no part
+   * of this hit and says nothing about it.
+   */
+  const readsDefenderAttack = override?.attackFromDefender === true
+  const attackSource: AttackSource = readsDefenderAttack
+    ? { stats: defenderStats, boosts: defender.boosts }
+    : { stats: attackerStats, boosts: stages.boosts }
+  if (readsDefenderAttack) {
+    notes.add(
+      `${moveRecord.name} attacked with ${displayName(defenderSpecies)}'s ${STAT_LABEL[attackStatName]}, not ${displayName(attackerSpecies)}'s.`,
+    )
+    notes.add(
+      foeStageNote({
+        dex,
+        move: moveRecord,
+        attackerEntry,
+        attackerAbility: attacker.set.ability,
+        defenderEntry,
+        defenderBoosts: defender.boosts,
+        defenderSpecies,
+      }),
+    )
+  }
 
   const defenderTypes: readonly PokemonType[] =
     defenderTera !== null && defenderTera !== 'stellar' ? [defenderTera] : defenderSpecies.types
@@ -308,7 +340,8 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   const attackStat = resolveAttack({
     context,
     attacker,
-    attackerStats,
+    attackSource,
+    readsAttackerStages: !readsDefenderAttack,
     attackStatName,
     attackerEntry,
     defenderEntry,
@@ -364,7 +397,7 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
     itemModifier(defenderItem, (handler) => handler.finalDefender, context),
   ])
 
-  const levelFactor = Math.floor((2 * attacker.set.level) / 5 + 2)
+  const levelFactor = levelFactorOf(attacker.set.level)
   const baseDamages = basePowers.map(
     (hitPower) =>
       Math.floor(Math.floor((levelFactor * hitPower * attackStat) / defenseStat) / 50) + 2,
@@ -480,6 +513,22 @@ type SuppressInput = {
   readonly notes: NoteLog
 }
 
+/**
+ * The defender's ability as the attacker's move sees it.
+ *
+ * Mold Breaker reaches only as far as the move. Bulbapedia: "When a Pokémon
+ * with Mold Breaker uses a move, the effects of all Pokémon's ignorable
+ * Abilities are ignored for the execution of that move." Showdown's
+ * `moldbreaker` is that sentence as code — its whole body is
+ * `onModifyMove(move) { move.ignoreAbility = true }`.
+ *
+ * A stage the defender's Intimidate already landed is not part of that
+ * execution. Showdown's `intimidate` is an `onStart` hook that fires when its
+ * holder enters, and it carries no `breakable` flag, so it is not an ignorable
+ * Ability at all. The stage was on the attacker before the move was chosen, so
+ * it survives, and an ability that does nothing else is not suppressed and says
+ * nothing about it.
+ */
 function suppressDefenderAbility({
   dex,
   attackerEntry,
@@ -491,10 +540,13 @@ function suppressDefenderAbility({
   if (attackerEntry?.moldBreaker !== true) return defenderEntry
   if (defenderAbility === null || defenderEntry === null) return defenderEntry
   if (dex.ability(defenderAbility)?.suppressable === false) return defenderEntry
+  const { foeAttackStage, ...withinTheMove } = defenderEntry
+  const onlyTheStage = foeAttackStage !== undefined && Object.keys(withinTheMove).length === 0
+  if (onlyTheStage) return defenderEntry
   notes.add(
     `${displayName(defenderSpecies)}'s ${abilityLabel(dex, defenderAbility)} was suppressed by the attacker's Mold Breaker.`,
   )
-  return null
+  return foeAttackStage === undefined ? null : { foeAttackStage }
 }
 
 function resolveTera(
@@ -572,6 +624,102 @@ function itemModifier(
   return hook === undefined ? null : hook(item.effect, context)
 }
 
+// --- Category ---------------------------------------------------------------
+
+type CategoryInput = {
+  readonly declared: 'physical' | 'special'
+  readonly override: MoveOverride | null
+  readonly move: Move
+  readonly terastallized: boolean
+  readonly level: number
+  readonly attackerStats: StatSpread
+  readonly attackerBoosts: BoostSpread
+  readonly defenderStats: StatSpread
+  readonly defenderBoosts: BoostSpread
+  readonly notes: NoteLog
+}
+
+/**
+ * Which side of the formula the hit lands on.
+ *
+ * Three answers: the category the move is printed with, the user's higher
+ * attacking stat once Tera Blast has a Tera type to read, or — Shell Side Arm —
+ * whichever side would do more to this target.
+ */
+function chooseCategory({
+  declared,
+  override,
+  move,
+  terastallized,
+  level,
+  attackerStats,
+  attackerBoosts,
+  defenderStats,
+  defenderBoosts,
+  notes,
+}: CategoryInput): 'physical' | 'special' {
+  if (override?.categoryFromStats === true && terastallized) {
+    return applyBoost(attackerStats.atk, attackerBoosts.atk) >
+      applyBoost(attackerStats.spa, attackerBoosts.spa)
+      ? 'physical'
+      : 'special'
+  }
+  if (override?.categoryFromDamage !== true) return declared
+
+  const physical = sideDamage({
+    level,
+    basePower: move.basePower,
+    attack: applyBoost(attackerStats.atk, attackerBoosts.atk),
+    defense: applyBoost(defenderStats.def, defenderBoosts.def),
+  })
+  const special = sideDamage({
+    level,
+    basePower: move.basePower,
+    attack: applyBoost(attackerStats.spa, attackerBoosts.spa),
+    defense: applyBoost(defenderStats.spd, defenderBoosts.spd),
+  })
+
+  if (physical === special) {
+    notes.add(
+      `${move.name}'s two sides come out level here, which the games settle with a coin flip. Nothing in the core can flip one, so it was read as special, the category it is printed with.`,
+    )
+    return 'special'
+  }
+  const side = physical > special ? 'physical' : 'special'
+  notes.add(
+    `${move.name} hit ${side === 'physical' ? 'physically' : 'specially'}, the side that does more here. The comparison counts stat stages and nothing else, which is what the games count.`,
+  )
+  return side
+}
+
+type SideDamageInput = {
+  readonly level: number
+  readonly basePower: number
+  readonly attack: number
+  readonly defense: number
+}
+
+/**
+ * What one side of the formula would deal, taken far enough for the two sides
+ * to be compared. The chain is the one Shell Side Arm's own description spells
+ * out, quoted in `moves.ts`, down to the order of the divisions.
+ *
+ * Compared as damage rather than as two ratios, because that is where the games
+ * compare them: two ratios that differ can still floor to the same number, and
+ * the games settle that with a coin flip rather than with the larger ratio.
+ * `@smogon/calc` compares the ratios, so that is the one corner where the two
+ * can part, and no differential case sits in it.
+ */
+function sideDamage({ level, basePower, attack, defense }: SideDamageInput): number {
+  return Math.floor(
+    Math.floor(Math.floor(levelFactorOf(level) * basePower * attack) / defense) / 50,
+  )
+}
+
+function levelFactorOf(level: number): number {
+  return Math.floor((2 * level) / 5 + 2)
+}
+
 // --- Type effectiveness -----------------------------------------------------
 
 type EffectivenessInput = {
@@ -628,10 +776,24 @@ function typeLabel(type: TeraType): string {
 
 // --- Stats ------------------------------------------------------------------
 
+/**
+ * Whose stats the attacking side of the formula reads. The attacker's, except
+ * for Foul Play, which reads the target's.
+ */
+type AttackSource = {
+  readonly stats: StatSpread
+  readonly boosts: BoostSpread
+}
+
 type AttackInput = {
   readonly context: ModifierContext
   readonly attacker: Attacker
-  readonly attackerStats: StatSpread
+  readonly attackSource: AttackSource
+  /**
+   * Whether the stages the calculator landed on the attacker reach this hit at
+   * all. Foul Play reads the target's Attack, so they do not.
+   */
+  readonly readsAttackerStages: boolean
   readonly attackStatName: BoostableStat
   readonly attackerEntry: AbilityEntry | null
   readonly defenderEntry: AbilityEntry | null
@@ -647,7 +809,8 @@ type AttackInput = {
 function resolveAttack({
   context,
   attacker,
-  attackerStats,
+  attackSource,
+  readsAttackerStages,
   attackStatName,
   attackerEntry,
   defenderEntry,
@@ -667,12 +830,12 @@ function resolveAttack({
       stageNote({
         ...landing,
         holder,
-        reads: (stat) => powerReadsStages || stat === attackStatName,
+        reads: (stat) => powerReadsStages || (readsAttackerStages && stat === attackStatName),
       }),
     )
   }
 
-  let stage = stages.boosts[attackStatName]
+  let stage = attackSource.boosts[attackStatName]
   if (defenderEntry?.ignoresFoeBoosts === true) stage = 0
   else if (criticalHit && stage < 0) stage = 0
 
@@ -682,7 +845,60 @@ function resolveAttack({
     itemModifier(attackerItem, (handler) => handler.attackStat, context),
   ])
 
-  return Math.max(1, applyModifier(applyBoost(attackerStats[attackStatName], stage), modifier))
+  return Math.max(1, applyModifier(applyBoost(attackSource.stats[attackStatName], stage), modifier))
+}
+
+type FoeStageNoteInput = {
+  readonly dex: Dex
+  readonly move: Move
+  readonly attackerEntry: AbilityEntry | null
+  readonly attackerAbility: AbilityId | null
+  readonly defenderEntry: AbilityEntry | null
+  readonly defenderBoosts: BoostSpread
+  readonly defenderSpecies: Species
+}
+
+/**
+ * Intimidate on the attacking side would take a stage off the target's Attack,
+ * which is the stat Foul Play then reads. The calculator only ever lands a
+ * stage on the attacker — see the honesty rules — so here it says what it left
+ * out rather than reading the target's Attack as untouched and saying nothing.
+ *
+ * It says what the stage would have come to through the target's own ability,
+ * and nothing at all when that is no change: Clear Body blocks the drop, a
+ * stage at -6 cannot fall, and Unaware reads none of it.
+ */
+function foeStageNote({
+  dex,
+  move,
+  attackerEntry,
+  attackerAbility,
+  defenderEntry,
+  defenderBoosts,
+  defenderSpecies,
+}: FoeStageNoteInput): string | null {
+  const change = attackerEntry?.foeAttackStage
+  if (change === undefined || attackerAbility === null) return null
+  if (defenderEntry?.ignoresFoeBoosts === true) return null
+
+  const landed = landStage({
+    boosts: defenderBoosts,
+    change,
+    cause: 'intimidate',
+    response: defenderEntry?.stageResponse ?? null,
+  })
+  const before = defenderBoosts[change.stat]
+  const after = landed.boosts[change.stat]
+  if (after === before) return null
+
+  const by = abilityLabel(dex, attackerAbility)
+  const label = STAT_LABEL[change.stat]
+  const target = displayName(defenderSpecies)
+  const unmodelled = 'Only a stage landed on the attacker is modelled, so this one was not applied.'
+  if (landed.rewrite === null && after - before === change.stages) {
+    return `${by} would take ${signed(change.stages)} ${label} off ${target}, which ${move.name} reads. ${unmodelled}`
+  }
+  return `${by} would move ${target}'s ${label} stage from ${signed(before)} to ${signed(after)}, which ${move.name} reads. ${unmodelled}`
 }
 
 type AttackerStages = {

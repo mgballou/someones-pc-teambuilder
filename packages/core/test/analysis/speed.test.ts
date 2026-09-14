@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
   analyzeSpeed,
+  CLEAR_FIELD,
   ladderEntrySpeed,
+  speedFieldText,
   speedNoteText,
+  terrainLabel,
   UNMODELLED_SPEED_EFFECTS,
+  weatherLabel,
 } from '../../src/analysis/index'
 import type { LadderEntry, SpeedField, SpeedModifier } from '../../src/analysis/index'
 import { gen9Ou, regulationH, unrestricted } from '../../src/formats/index'
-import type { Team } from '../../src/index'
+import { abilityId } from '../../src/index'
+import type { SetId, Team } from '../../src/index'
 import { fixtureDex } from '../fixtures/dex'
 import { makeTeam } from './support'
 
@@ -19,6 +24,11 @@ const speedOnField = (team: Team, field: SpeedField) =>
 
 const sun: SpeedField = { weather: 'sun', terrain: 'none' }
 const electric: SpeedField = { weather: 'none', terrain: 'electric' }
+
+const fieldLine = (team: Team, field: SpeedField) =>
+  speedOnField(team, field).members[0]?.modifiers.find(
+    (entry) => entry.modifier.kind === 'field-ability',
+  )
 
 const modifier = (team: Team, kind: SpeedModifier['kind']) =>
   speedOf(team).members[0]?.modifiers.find((entry) => entry.modifier.kind === kind)
@@ -377,6 +387,163 @@ describe('ties and Trick Room', () => {
     expect(
       speedOf(onItsOwnBenchmark).members[0]?.modifiers.map((entry) => entry.modifier.kind),
     ).not.toContain('trick-room')
+  })
+})
+
+/**
+ * Every one of these five used to be a line in `UNMODELLED_SPEED_EFFECTS`,
+ * because there was no way to put weather on the field. Each test pairs the
+ * holder with a Garchomp it cannot outrun on a clear field, and asserts the
+ * order both ways round.
+ */
+describe('the field-reading Speed abilities', () => {
+  const rain: SpeedField = { weather: 'rain', terrain: 'none' }
+  const sand: SpeedField = { weather: 'sand', terrain: 'none' }
+  const snow: SpeedField = { weather: 'snow', terrain: 'none' }
+
+  const memberOrder = (team: Team, field: SpeedField): readonly string[] =>
+    speedOnField(team, field)
+      .ladder.filter(
+        (entry): entry is Extract<LadderEntry, { kind: 'member' }> => entry.kind === 'member',
+      )
+      .map((entry) => entry.setId)
+
+  const paired = (seed: {
+    readonly id: string
+    readonly species: string
+    readonly ability: string
+  }) => makeTeam(regulationH, [seed, { id: 'z-garchomp', species: 'garchomp' }])
+
+  const venusaur = paired({ id: 'a-venusaur', species: 'venusaur', ability: 'chlorophyll' })
+  const kingdra = paired({ id: 'a-kingdra', species: 'kingdra', ability: 'swift-swim' })
+  const dracozolt = paired({ id: 'a-dracozolt', species: 'dracozolt', ability: 'sand-rush' })
+  const cetitan = paired({ id: 'a-cetitan', species: 'cetitan', ability: 'slush-rush' })
+
+  const raichu = makeTeam(regulationH, [
+    { id: 'a-raichu-alola', species: 'raichu-alola', ability: 'surge-surfer' },
+    { id: 'z-talonflame', species: 'talonflame' },
+  ])
+
+  it('leaves Chlorophyll behind Garchomp on a clear field', () => {
+    expect(memberOrder(venusaur, CLEAR_FIELD)).toEqual(['z-garchomp', 'a-venusaur'])
+  })
+
+  it('puts Chlorophyll in front in the sun', () => {
+    expect(memberOrder(venusaur, sun)).toEqual(['a-venusaur', 'z-garchomp'])
+  })
+
+  it('leaves Swift Swim behind Garchomp on a clear field', () => {
+    expect(memberOrder(kingdra, CLEAR_FIELD)).toEqual(['z-garchomp', 'a-kingdra'])
+  })
+
+  it('puts Swift Swim in front in the rain', () => {
+    expect(memberOrder(kingdra, rain)).toEqual(['a-kingdra', 'z-garchomp'])
+  })
+
+  it('leaves Sand Rush behind Garchomp on a clear field', () => {
+    expect(memberOrder(dracozolt, CLEAR_FIELD)).toEqual(['z-garchomp', 'a-dracozolt'])
+  })
+
+  it('puts Sand Rush in front in the sand', () => {
+    expect(memberOrder(dracozolt, sand)).toEqual(['a-dracozolt', 'z-garchomp'])
+  })
+
+  it('leaves Slush Rush behind Garchomp on a clear field', () => {
+    expect(memberOrder(cetitan, CLEAR_FIELD)).toEqual(['z-garchomp', 'a-cetitan'])
+  })
+
+  it('puts Slush Rush in front in the snow', () => {
+    expect(memberOrder(cetitan, snow)).toEqual(['a-cetitan', 'z-garchomp'])
+  })
+
+  it('leaves Surge Surfer behind Talonflame on a clear field', () => {
+    expect(memberOrder(raichu, CLEAR_FIELD)).toEqual(['z-talonflame', 'a-raichu-alola'])
+  })
+
+  it('puts Surge Surfer in front under Electric Terrain', () => {
+    expect(memberOrder(raichu, electric)).toEqual(['a-raichu-alola', 'z-talonflame'])
+  })
+
+  it('leaves Swift Swim alone in the sun', () => {
+    expect(speedOnField(kingdra, sun).members[0]?.effective).toBe(105)
+  })
+
+  it('leaves Chlorophyll alone under Electric Terrain', () => {
+    expect(speedOnField(venusaur, electric).members[0]?.effective).toBe(100)
+  })
+
+  it('doubles the Speed it reads', () => {
+    expect(speedOnField(venusaur, sun).members[0]?.effective).toBe(200)
+  })
+
+  it('names a dormant ability in the notes', () => {
+    expect(speedOf(venusaur).notes.map((note) => note.kind)).toContain('field-ability-dormant')
+  })
+
+  it('drops that note once the weather is standing', () => {
+    expect(speedOnField(venusaur, sun).notes.map((note) => note.kind)).not.toContain(
+      'field-ability-dormant',
+    )
+  })
+
+  it('says what a dormant ability is waiting for', () => {
+    expect(
+      speedNoteText({
+        kind: 'field-ability-dormant',
+        setId: 'a-venusaur' as SetId,
+        ability: abilityId('surge-surfer'),
+      }),
+    ).toContain('Electric Terrain')
+  })
+
+  it('marks the field line unreachable on a clear field', () => {
+    expect(fieldLine(venusaur, CLEAR_FIELD)?.available).toBe(false)
+  })
+
+  it('marks it reachable once the weather is standing', () => {
+    expect(fieldLine(venusaur, sun)?.available).toBe(true)
+  })
+
+  it('leaves it unreachable for a set with no such ability', () => {
+    expect(fieldLine(bare, sun)?.available).toBe(false)
+  })
+
+  it('chains the doubling with a Choice Scarf the way the games do', () => {
+    const team = makeTeam(regulationH, [
+      { id: 'a-kingdra', species: 'kingdra', ability: 'swift-swim', item: 'choice-scarf' },
+    ])
+
+    expect(speedOnField(team, rain).members[0]?.effective).toBe(315)
+  })
+
+  it('no longer lists them among the effects it cannot account for', () => {
+    expect(UNMODELLED_SPEED_EFFECTS.join(' ')).not.toContain('Chlorophyll')
+  })
+})
+
+describe('the field in words', () => {
+  it('says a clear field plainly', () => {
+    expect(speedFieldText(CLEAR_FIELD)).toBe('a clear field')
+  })
+
+  it('names weather on its own', () => {
+    expect(speedFieldText(sun)).toBe('sun')
+  })
+
+  it('names terrain on its own', () => {
+    expect(speedFieldText(electric)).toBe('Electric Terrain')
+  })
+
+  it('joins the two when both are standing', () => {
+    expect(speedFieldText({ weather: 'rain', terrain: 'grassy' })).toBe('rain and Grassy Terrain')
+  })
+
+  it('labels a weather for a control', () => {
+    expect(weatherLabel('sand')).toBe('Sand')
+  })
+
+  it('labels a terrain for a control', () => {
+    expect(terrainLabel('misty')).toBe('Misty Terrain')
   })
 })
 

@@ -30,6 +30,7 @@ import {
 } from '@spc/core'
 import { miniDex, type DexPayload } from '../lib/mini-dex'
 import { Panel, SourceNote } from './panel'
+import { Select } from './select'
 import { formatPercentRange } from '../lib/format'
 
 export type AttackerOption = {
@@ -389,37 +390,6 @@ function boostOptions() {
     value: String(stage),
     label: stage > 0 ? `+${stage}` : String(stage),
   }))
-}
-
-function Select({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  readonly label: string
-  readonly value: string
-  readonly onChange: (value: string) => void
-  readonly options: readonly { readonly value: string; readonly label: string }[]
-}) {
-  return (
-    <label className="flex flex-col gap-0.5">
-      <span className="text-[0.625rem] font-medium uppercase tracking-wider text-text-faint">
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="well px-2 py-1 text-xs capitalize outline-none"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  )
 }
 
 function Toggle({

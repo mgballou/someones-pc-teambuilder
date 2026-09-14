@@ -327,6 +327,29 @@ export const ABILITY_REGISTRY: Readonly<Record<string, AbilityEntry>> = {
    */
   'clear-body': { stageResponse: { kind: 'blocks-foe-drops' } },
   /**
+   * Bulbapedia, White Smoke: it "prevents stat reduction caused by other
+   * Pokémon's moves and Abilities (such as Scary Face and Intimidate)" and
+   * "does not prevent self-inflicted stat reductions". Showdown gives it Clear
+   * Body's `onTryBoost` body, to the line.
+   */
+  'white-smoke': { stageResponse: { kind: 'blocks-foe-drops' } },
+  /**
+   * Bulbapedia, Full Metal Body: the same sentence again, and "unlike White
+   * Smoke and Clear Body, this Ability cannot be ignored by moves or
+   * Abilities." Showdown agrees in the only place it could — the same
+   * `onTryBoost` body, and `flags: {}` where Clear Body carries `breakable: 1`.
+   */
+  'full-metal-body': { stageResponse: { kind: 'blocks-foe-drops' } },
+  /**
+   * Bulbapedia, Hyper Cutter: it "prevents other Pokémon from lowering the
+   * Attack stat stage of the Pokémon with this Ability", and "does not prevent
+   * the Pokémon with this Ability from lowering its own Attack". Attack alone,
+   * where Clear Body holds every stat, which costs nothing to say as
+   * `blocks-foe-drops`: Intimidate is the only stage this calculator lands that
+   * the other side caused, and it is an Attack stage.
+   */
+  'hyper-cutter': { stageResponse: { kind: 'blocks-foe-drops' } },
+  /**
    * Bulbapedia, Guard Dog: "if a Pokémon with this ability is affected by
    * Intimidate, its Attack stat will increase by one stage, rather than
    * decreasing by one stage." Its other effect, refusing a forced switch, does
