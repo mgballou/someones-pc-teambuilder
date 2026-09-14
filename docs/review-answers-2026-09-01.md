@@ -1,6 +1,6 @@
 # Review answers — 2026-09-01
 
-Screens captured by `laila/scripts/review.py` from `review/someones-pc.json`, answered by Matthew.
+Screens of the seeded app, answered by Matthew.
 
 | #   | Screen     | Question                                        | Answer       |
 | --- | ---------- | ----------------------------------------------- | ------------ |
@@ -39,33 +39,11 @@ key value table at the top (last verified: date time)."_ The hand-check date is
 currently somewhere it does not read. It belongs in the key/value table at the
 top of the page, labelled `Last verified:` with the date and the time.
 
-He offered no word on 10 — `buried` is Laila's reading of an instruction that
-only makes sense if the date is hard to find. If that reading is wrong, the
-answer to change is 10 and nothing else.
+He offered no word on 10 — `buried` is a reading of an instruction that only
+makes sense if the date is hard to find. If that reading is wrong, the answer
+to change is 10 and nothing else.
 
 **6 — speed, answered separately.** _"Does the ladder show where your team
 sits?"_ — _"the answer is yes, it shows."_ Answered on the evening of
 1 September, after the sheet was first written. Nothing to change on that
 screen.
-
-## The fixture these screens were captured against
-
-`pnpm db:seed` does not reproduce it, and running it destroys it. Three things
-to know before anyone runs it again:
-
-- **The seed writes six members into Reg H Rain. The review needs seven.** The
-  seventh is a hand-made duplicate of the Pelipper at slot 02, and it is the
-  only reason the team breaks three clauses at once — over team size, Species
-  Clause, Item Clause. Seeded alone, the legality screen has nothing to show.
-- **`pnpm test:e2e` leaves a duplicate behind.** `a set duplicates in place`
-  duplicates the first card of Reg H Rain and never removes it, so every run
-  adds an eighth member.
-- **The seed generates fresh uuids.** `review/someones-pc.json` and
-  `review/still-frames.json` pin the team and set ids in their paths, so a
-  reseed 404s every screen below the team level.
-
-The pinned ids, for restoring by hand: team `bdc4eece-3279-4968-b0ac-bd3ada1e2021`
-is Reg H Rain, `12ed4e65-8f14-4e9a-9fa3-c3f3073bc54b` is OU Balance,
-`099d1ec7-d3f6-4d2b-b964-63bac0086f79` is Reg G Miraidon; set
-`866c3c78-4cf4-415d-b3fb-b5836d2d2f96` is the duplicate Pelipper the set-editor
-screen opens.
