@@ -1,8 +1,8 @@
 import type { BoostableStat, BoostSpread } from '../stats'
 import { ImpossibleState } from './errors'
 
-const MIN_STAGE = -6
-const MAX_STAGE = 6
+export const MIN_STAGE = -6
+export const MAX_STAGE = 6
 
 /**
  * Where a stat stage change the calculator applies came from.
@@ -51,6 +51,12 @@ export type LandedStage = {
   readonly boosts: BoostSpread
   /** Null when the holder's ability left the change as it was made. */
   readonly rewrite: StageRewrite | null
+  /**
+   * How far the change moved its own stat, before any answer to it. Less than
+   * the change asked for when the stage met -6 or +6, and zero when it was
+   * already there or the change was blocked.
+   */
+  readonly moved: number
 }
 
 export type LandStageInput = {
@@ -75,42 +81,43 @@ export type LandStageInput = {
  * and reads -5; this follows the games.
  */
 export function landStage({ boosts, change, cause, response }: LandStageInput): LandedStage {
-  if (response === null) return { boosts: shift(boosts, change), rewrite: null }
+  const unchanged: LandedStage = {
+    boosts: shift(boosts, change),
+    rewrite: null,
+    moved: landing(boosts, change),
+  }
+  if (response === null) return unchanged
 
   switch (response.kind) {
     case 'multiplies': {
-      const stages = change.stages * response.factor
+      const multiplied = { stat: change.stat, stages: change.stages * response.factor }
       return {
-        boosts: shift(boosts, { stat: change.stat, stages }),
-        rewrite: { kind: 'multiplied', factor: response.factor, stages },
+        boosts: shift(boosts, multiplied),
+        rewrite: { kind: 'multiplied', factor: response.factor, stages: multiplied.stages },
+        moved: landing(boosts, multiplied),
       }
     }
     case 'blocks-foe-drops':
-      if (cause === 'own-move' || landing(boosts, change) >= 0) {
-        return { boosts: shift(boosts, change), rewrite: null }
-      }
-      return { boosts, rewrite: { kind: 'blocked' } }
+      if (cause === 'own-move' || landing(boosts, change) >= 0) return unchanged
+      return { boosts, rewrite: { kind: 'blocked' }, moved: 0 }
     case 'blocks-intimidate':
-      if (cause !== 'intimidate' || landing(boosts, change) === 0) {
-        return { boosts: shift(boosts, change), rewrite: null }
-      }
-      return { boosts, rewrite: { kind: 'blocked' } }
-    case 'raises-on-intimidate':
-      if (cause !== 'intimidate' || landing(boosts, change) === 0) {
-        return { boosts: shift(boosts, change), rewrite: null }
-      }
+      if (cause !== 'intimidate' || landing(boosts, change) === 0) return unchanged
+      return { boosts, rewrite: { kind: 'blocked' }, moved: 0 }
+    case 'raises-on-intimidate': {
+      if (cause !== 'intimidate' || landing(boosts, change) === 0) return unchanged
+      const raise = { stat: change.stat, stages: response.stages }
       return {
-        boosts: shift(boosts, { stat: change.stat, stages: response.stages }),
+        boosts: shift(boosts, raise),
         rewrite: { kind: 'raised-instead', stages: response.stages },
+        moved: landing(boosts, raise),
       }
+    }
     case 'answers-foe-drops': {
-      const landed = shift(boosts, change)
-      if (cause === 'own-move' || landing(boosts, change) >= 0) {
-        return { boosts: landed, rewrite: null }
-      }
+      if (cause === 'own-move' || landing(boosts, change) >= 0) return unchanged
       return {
-        boosts: shift(landed, { stat: response.stat, stages: response.stages }),
+        boosts: shift(unchanged.boosts, { stat: response.stat, stages: response.stages }),
         rewrite: { kind: 'answered', stat: response.stat, stages: response.stages },
+        moved: unchanged.moved,
       }
     }
     default:

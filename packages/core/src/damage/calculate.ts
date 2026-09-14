@@ -28,7 +28,7 @@ import {
 } from './modifier'
 import { moveOverride } from './moves'
 import type { StageCause, StageChange, StageRewrite } from './stage-change'
-import { landStage } from './stage-change'
+import { landStage, MAX_STAGE, MIN_STAGE } from './stage-change'
 import { hitCount, multiHitNote } from './multi-hit'
 import { koChance } from './ko'
 import { stabModifier } from './stab'
@@ -700,7 +700,11 @@ type StageSource = {
   readonly cause: StageCause
 }
 
-type StageLanding = StageSource & { readonly rewrite: StageRewrite | null }
+type StageLanding = StageSource & {
+  readonly rewrite: StageRewrite | null
+  /** How far the change moved its own stat, which the limit can cut short. */
+  readonly moved: number
+}
 
 type AttackerStagesInput = {
   readonly attacker: Attacker
@@ -753,7 +757,7 @@ function landAttackerStages({
       })
       return {
         boosts: next.boosts,
-        landings: [...landed.landings, { ...source, rewrite: next.rewrite }],
+        landings: [...landed.landings, { ...source, rewrite: next.rewrite, moved: next.moved }],
       }
     },
     { boosts: attacker.boosts, landings: [] },
@@ -783,11 +787,22 @@ type StageNoteInput = StageLanding & {
  * Attack means nothing to Hydro Pump, though it is 20 base power to Stored
  * Power.
  */
-function stageNote({ by, why, holder, change, rewrite, reads }: StageNoteInput): string | null {
+function stageNote({
+  by,
+  why,
+  holder,
+  change,
+  rewrite,
+  moved,
+  reads,
+}: StageNoteInput): string | null {
   const label = STAT_LABEL[change.stat]
   const onStat = reads(change.stat)
   const reason = why === null ? '' : `, which ${why}`
   const plain = `${by} was applied as ${signed(change.stages)} ${label}${reason}. ${CLEAR_ONE}`
+
+  const limited = limitedNote({ by, label, holder, change, rewrite, moved })
+  if (limited !== undefined) return onStat ? limited : null
 
   if (rewrite === null) return onStat ? plain : null
 
@@ -815,6 +830,71 @@ function stageNote({ by, why, holder, change, rewrite, reads }: StageNoteInput):
       }
       return onStat ? plain : null
     }
+    default:
+      throw ImpossibleState.unreachable(rewrite)
+  }
+}
+
+type LimitedNoteInput = {
+  readonly by: string
+  readonly label: string
+  readonly holder: string
+  readonly change: StageChange
+  readonly rewrite: StageRewrite | null
+  readonly moved: number
+}
+
+/**
+ * The note for a change the -6 to +6 limit cut short, or `undefined` when it
+ * landed whole. It names the stage that landed, never the one that was asked
+ * for: an attacker already at -6 takes nothing from Intimidate, and the note
+ * says so rather than claiming a -1.
+ */
+function limitedNote({
+  by,
+  label,
+  holder,
+  change,
+  rewrite,
+  moved,
+}: LimitedNoteInput): string | undefined {
+  const asked = askedFor({ holder, change, rewrite })
+  if (asked === undefined || moved === asked.stages) return undefined
+  const limit = signed(asked.stages < 0 ? MIN_STAGE : MAX_STAGE)
+  const because = asked.clause === '' ? '' : `${asked.clause} and `
+  if (moved === 0) {
+    return `${by} changed no ${label} stage, because ${because}the stage is already at ${limit}.`
+  }
+  return `${by} was applied as ${signed(moved)} ${label}, because ${because}the stage cannot pass ${limit}. ${CLEAR_ONE}`
+}
+
+type AskedForInput = {
+  readonly holder: string
+  readonly change: StageChange
+  readonly rewrite: StageRewrite | null
+}
+
+/**
+ * The stages the change asked for once the holder's ability had rewritten it,
+ * and a clause saying what the ability did. A block and an answer say their
+ * own, so they have nothing to ask.
+ */
+function askedFor({
+  holder,
+  change,
+  rewrite,
+}: AskedForInput): { readonly stages: number; readonly clause: string } | undefined {
+  if (rewrite === null) return { stages: change.stages, clause: '' }
+  switch (rewrite.kind) {
+    case 'multiplied': {
+      const verb = rewrite.factor === 2 ? 'doubles' : 'reverses'
+      return { stages: rewrite.stages, clause: `${holder} ${verb} it to ${signed(rewrite.stages)}` }
+    }
+    case 'raised-instead':
+      return { stages: rewrite.stages, clause: `${holder} turns it into ${signed(rewrite.stages)}` }
+    case 'blocked':
+    case 'answered':
+      return undefined
     default:
       throw ImpossibleState.unreachable(rewrite)
   }

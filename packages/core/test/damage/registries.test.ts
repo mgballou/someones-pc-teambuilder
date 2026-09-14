@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { MoveId, Nature, StatSpread } from '../../src/index'
+import type { BoostSpread, MoveId, Nature, StatSpread } from '../../src/index'
 import { applyBoost, moveId, ZERO_BOOSTS } from '../../src/index'
 import type { DamageResult, Field, Terrain, Weather } from '../../src/damage/index'
 import {
@@ -41,6 +41,7 @@ type Scenario = {
   readonly reflect?: boolean
   readonly style?: Field['style']
   readonly status?: 'burn' | 'none'
+  readonly attackerBoosts?: Partial<BoostSpread>
   readonly defenseBoost?: number
 }
 
@@ -60,6 +61,7 @@ function run({
   reflect = false,
   style = 'singles',
   status = 'none',
+  attackerBoosts = {},
   defenseBoost = 0,
 }: Scenario): DamageResult {
   return calculate({
@@ -71,6 +73,7 @@ function run({
         item: attackerItem,
         ability: attackerAbility,
       }),
+      boosts: { ...ZERO_BOOSTS, ...attackerBoosts },
       status,
     }),
     defender: newDefender({
@@ -649,6 +652,57 @@ describe('the stage rewrites', () => {
     expect(intimidated('mabosstiff', 'guard-dog').notes).toContain(
       "Intimidate was applied as +1 Atk rather than -1, because Guard Dog turns it into a raise. Clear it from the attacker's boosts if it is already counted there.",
     )
+  })
+
+  it('says Intimidate changed nothing on an attacker already at -6 Atk', () => {
+    expect(
+      run({
+        attackerSpecies: 'metagross',
+        move: EARTHQUAKE,
+        attackerAbility: 'clear-body',
+        defenderAbility: 'intimidate',
+        attackerBoosts: { atk: -6 },
+      }).notes,
+    ).toContain('Intimidate changed no Atk stage, because the stage is already at -6.')
+  })
+
+  it('names only the stage Simple could land against the floor', () => {
+    expect(
+      run({
+        attackerSpecies: 'bibarel',
+        move: EARTHQUAKE,
+        attackerAbility: 'simple',
+        defenderAbility: 'intimidate',
+        attackerBoosts: { atk: -5 },
+      }).notes,
+    ).toContain(
+      "Intimidate was applied as -1 Atk, because Simple doubles it to -2 and the stage cannot pass -6. Clear it from the attacker's boosts if it is already counted there.",
+    )
+  })
+
+  it('says Guard Dog raised nothing at +6 Atk', () => {
+    expect(
+      run({
+        attackerSpecies: 'mabosstiff',
+        move: EARTHQUAKE,
+        attackerAbility: 'guard-dog',
+        defenderAbility: 'intimidate',
+        attackerBoosts: { atk: 6 },
+      }).notes,
+    ).toContain(
+      'Intimidate changed no Atk stage, because Guard Dog turns it into +1 and the stage is already at +6.',
+    )
+  })
+
+  it('says the charge boost changed nothing at +6 SpA', () => {
+    expect(
+      run({
+        attackerSpecies: 'malamar',
+        nature: 'modest',
+        move: METEOR_BEAM,
+        attackerBoosts: { spa: 6 },
+      }).notes,
+    ).toContain('Meteor Beam changed no SpA stage, because the stage is already at +6.')
   })
 
   it('reports none of the six as outside the model', () => {

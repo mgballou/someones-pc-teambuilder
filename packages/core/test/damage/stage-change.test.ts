@@ -37,6 +37,66 @@ describe('a stage change with no ability answering it', () => {
   it('stops at the ceiling', () => {
     expect(land(CHARGE, 'own-move', null, { spa: 6 }).spa).toBe(6)
   })
+
+  it('says it moved the whole change', () => {
+    expect(
+      landStage({ boosts: ZERO_BOOSTS, change: INTIMIDATE, cause: 'intimidate', response: null })
+        .moved,
+    ).toBe(-1)
+  })
+
+  it('says it moved nothing at the floor', () => {
+    expect(
+      landStage({
+        boosts: { ...ZERO_BOOSTS, atk: -6 },
+        change: INTIMIDATE,
+        cause: 'intimidate',
+        response: null,
+      }).moved,
+    ).toBe(0)
+  })
+})
+
+describe('how far a rewritten change moved', () => {
+  it('counts what Simple could land against the floor', () => {
+    expect(
+      landStage({
+        boosts: { ...ZERO_BOOSTS, atk: -5 },
+        change: INTIMIDATE,
+        cause: 'intimidate',
+        response: SIMPLE,
+      }).moved,
+    ).toBe(-1)
+  })
+
+  it('counts a blocked change as nothing', () => {
+    expect(
+      landStage({
+        boosts: ZERO_BOOSTS,
+        change: INTIMIDATE,
+        cause: 'intimidate',
+        response: CLEAR_BODY,
+      }).moved,
+    ).toBe(0)
+  })
+
+  it('counts the drop Defiant answered, not the answer', () => {
+    expect(
+      landStage({ boosts: ZERO_BOOSTS, change: INTIMIDATE, cause: 'intimidate', response: DEFIANT })
+        .moved,
+    ).toBe(-1)
+  })
+
+  it('counts nothing for Guard Dog at the ceiling', () => {
+    expect(
+      landStage({
+        boosts: { ...ZERO_BOOSTS, atk: 6 },
+        change: INTIMIDATE,
+        cause: 'intimidate',
+        response: GUARD_DOG,
+      }).moved,
+    ).toBe(0)
+  })
 })
 
 describe('Simple', () => {
