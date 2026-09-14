@@ -52,13 +52,16 @@ export type MoveOverride = {
    * turn the calculator does not hold — it is a rule of the move — and it is
    * applied rather than noted as out of reach.
    *
-   * Simple and Contrary change the size of it and neither is in the ability
-   * model, so both already arrive with a note saying they were not applied.
+   * Simple doubles it and Contrary reverses it, and the ability model applies
+   * both — see `stage-change.ts`.
    */
   readonly selfBoostBeforeHit?: {
     readonly stat: BoostableStat
     readonly stages: number
-    /** Said on every call, so a stage nobody asked for is never silent. */
+    /**
+     * Said on every call, so a stage nobody asked for is never silent. Reads
+     * after "which", and after "the +1" when an ability rewrites the stage.
+     */
     readonly why: string
   }
 }
@@ -110,10 +113,10 @@ export const MOVE_OVERRIDES: Readonly<Record<string, MoveOverride>> = {
       attacker.grounded ? (TERRAIN_PULSE_TYPE[field.terrain] ?? null) : null,
   },
   'meteor-beam': {
-    selfBoostBeforeHit: { stat: 'spa', stages: 1, why: 'which it gains as it charges' },
+    selfBoostBeforeHit: { stat: 'spa', stages: 1, why: 'it gains as it charges' },
   },
   'electro-shot': {
-    selfBoostBeforeHit: { stat: 'spa', stages: 1, why: 'which it gains as it charges' },
+    selfBoostBeforeHit: { stat: 'spa', stages: 1, why: 'it gains as it charges' },
   },
   facade: { ignoresBurn: true },
   earthquake: { halvedByGrassyTerrain: true },
