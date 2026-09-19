@@ -22,22 +22,22 @@
     --well: oklch(92.2% 0.005 90);
 
     --line: oklch(87% 0.006 90);
-    --line-strong: oklch(73% 0.008 90);
+    --line-strong: oklch(61% 0.008 90);
 
     --text: oklch(24% 0.008 90);
-    --text-dim: oklch(52% 0.008 90);
-    --text-faint: oklch(66% 0.007 90);
+    --text-dim: oklch(38% 0.008 90);
+    --text-faint: oklch(51% 0.007 90);
 
-    --accent: oklch(62% 0.155 52);
+    --accent: oklch(52% 0.133 52);
     --accent-ink: oklch(100% 0 0);
-    --accent-soft: oklch(62% 0.155 52 / 0.12);
+    --accent-soft: oklch(52% 0.133 52 / 0.12);
 
-    --danger: oklch(55% 0.185 25);
-    --danger-soft: oklch(55% 0.185 25 / 0.12);
-    --warn: oklch(62% 0.115 82);
-    --warn-soft: oklch(62% 0.115 82 / 0.14);
-    --ok: oklch(56% 0.115 155);
-    --ok-soft: oklch(56% 0.115 155 / 0.14);
+    --danger: oklch(53% 0.185 5);
+    --danger-soft: oklch(53% 0.185 5 / 0.12);
+    --warn: oklch(51% 0.106 100);
+    --warn-soft: oklch(51% 0.106 100 / 0.14);
+    --ok: oklch(49% 0.115 155);
+    --ok-soft: oklch(49% 0.115 155 / 0.14);
 
     /* Effectiveness scale. Diverging, and never the type hues. */
     --eff-immune: oklch(50% 0.01 90);
@@ -45,12 +45,12 @@
     --eff-half: oklch(55% 0.06 240);
     --eff-neutral: oklch(70% 0.004 90);
     --eff-double: oklch(56% 0.14 35);
-    --eff-quad: oklch(46% 0.19 28);
+    --eff-quad: oklch(46% 0.188 28);
 
     --type-normal: oklch(58% 0.012 90);
-    --type-fire: oklch(60% 0.175 44);
+    --type-fire: oklch(60% 0.174 44);
     --type-water: oklch(56% 0.135 250);
-    --type-electric: oklch(66% 0.145 92);
+    --type-electric: oklch(66% 0.135 92);
     --type-grass: oklch(58% 0.135 143);
     --type-ice: oklch(62% 0.085 210);
     --type-fighting: oklch(52% 0.145 32);
@@ -65,10 +65,6 @@
     --type-dark: oklch(42% 0.045 55);
     --type-steel: oklch(58% 0.035 235);
     --type-fairy: oklch(66% 0.125 340);
-
-    --radius: 0.25rem;
-    --radius-panel: 0.375rem;
-    --slot-size: 4.5rem;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -81,20 +77,20 @@
       --well: oklch(14.5% 0.006 264);
 
       --line: oklch(31% 0.009 264);
-      --line-strong: oklch(44% 0.011 264);
+      --line-strong: oklch(54% 0.011 264);
 
       --text: oklch(93% 0.004 264);
-      --text-dim: oklch(70% 0.008 264);
-      --text-faint: oklch(55% 0.008 264);
+      --text-dim: oklch(78% 0.008 264);
+      --text-faint: oklch(64% 0.008 264);
 
-      --accent: oklch(72% 0.155 58);
-      --accent-ink: oklch(18% 0.01 60);
-      --accent-soft: oklch(72% 0.155 58 / 0.16);
+      --accent: oklch(72% 0.155 52);
+      --accent-ink: oklch(18% 0.01 52);
+      --accent-soft: oklch(72% 0.155 52 / 0.16);
 
-      --danger: oklch(68% 0.165 27);
-      --danger-soft: oklch(68% 0.165 27 / 0.16);
-      --warn: oklch(76% 0.125 85);
-      --warn-soft: oklch(76% 0.125 85 / 0.16);
+      --danger: oklch(68% 0.165 5);
+      --danger-soft: oklch(68% 0.165 5 / 0.16);
+      --warn: oklch(76% 0.125 100);
+      --warn-soft: oklch(76% 0.125 100 / 0.16);
       --ok: oklch(72% 0.125 158);
       --ok-soft: oklch(72% 0.125 158 / 0.16);
 
@@ -103,7 +99,7 @@
       --eff-half: oklch(70% 0.065 240);
       --eff-neutral: oklch(45% 0.006 264);
       --eff-double: oklch(70% 0.135 38);
-      --eff-quad: oklch(76% 0.175 32);
+      --eff-quad: oklch(76% 0.144 32);
 
       --type-normal: oklch(72% 0.012 90);
       --type-fire: oklch(73% 0.155 46);
@@ -135,20 +131,20 @@
     --well: oklch(14.5% 0.006 264);
 
     --line: oklch(31% 0.009 264);
-    --line-strong: oklch(44% 0.011 264);
+    --line-strong: oklch(54% 0.011 264);
 
     --text: oklch(93% 0.004 264);
-    --text-dim: oklch(70% 0.008 264);
-    --text-faint: oklch(55% 0.008 264);
+    --text-dim: oklch(78% 0.008 264);
+    --text-faint: oklch(64% 0.008 264);
 
-    --accent: oklch(72% 0.155 58);
-    --accent-ink: oklch(18% 0.01 60);
-    --accent-soft: oklch(72% 0.155 58 / 0.16);
+    --accent: oklch(72% 0.155 52);
+    --accent-ink: oklch(18% 0.01 52);
+    --accent-soft: oklch(72% 0.155 52 / 0.16);
 
-    --danger: oklch(68% 0.165 27);
-    --danger-soft: oklch(68% 0.165 27 / 0.16);
-    --warn: oklch(76% 0.125 85);
-    --warn-soft: oklch(76% 0.125 85 / 0.16);
+    --danger: oklch(68% 0.165 5);
+    --danger-soft: oklch(68% 0.165 5 / 0.16);
+    --warn: oklch(76% 0.125 100);
+    --warn-soft: oklch(76% 0.125 100 / 0.16);
     --ok: oklch(72% 0.125 158);
     --ok-soft: oklch(72% 0.125 158 / 0.16);
 
@@ -157,7 +153,7 @@
     --eff-half: oklch(70% 0.065 240);
     --eff-neutral: oklch(45% 0.006 264);
     --eff-double: oklch(70% 0.135 38);
-    --eff-quad: oklch(76% 0.175 32);
+    --eff-quad: oklch(76% 0.144 32);
 
     --type-normal: oklch(72% 0.012 90);
     --type-fire: oklch(73% 0.155 46);
@@ -181,6 +177,21 @@
 
   :root[data-theme='light'] {
     color-scheme: light;
+  }
+
+  /**
+   * What a theme is not a block of.
+   *
+   * A theme is a complete block of the same token set, and `test/tokens.test.ts`
+   * holds the three blocks above to exactly that. The set it is a block of is
+   * the set of tokens that *vary by theme*. A radius and a slot size do not, so
+   * they are declared once, here, rather than restated three times where they
+   * would only ever drift apart.
+   */
+  :root {
+    --radius: 0.25rem;
+    --radius-panel: 0.375rem;
+    --slot-size: 4.5rem;
   }
 }
 
