@@ -5,10 +5,12 @@ import {
   VGC_STALE_AFTER_DAYS,
   VGC_VERIFIED_ON,
 } from '@spc/core'
-import { openPanel, signIn } from './steps'
+import { DEMO_STATE, openPanel, openTeams } from './steps'
+
+test.use({ storageState: DEMO_STATE })
 
 test.beforeEach(async ({ page }) => {
-  await signIn(page)
+  await openTeams(page)
 })
 
 function panel(page: Page, title: string) {

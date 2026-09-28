@@ -11,5 +11,6 @@ packages/*/coverage/
 .DS_Store
 playwright-report/
 test-results/
+apps/web/e2e/.auth/
 .playwright-mcp/
 .vercel

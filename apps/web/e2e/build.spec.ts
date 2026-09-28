@@ -1,13 +1,17 @@
 import { expect, test } from '@playwright/test'
-import { addPokemon, createTeam, signIn, signUpFresh } from './steps'
+import { addPokemon, createTeam, DEMO_STATE, openTeams, signUpFresh } from './steps'
 
-test('a full team shows its six sets and no empty slot', async ({ page }) => {
-  await signIn(page)
-  await page.getByRole('link', { name: /Reg G Miraidon/ }).click()
+test.describe('signed in once', () => {
+  test.use({ storageState: DEMO_STATE })
 
-  await expect(page.getByRole('article')).toHaveCount(6)
-  await expect(page.getByLabel(/^Slot \d+, empty$/)).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Add a Pokémon' })).toHaveCount(0)
+  test('a full team shows its six sets and no empty slot', async ({ page }) => {
+    await openTeams(page)
+    await page.getByRole('link', { name: /Reg G Miraidon/ }).click()
+
+    await expect(page.getByRole('article')).toHaveCount(6)
+    await expect(page.getByLabel(/^Slot \d+, empty$/)).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Add a Pokémon' })).toHaveCount(0)
+  })
 })
 
 test('an empty team offers one control, in its first slot', async ({ page }) => {

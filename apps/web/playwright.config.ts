@@ -21,7 +21,10 @@ export default defineConfig({
   retries: process.env.CI === undefined ? 0 : 2,
   reporter: 'list',
   use: { baseURL, trace: 'on-first-retry' },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'setup', testMatch: /\.setup\.ts$/, use: { ...devices['Desktop Chrome'] } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, dependencies: ['setup'] },
+  ],
   webServer: {
     command: `next build && next start --port ${PORT}`,
     url: baseURL,
