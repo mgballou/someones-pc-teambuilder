@@ -170,7 +170,7 @@ export const MEGA_STONES: Readonly<Record<string, MegaStone>> = {
   'mewtwonite-y': { holder: 'mewtwo', into: 'mewtwo-mega-y' },
   pidgeotite: { holder: 'pidgeot', into: 'pidgeot-mega' },
   pinsirite: { holder: 'pinsir', into: 'pinsir-mega' },
-  pyroarite: { holder: 'pyroar', into: 'pyroar-mega' },
+  pyroarite: { holder: 'pyroar-male', into: 'pyroar-mega' },
   'raichunite-x': { holder: 'raichu', into: 'raichu-mega-x' },
   'raichunite-y': { holder: 'raichu', into: 'raichu-mega-y' },
   sablenite: { holder: 'sableye', into: 'sableye-mega' },
@@ -192,7 +192,7 @@ export const MEGA_STONES: Readonly<Record<string, MegaStone>> = {
   venusaurite: { holder: 'venusaur', into: 'venusaur-mega' },
   victreebelite: { holder: 'victreebel', into: 'victreebel-mega' },
   zeraorite: { holder: 'zeraora', into: 'zeraora-mega' },
-  zygardite: { holder: 'zygarde', into: 'zygarde-mega' },
+  zygardite: { holder: 'zygarde-complete', into: 'zygarde-mega' },
 }
 
 export type SignatureItem = {

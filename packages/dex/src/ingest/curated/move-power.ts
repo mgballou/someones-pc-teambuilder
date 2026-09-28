@@ -41,7 +41,6 @@ export const CURATED_VARIABLE_POWER: Readonly<Record<string, VariablePower>> = {
   rollout: { kind: 'consecutive-use' },
 
   'dragon-rage': { kind: 'fixed-damage', amount: 40 },
-  sonicboom: { kind: 'fixed-damage', amount: 20 },
   'sonic-boom': { kind: 'fixed-damage', amount: 20 },
 
   'night-shade': { kind: 'level-damage' },
