@@ -19,7 +19,7 @@
     "fix": "eslint . --fix && prettier --write .",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "ingest": "pnpm --filter @spc/dex ingest",
-    "db:up": "docker compose up -d db",
+    "db:up": "docker compose up --detach --wait db",
     "db:down": "docker compose down",
     "db:push": "pnpm --filter @spc/web db:push",
     "db:seed": "pnpm --filter @spc/web db:seed",
