@@ -1,19 +1,13 @@
 import { expect, test } from '@playwright/test'
+import { signIn } from './steps'
 
 /**
  * The path a person actually walks: sign in, open a team, read the analysis,
  * duplicate a set. Runs against the seeded demo account.
  */
 
-const EMAIL = 'demo@someones.pc'
-const PASSWORD = 'competitive'
-
 test.beforeEach(async ({ page }) => {
-  await page.goto('/sign-in')
-  await page.getByLabel('Email').fill(EMAIL)
-  await page.getByLabel('Password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL('/teams')
+  await signIn(page)
 })
 
 test('the seeded teams are listed', async ({ page }) => {
