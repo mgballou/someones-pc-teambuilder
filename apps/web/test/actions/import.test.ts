@@ -16,10 +16,10 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
   beforeEach(() => resetRequest())
   afterAll(() => people.removeAll())
 
-  async function myTeam(species: readonly string[] = []) {
+  async function myTeam(species: readonly string[] = [], formatId = 'gen9-ou') {
     const person = await people.create()
     await signIn(person.id)
-    return seedTeam({ userId: person.id, species })
+    return seedTeam({ userId: person.id, species, formatId })
   }
 
   it('reports how many sets it imported and no problems', async () => {
@@ -52,9 +52,9 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
     expect(garchomp?.moves).toEqual(['earthquake', 'outrage', 'stone-edge', 'fire-fang'])
   })
 
-  it("gives a set with no level line the format's level", async () => {
-    const team = await myTeam()
-    await importPasteAction(team.id, 'vgc-reg-h', TWO_SETS)
+  it("gives a set with no level line the team's format level, whatever format the client sends", async () => {
+    const team = await myTeam([], 'vgc-reg-h')
+    await importPasteAction(team.id, 'gen9-ou', TWO_SETS)
     expect((await membersOf(team.id)).map((row) => row.level)).toEqual([50, 50])
   })
 
@@ -92,6 +92,13 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
       `Not allowed to act on team ${team.id}.`,
     )
     expect(await membersOf(team.id)).toHaveLength(0)
+  })
+
+  it('refuses a team id that is not a uuid before it reaches the database', async () => {
+    await signIn((await people.create()).id)
+    await expect(importPasteAction('not-a-uuid', 'gen9-ou', TWO_SETS)).rejects.toThrow(
+      'Not allowed to act on team not-a-uuid.',
+    )
   })
 
   it('refuses a signed-out call', async () => {
