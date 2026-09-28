@@ -43,8 +43,10 @@ jobs:
       # The dataset is committed, so nothing here touches PokéAPI.
       - run: pnpm typecheck
       - run: pnpm lint
+
+      # The web tests write real rows, so the schema goes in before they run.
+      - run: pnpm db:push
       - run: pnpm test
 
-      - run: pnpm db:push
       - run: pnpm db:seed
       - run: pnpm build
