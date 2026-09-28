@@ -105,6 +105,14 @@ describe.skipIf(noDatabase)('team actions', () => {
       expect(target).toBe(`/teams/${created?.id}`)
     })
 
+    it('refuses a format the dataset does not have', async () => {
+      const person = await signedIn()
+      await expect(
+        actions.createTeamAction(form({ name: 'Sun', formatId: 'gen1-nonsense' })),
+      ).rejects.toThrow('No format with that id.')
+      expect(await teamsOf(person.id)).toHaveLength(0)
+    })
+
     it('refuses a blank name', async () => {
       const person = await signedIn()
       await expect(
@@ -144,6 +152,14 @@ describe.skipIf(noDatabase)('team actions', () => {
       const team = await seedTeam({ userId: person.id, formatId: 'gen9-ou' })
       await actions.setTeamFormatAction(team.id, 'vgc-reg-h')
       expect((await teamRow(team.id))?.formatId).toBe('vgc-reg-h')
+    })
+
+    it('refuses a format the dataset does not have and keeps the saved one', async () => {
+      const person = await signedIn()
+      const team = await seedTeam({ userId: person.id, formatId: 'gen9-ou' })
+      const result = await actions.setTeamFormatAction(team.id, 'gen1-nonsense')
+      expect(result.ok).toBe(false)
+      expect((await teamRow(team.id))?.formatId).toBe('gen9-ou')
     })
 
     it("refuses another user's team", async () => {
