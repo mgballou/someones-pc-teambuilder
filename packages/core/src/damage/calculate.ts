@@ -76,6 +76,13 @@ export function calculate({ attacker, defender, move, field, dex }: CalculateInp
   const moveRecord = requireMove(dex, move)
   const declaredCategory = moveRecord.category
   if (declaredCategory === 'status') throw UncalculableMove.status(move)
+  /**
+   * A damaging move that prints no power and carries no rule for one would run
+   * the formula at power zero and hand back rolls of 2 with no note.
+   */
+  if (moveRecord.basePower <= 0 && moveRecord.variablePower === null) {
+    throw UncalculableMove.noPower(move)
+  }
 
   const attackerSpecies = requireSpecies(dex, attacker.set.species)
   const defenderSpecies = requireSpecies(dex, defender.set.species)
