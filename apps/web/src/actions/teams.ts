@@ -30,14 +30,23 @@ const formatIdSchema = z
   .min(1)
   .refine((id) => dex().format(formatId(id)) !== undefined, 'No format with that id.')
 
+const teamNameSchema = z.string().trim().min(1, 'Name the team.').max(80)
+
 const createTeamSchema = z.object({
-  name: z.string().trim().min(1, 'Name the team.').max(80),
+  name: teamNameSchema,
   formatId: formatIdSchema,
 })
 
 export type ActionResult = { readonly ok: true } | { readonly ok: false; readonly message: string }
 
+/**
+ * The message a client shows. A `ZodError`'s own message is its issue list as
+ * JSON, so a rejected input answers with its first issue instead.
+ */
 function failure(error: unknown): ActionResult {
+  if (error instanceof z.ZodError) {
+    return { ok: false, message: error.issues[0]?.message ?? 'Check the input.' }
+  }
   const message = error instanceof Error ? error.message : 'Something went wrong.'
   return { ok: false, message }
 }
@@ -60,7 +69,7 @@ export async function renameTeamAction(teamId: string, name: string): Promise<Ac
     await repo.updateTeam({
       userId: user.id,
       teamId: teamIdSchema.parse(teamId) as TeamId,
-      name: z.string().trim().min(1).max(80).parse(name),
+      name: teamNameSchema.parse(name),
       now: new Date(),
     })
     revalidatePath(`/teams/${teamId}`)
@@ -98,7 +107,7 @@ export async function cloneTeamAction(teamId: string, name: string): Promise<nev
   const created = await repo.cloneTeamDeep({
     userId: user.id,
     teamId: teamIdSchema.parse(teamId) as TeamId,
-    name: z.string().trim().min(1).max(80).parse(name),
+    name: teamNameSchema.parse(name),
   })
   revalidatePath('/teams')
   redirect(`/teams/${created}`)
