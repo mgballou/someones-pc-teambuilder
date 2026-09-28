@@ -1,8 +1,10 @@
 import { expect, test, type Page } from '@playwright/test'
-import { openPanel, signIn } from './steps'
+import { DEMO_STATE, openPanel, openTeams } from './steps'
+
+test.use({ storageState: DEMO_STATE })
 
 test.beforeEach(async ({ page }) => {
-  await signIn(page)
+  await openTeams(page)
   await openPanel(page, 'Reg H Rain', 'Speed')
 })
 
