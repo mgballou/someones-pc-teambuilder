@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { moveId } from '../../src/index'
+import type { Dex, Move } from '../../src/index'
+import { moveId, requireMove } from '../../src/index'
 import {
   calculate,
   DEFAULT_FIELD,
@@ -24,6 +25,20 @@ function caught(run: () => unknown): unknown {
 const chomp = buildSet({ species: 'garchomp' })
 const rotom = buildSet({ species: 'rotom-wash' })
 
+const powerless: Move = {
+  ...requireMove(fixtureDex, moveId('earthquake')),
+  id: moveId('blank-slam'),
+  name: 'Blank Slam',
+  basePower: 0,
+  variablePower: null,
+}
+
+const dexWithPowerless: Dex = {
+  ...fixtureDex,
+  move: (id) => (id === powerless.id ? powerless : fixtureDex.move(id)),
+  allMoves: () => [...fixtureDex.allMoves(), powerless],
+}
+
 function calculateWith(move: string, attacker = chomp, defender = rotom) {
   return () =>
     calculate({
@@ -31,7 +46,7 @@ function calculateWith(move: string, attacker = chomp, defender = rotom) {
       defender: newDefender({ set: defender }),
       move: moveId(move),
       field: DEFAULT_FIELD,
-      dex: fixtureDex,
+      dex: dexWithPowerless,
     })
 }
 
@@ -88,6 +103,20 @@ describe('calculate on input it cannot answer', () => {
     expect(calculateWith('swords-dance')).toThrow(
       '"swords-dance" is a status move and deals no damage',
     )
+  })
+
+  it('throws UncalculableMove for a damaging move with no power and no rule', () => {
+    expect(caught(calculateWith('blank-slam'))).toBeInstanceOf(UncalculableMove)
+  })
+
+  it('says a missing power is why', () => {
+    expect(calculateWith('blank-slam')).toThrow(
+      '"blank-slam" has no base power and no rule for computing one',
+    )
+  })
+
+  it('still calculates a move whose power is computed by a rule', () => {
+    expect(calculateWith('sheer-cold')().max).toBeGreaterThan(0)
   })
 
   it('throws MissingFromDex for a move the dataset does not hold', () => {
