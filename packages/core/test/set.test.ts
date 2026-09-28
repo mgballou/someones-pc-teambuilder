@@ -10,9 +10,19 @@ import {
   PERFECT_IVS,
   setId,
   setLabel,
+  SlotOutOfRange,
   speciesId,
   withMoveAt,
 } from '../src/index'
+
+function caught(run: () => unknown): unknown {
+  try {
+    run()
+  } catch (error) {
+    return error
+  }
+  throw new Error('expected the call to throw')
+}
 
 const blank = newSet({ id: setId('a'), species: speciesId('garchomp') })
 
@@ -74,6 +84,20 @@ describe('the move slots', () => {
 
   it('clears a slot with null', () => {
     expect(withMoveAt(sparse, 1, null).moves).toEqual([null, null, null, PROTECT])
+  })
+})
+
+describe('a move slot that does not exist', () => {
+  it.each([4, -1, 1.5, Number.NaN])('throws SlotOutOfRange for slot %s', (index) => {
+    expect(caught(() => withMoveAt(blank, index, EARTHQUAKE))).toBeInstanceOf(SlotOutOfRange)
+  })
+
+  it('names the slot it rejected', () => {
+    expect(() => withMoveAt(blank, 4, EARTHQUAKE)).toThrow('No move slot 4. A set has slots 0 to 3')
+  })
+
+  it('records the slot it rejected', () => {
+    expect(SlotOutOfRange.move(4).index).toBe(4)
   })
 })
 
