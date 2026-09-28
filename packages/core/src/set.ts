@@ -90,8 +90,15 @@ export function moveCount(set: PokemonSet): number {
   return filledMoves(set).length
 }
 
-/** Replace one slot, leaving the other three alone. */
+/**
+ * Replace one slot, leaving the other three alone.
+ *
+ * Throws for a slot outside 0 to 3. Writing past the end would hand back a set
+ * with five moves typed as four, and a negative index would drop the move
+ * without a word.
+ */
 export function withMoveAt(set: PokemonSet, index: number, move: MoveId | null): PokemonSet {
+  if (!Number.isInteger(index) || index < 0 || index >= MAX_MOVES) throw SlotOutOfRange.move(index)
   const moves = [...set.moves] as [MoveId | null, MoveId | null, MoveId | null, MoveId | null]
   moves[index] = move
   return { ...set, moves }
@@ -104,4 +111,17 @@ export function cloneSet(set: PokemonSet, id: SetId): PokemonSet {
 
 export function setLabel(set: PokemonSet, speciesName: string): string {
   return set.nickname === null ? speciesName : `${set.nickname} (${speciesName})`
+}
+
+/** Typed error with a static factory, never a hand-written string. */
+export class SlotOutOfRange extends Error {
+  override readonly name = 'SlotOutOfRange'
+
+  private constructor(readonly index: number) {
+    super(`No move slot ${index}. A set has slots 0 to ${MAX_MOVES - 1}`)
+  }
+
+  static move(index: number): SlotOutOfRange {
+    return new SlotOutOfRange(index)
+  }
 }
