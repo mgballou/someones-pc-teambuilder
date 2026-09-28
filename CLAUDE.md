@@ -240,6 +240,7 @@ This app makes claims about a competitive game. Several are approximations, and 
 - PR descriptions follow the format in the global `CLAUDE.md`.
 
 <!-- block:begin -->
+
 ## Agents
 
 Delegate anything that means many reads and one conclusion. A turn in this pane
