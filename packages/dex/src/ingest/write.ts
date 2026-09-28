@@ -41,7 +41,8 @@ async function write(
   value: unknown,
   records: number,
 ): Promise<WrittenFile> {
-  const body = JSON.stringify(value)
-  await writeFile(join(dataDir, file), `${body}\n`, 'utf8')
-  return { file, records, bytes: body.length + 1 }
+  const body = `${JSON.stringify(value)}\n`
+  await writeFile(join(dataDir, file), body, 'utf8')
+  /** Bytes on disk, not UTF-16 units. One "é" in a description is enough to split them. */
+  return { file, records, bytes: Buffer.byteLength(body, 'utf8') }
 }

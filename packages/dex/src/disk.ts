@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Ability, Item, Move, Species } from '@spc/core'
 import { SHIPPED_FORMATS } from '@spc/core'
@@ -33,7 +34,7 @@ export function loadDataset(dataDir: string = defaultDataDir()): DexDataset {
 }
 
 function readJson<T>(dataDir: string, file: string): T {
-  const path = `${dataDir}${file}`
+  const path = join(dataDir, file)
   let raw: string
   try {
     raw = readFileSync(path, 'utf8')
