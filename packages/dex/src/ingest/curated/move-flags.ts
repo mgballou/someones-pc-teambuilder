@@ -54,7 +54,7 @@ export const CONTACT_MOVES = set(
   'superpower', 'surging-strikes', 'tackle', 'tail-slap', 'take-down', 'temper-flare', 'thief',
   'thrash', 'throat-chop', 'thunder-fang', 'thunder-punch', 'thunderous-kick', 'trailblaze',
   'triple-axel', 'triple-dive', 'trop-kick', 'u-turn', 'upper-hand', 'v-create', 'vine-whip',
-  'vise-grip', 'vital-throw', 'volt-tackle', 'wake-up-slap', 'waterfall', 'wave-crash',
+  'vice-grip', 'vital-throw', 'volt-tackle', 'wake-up-slap', 'waterfall', 'wave-crash',
   'wicked-blow', 'wicked-torque', 'wild-charge', 'wing-attack', 'wood-hammer', 'wrap',
   'wring-out', 'x-scissor', 'zen-headbutt', 'zing-zap',
 )
