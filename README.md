@@ -80,7 +80,9 @@ pnpm setup          # install, start postgres, push the schema, seed a demo acco
 pnpm dev            # http://localhost:3000
 ```
 
-`pnpm setup` needs Docker for Postgres. It seeds an account with three real teams in it:
+`pnpm setup` needs Docker running: it starts Postgres on port 5433 and waits for it. If
+`db:push` cannot connect, it says so in one line naming the host and port rather than failing
+partway through. It seeds an account with three real teams in it:
 
 ```
 demo@someones.pc / competitive
@@ -95,13 +97,20 @@ set `DATABASE_URL`, and run `pnpm db:push && pnpm db:seed`. That is the only env
 ```bash
 pnpm dev            # web app
 pnpm test           # vitest, all packages
-pnpm test:e2e       # playwright
+pnpm test:e2e       # playwright, against its own database
 pnpm typecheck      # tsc --noEmit across the workspace
 pnpm lint           # eslint + prettier
 pnpm fix            # autofix both
 pnpm check          # typecheck + lint + test
 pnpm ingest         # rebuild the dataset from PokéAPI
 ```
+
+`pnpm test:e2e` never opens the database `pnpm setup` made. It starts a second Postgres on port
+5434 that keeps its data in memory, pushes the schema, seeds the demo account, runs the suite
+against a production build on port 3100, and removes the container afterwards. It refuses any
+database whose name does not end in `_e2e`. Set `E2E_DATABASE_URL` to use a Postgres you started
+yourself, as CI does. Playwright's browser installs once with
+`pnpm --filter @spc/web exec playwright install chromium`.
 
 ---
 

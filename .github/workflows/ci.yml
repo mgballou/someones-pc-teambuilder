@@ -48,3 +48,46 @@ jobs:
       - run: pnpm db:push
       - run: pnpm db:seed
       - run: pnpm build
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    # The suite's own database, named so the guard in `apps/web/e2e/database.ts`
+    # lets the suite write to it. `pnpm test:e2e` pushes and seeds it.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: spc
+          POSTGRES_PASSWORD: spc
+          POSTGRES_DB: someones_pc_e2e
+        ports: ['5434:5432']
+        options: >-
+          --health-cmd "pg_isready -U spc -d someones_pc_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      E2E_DATABASE_URL: postgresql://spc:spc@localhost:5434/someones_pc_e2e
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @spc/web exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: apps/web/test-results/
+          retention-days: 7

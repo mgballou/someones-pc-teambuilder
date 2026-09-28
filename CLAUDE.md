@@ -20,7 +20,7 @@ pnpm setup          # install + start postgres + push schema + seed
 pnpm dev            # web app, localhost:3000
 pnpm test           # vitest, all packages
 pnpm test:watch
-pnpm test:e2e       # playwright
+pnpm test:e2e       # playwright, against its own disposable database
 pnpm typecheck      # tsc --noEmit across the workspace
 pnpm lint           # eslint + prettier check
 pnpm fix            # eslint --fix + prettier --write
