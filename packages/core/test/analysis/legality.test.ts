@@ -9,7 +9,7 @@ import {
   SHIPPED_FORMATS,
   unrestricted,
 } from '../../src/formats/index'
-import { CLAUSES, reorderMember } from '../../src/index'
+import { CLAUSES, itemId, reorderMember } from '../../src/index'
 import type { Format, SetId, Team } from '../../src/index'
 import { fixtureDex } from '../fixtures/dex'
 import { CLEAN_SIX, makeTeam } from './support'
@@ -222,6 +222,29 @@ describe('validateTeam', () => {
     ])
 
     expect(violationsOfKind(team, gen9Ou, 'species-banned')[0]?.species).toBe('flutter-mane')
+  })
+
+  it('rejects an item the format bans', () => {
+    const leftoversBanned: Format = {
+      ...regulationH,
+      legality: { ...regulationH.legality, bannedItems: [itemId('leftovers')] },
+    }
+    const team = makeTeam(leftoversBanned, CLEAN_SIX.slice(0, 4))
+
+    expect(violationsOfKind(team, leftoversBanned, 'item-banned')[0]?.message).toBe(
+      `Leftovers is banned in ${regulationH.name}.`,
+    )
+  })
+
+  it('reports an item the dataset does not hold', () => {
+    const team = makeTeam(regulationH, [
+      { ...CLEAN_SIX[0]!, item: 'bright-powder' },
+      CLEAN_SIX[1]!,
+      CLEAN_SIX[2]!,
+      CLEAN_SIX[3]!,
+    ])
+
+    expect(violationsOfKind(team, regulationH, 'missing-from-dataset')[0]?.id).toBe('bright-powder')
   })
 })
 
