@@ -39,7 +39,7 @@ export default async function BuildPage({
 
         {Array.from({ length: emptySlots }, (_, index) => (
           <EmptySlot key={`empty-${index}`} slotNumber={views.length + index + 1}>
-            {index === 0 && <AddSpecies teamId={team.id} />}
+            {index === 0 && <AddSpecies teamId={team.id} format={format} />}
           </EmptySlot>
         ))}
       </div>

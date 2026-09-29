@@ -1,6 +1,15 @@
 import { eq } from 'drizzle-orm'
 import type { PokemonSet, SetId, StatSpread } from '@spc/core'
-import { EMPTY_EVS, PERFECT_IVS, abilityId, formatId, itemId, moveId, speciesId } from '@spc/core'
+import {
+  EMPTY_EVS,
+  PERFECT_IVS,
+  abilityId,
+  defaultLevelFor,
+  formatId,
+  itemId,
+  moveId,
+  speciesId,
+} from '@spc/core'
 import { dex as loadDex } from '@spc/dex'
 // Loads apps/web/.env.local, and has to stay above './client', which reads
 // DATABASE_URL while it is being evaluated.
@@ -263,7 +272,8 @@ async function main(): Promise<void> {
   let skipped = 0
 
   for (const seed of TEAMS) {
-    if (dex.format(formatId(seed.format)) === undefined) {
+    const format = dex.format(formatId(seed.format))
+    if (format === undefined) {
       console.warn(`Skipping "${seed.name}": no format "${seed.format}" in the dataset.`)
       continue
     }
@@ -298,7 +308,7 @@ async function main(): Promise<void> {
         id: crypto.randomUUID() as SetId,
         species: species.id,
         nickname: null,
-        level: 50,
+        level: defaultLevelFor(format),
         gender: null,
         shiny: false,
         ability: abilityId(member.ability),

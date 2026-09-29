@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { DEMO_STATE, openTeams, signIn } from './steps'
+import { addPokemon, createTeam, DEMO_STATE, openTeams, signIn, signUpFresh } from './steps'
 
 /**
  * The path a person actually walks: sign in, open a team, read the analysis,
@@ -32,6 +32,32 @@ test.describe('signed in once', () => {
     await page.getByRole('link', { name: 'Speed' }).click()
     await expect(page.getByRole('heading', { name: 'OU Balance' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Ladder' })).toBeVisible()
+  })
+
+  test('OU Balance puts Dragapult 421 above the Weavile benchmark at speed', async ({ page }) => {
+    await page.getByRole('link', { name: /OU Balance/ }).click()
+    await page.getByRole('link', { name: 'Speed' }).click()
+    await expect(page.getByRole('heading', { name: 'Ladder' })).toBeVisible()
+
+    const ladder = page
+      .locator('section')
+      .filter({ has: page.getByRole('heading', { name: 'Ladder' }) })
+    const entries = await ladder.innerText()
+    const dragapult = entries.indexOf('Max Speed Jolly Dragapult')
+    const weavile = entries.indexOf('Max Speed Jolly Weavile')
+    const dragapultSet = page
+      .getByRole('table')
+      .getByRole('row', { name: /Dragapult/ })
+      .getByRole('cell')
+      .nth(2)
+
+    await expect(dragapultSet).toHaveText('421')
+    await expect(
+      ladder.getByRole('listitem').filter({ hasText: 'Max Speed Jolly Weavile' }),
+    ).toContainText('383')
+    expect(dragapult).toBeGreaterThanOrEqual(0)
+    expect(weavile).toBeGreaterThanOrEqual(0)
+    expect(dragapult).toBeLessThan(weavile)
   })
 
   test('the legality panel names its source', async ({ page }) => {
@@ -72,6 +98,18 @@ test.describe('signed in once', () => {
 
     await expect(page.getByText('read against rain and Grassy Terrain').first()).toBeVisible()
   })
+})
+
+test('a new OU team adds species at level 100', async ({ page }) => {
+  await signUpFresh(page)
+  await createTeam(page, 'OU Balance')
+  await addPokemon(page, 'Weavile')
+  await page
+    .getByRole('article', { name: 'Slot 1: Weavile' })
+    .getByRole('link', { name: 'Edit' })
+    .click()
+
+  await expect(page.getByLabel('Level')).toHaveValue('100')
 })
 
 test('a set duplicates in place', async ({ page }) => {
