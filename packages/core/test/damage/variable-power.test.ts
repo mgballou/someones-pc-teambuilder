@@ -75,6 +75,27 @@ describe('resolvePower', () => {
     expect(resolved.kind === 'power' ? resolved.power : -1).toBe(120)
   })
 
+  it.each([
+    [9.9, 20],
+    [10, 40],
+    [24.9, 40],
+    [25, 60],
+    [49.9, 60],
+    [50, 80],
+    [99.9, 80],
+    [100, 100],
+    [199.9, 100],
+    [200, 120],
+  ])('sets Low Kick power to %s at %skg target weight', (weight, expected) => {
+    const resolved = resolvePower({
+      ...BASE,
+      defenderWeightKg: weight,
+      move: move({ kind: 'weight-of-target' }),
+    })
+
+    expect(resolved).toEqual({ kind: 'power', power: expected, note: null })
+  })
+
   it('gives Heavy Slam 120 when the user is five times heavier', () => {
     const resolved = resolvePower({
       ...BASE,
@@ -85,8 +106,44 @@ describe('resolvePower', () => {
     expect(resolved.kind === 'power' ? resolved.power : -1).toBe(120)
   })
 
+  it.each([
+    [500, 100, 120],
+    [400, 100, 100],
+    [300, 100, 80],
+    [200, 100, 60],
+    [199, 100, 40],
+    [10, 0, 120],
+  ])('sets Heavy Slam power to %s at weights %skg / %skg', (attacker, defender, expected) => {
+    const resolved = resolvePower({
+      ...BASE,
+      attackerWeightKg: attacker,
+      defenderWeightKg: defender,
+      move: move({ kind: 'weight-ratio' }),
+    })
+
+    expect(resolved).toEqual({ kind: 'power', power: expected, note: null })
+  })
+
   it('gives Electro Ball 80 at double speed', () => {
     expect(power({ kind: 'speed-ratio' })).toBe(80)
+  })
+
+  it.each([
+    [400, 100, 150],
+    [300, 100, 120],
+    [200, 100, 80],
+    [150, 100, 60],
+    [100, 100, 40],
+    [100, 0, 150],
+  ])('sets Electro Ball power to %s at speeds %s / %s', (attacker, defender, expected) => {
+    const resolved = resolvePower({
+      ...BASE,
+      attackerSpeed: attacker,
+      defenderSpeed: defender,
+      move: move({ kind: 'speed-ratio' }),
+    })
+
+    expect(resolved.kind === 'power' ? resolved.power : -1).toBe(expected)
   })
 
   it('names the Gyro Ball assumption in a note', () => {
@@ -116,6 +173,26 @@ describe('resolvePower', () => {
     expect(resolved.kind === 'power' ? resolved.power : -1).toBe(1)
   })
 
+  it('scales Stored Power down with the target HP fraction', () => {
+    const resolved = resolvePower({
+      ...BASE,
+      defenderHpFraction: 0.5,
+      move: move({ kind: 'target-hp-ratio' }),
+    })
+
+    expect(resolved).toEqual({ kind: 'power', power: 60, note: null })
+  })
+
+  it('keeps HP-based power at one when the target has no HP left', () => {
+    const resolved = resolvePower({
+      ...BASE,
+      defenderHpFraction: 0,
+      move: move({ kind: 'target-hp-ratio' }),
+    })
+
+    expect(resolved).toEqual({ kind: 'power', power: 1, note: null })
+  })
+
   it('returns Seismic Toss as exact damage', () => {
     const resolved = resolvePower({ ...BASE, move: move({ kind: 'level-damage' }) })
     expect(resolved.kind === 'exact' ? resolved.damage : -1).toBe(50)
@@ -127,6 +204,30 @@ describe('resolvePower', () => {
       move: move({ kind: 'fixed-damage', amount: 20 }),
     })
     expect(resolved.kind === 'exact' ? resolved.damage : -1).toBe(20)
+  })
+
+  it('returns the defender current HP for a one-hit knockout move', () => {
+    const resolved = resolvePower({ ...BASE, move: move({ kind: 'ohko' }) })
+
+    expect(resolved).toEqual({
+      kind: 'exact',
+      damage: BASE.defenderCurrentHp,
+      note: expect.stringContaining('one-hit knockout move'),
+    })
+  })
+
+  it.each([
+    ['happiness', 'friendship'],
+    ['consecutive-use', 'how many turns'],
+    ['counter', 'returns damage'],
+  ] as const)('explains the %s power assumption', (kind, explanation) => {
+    const resolved = resolvePower({ ...BASE, move: move({ kind }, 0) })
+
+    expect(resolved).toEqual({
+      kind: 'power',
+      power: 1,
+      note: expect.stringContaining(explanation),
+    })
   })
 
   it('reports an unmodelled power rule rather than guessing', () => {
