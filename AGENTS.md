@@ -1,3 +1,4 @@
+<!-- prettier-ignore-start -->
 <!-- block:begin -->
 
 ## Agents
@@ -31,3 +32,4 @@ Matthew reads. Claude and Codex both reach Linear through its MCP.
 - Never touch another project's tickets. Never put client or work content in
   Linear.
 <!-- block:end -->
+<!-- prettier-ignore-end -->
