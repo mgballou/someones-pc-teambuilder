@@ -151,8 +151,10 @@ describe.skipIf(noDatabase)('team actions', () => {
 
     it('refuses an id that is not a uuid before it reaches the database', async () => {
       await signedIn()
-      const result = await actions.renameTeamAction('not-a-uuid', 'Name')
-      expect(result.ok).toBe(false)
+      expect(await actions.renameTeamAction('not-a-uuid', 'Name')).toEqual({
+        ok: false,
+        message: 'Invalid UUID',
+      })
     })
   })
 
