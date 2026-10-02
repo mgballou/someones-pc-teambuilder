@@ -133,8 +133,9 @@ describe('resolvePower', () => {
     [300, 100, 120],
     [200, 100, 80],
     [150, 100, 60],
-    [100, 100, 40],
-    [100, 0, 150],
+    [100, 100, 60],
+    [99, 100, 40],
+    [100, 0, 40],
   ])('gives Electro Ball at speed %s against %s a power of %s', (attacker, defender, expected) => {
     const resolved = resolvePower({
       ...BASE,
