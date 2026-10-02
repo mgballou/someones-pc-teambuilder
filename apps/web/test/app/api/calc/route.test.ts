@@ -33,7 +33,6 @@ describe('GET /api/calc', () => {
 
   it('lists an ability two species share once', async () => {
     const body = await payload('species=garchomp&species=gabite')
-    const ids = body.abilities.map((ability) => ability.id)
-    expect(ids).toEqual([...new Set(ids)])
+    expect(body.abilities.map((ability) => ability.id).sort()).toEqual(['rough-skin', 'sand-veil'])
   })
 })
