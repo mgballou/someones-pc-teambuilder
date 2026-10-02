@@ -86,7 +86,7 @@ describe('resolvePower', () => {
     [100, 100],
     [199.9, 100],
     [200, 120],
-  ])('sets Low Kick power to %s at %skg target weight', (weight, expected) => {
+  ])('gives Low Kick at %skg target weight a power of %s', (weight, expected) => {
     const resolved = resolvePower({
       ...BASE,
       defenderWeightKg: weight,
@@ -113,7 +113,7 @@ describe('resolvePower', () => {
     [200, 100, 60],
     [199, 100, 40],
     [10, 0, 120],
-  ])('sets Heavy Slam power to %s at weights %skg / %skg', (attacker, defender, expected) => {
+  ])('gives Heavy Slam at %skg against %skg a power of %s', (attacker, defender, expected) => {
     const resolved = resolvePower({
       ...BASE,
       attackerWeightKg: attacker,
@@ -135,7 +135,7 @@ describe('resolvePower', () => {
     [150, 100, 60],
     [100, 100, 40],
     [100, 0, 150],
-  ])('sets Electro Ball power to %s at speeds %s / %s', (attacker, defender, expected) => {
+  ])('gives Electro Ball at speed %s against %s a power of %s', (attacker, defender, expected) => {
     const resolved = resolvePower({
       ...BASE,
       attackerSpeed: attacker,
@@ -173,7 +173,7 @@ describe('resolvePower', () => {
     expect(resolved.kind === 'power' ? resolved.power : -1).toBe(1)
   })
 
-  it('scales Stored Power down with the target HP fraction', () => {
+  it('scales Crush Grip down with the target HP fraction', () => {
     const resolved = resolvePower({
       ...BASE,
       defenderHpFraction: 0.5,
