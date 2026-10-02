@@ -20,7 +20,7 @@ export type ImportResult = {
  *
  * The level rule comes from the team's own format, never from the caller. An
  * id that is not a uuid names no team anyone owns, so it is refused the same
- * way as a team that is not yours, before any query runs.
+ * way as a team that is not yours, before the team is looked up.
  */
 export async function importPasteAction(teamId: string, paste: string): Promise<ImportResult> {
   const user = await requireUser(new Date())
