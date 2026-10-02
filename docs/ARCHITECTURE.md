@@ -6,16 +6,18 @@ Someone's PC is a pnpm workspace with one web app and two packages. Dependencies
 ## Follow a request
 
 `apps/web/src/app/` contains the Next.js pages and API routes. Shared UI lives in
-`apps/web/src/components/`; browser interactions call server actions in `apps/web/src/actions/`.
-Team and set actions in `teams.ts` and `set.ts` authenticate and validate input; paste import is in
-`import.ts`. They call `apps/web/src/data/` repository functions, which scope Drizzle queries to
-the signed-in user and map database rows to core domain types. The schema and database client are
-in `apps/web/src/db/`.
+`apps/web/src/components/`. Forms and buttons call server actions in `apps/web/src/actions/`; the
+species, item and damage pickers fetch from the API routes in `apps/web/src/app/api/`. Team and set
+actions in `teams.ts` and `set.ts` authenticate and validate input; paste import is in `import.ts`.
+They call `apps/web/src/data/` repository functions (`set.ts` also reads its row directly), which
+scope Drizzle queries to the signed-in user and map database rows to core domain types. The schema
+and database client are in `apps/web/src/db/`.
 
-For a team analysis page, `apps/web/src/lib/team-view.ts` loads a team and its format. The page
-passes that domain data and a dex to pure functions from `@spc/core` for damage, speed, coverage,
-or legality, then renders the report. The core defines the `Dex` interface; it does not know how
-the data was loaded.
+For a team analysis page, `apps/web/src/lib/team-view.ts` loads a team and its format. The speed,
+coverage and legality pages pass that domain data and a dex to pure functions from `@spc/core` and
+render the report. The damage page hands a client panel part of the dex; the panel fetches the rest
+from `/api/calc`, builds a `Dex` with `apps/web/src/lib/mini-dex.ts` and runs `calculate` in the
+browser. The core defines the `Dex` interface; it does not know how the data was loaded.
 
 ## Find the domain and data
 
@@ -35,6 +37,6 @@ Core tests are in `packages/core/test/`, dex tests in `packages/dex/test/`, web 
 
 - Start the app and its local services: `pnpm setup`, then `pnpm dev`.
 - Run unit tests: `pnpm test`.
-- Run typecheck and lint together: `pnpm check`.
+- Run typecheck, lint and unit tests together: `pnpm check`.
 - Run browser tests: `pnpm test:e2e`.
 - Rebuild the committed dex dataset: `pnpm ingest`.
