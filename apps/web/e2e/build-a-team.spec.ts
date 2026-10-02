@@ -3,7 +3,8 @@ import { addPokemon, createTeam, DEMO_STATE, openTeams, signUpFresh } from './st
 
 /**
  * The path a person actually walks: sign in, open a team, read the analysis,
- * duplicate a set. Runs against the seeded demo account.
+ * duplicate a set. The read-only tests use the seeded demo account; the
+ * duplicate test signs up its own, so it never writes to the demo teams.
  */
 
 test.describe('signed in once', () => {
