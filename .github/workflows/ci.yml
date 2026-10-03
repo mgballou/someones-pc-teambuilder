@@ -5,9 +5,15 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -50,7 +56,9 @@ jobs:
       - run: pnpm build
 
   e2e:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     # The suite's own database, named so the guard in `apps/web/e2e/database.ts`
     # lets the suite write to it. `pnpm test:e2e` pushes and seeds it.
