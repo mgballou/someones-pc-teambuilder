@@ -20,7 +20,6 @@ export const NON_EVOLVING_FORMS: ReadonlySet<string> = new Set([
   'basculin-red-striped',
   'basculin-blue-striped',
   'floette-eternal',
-  'pichu-spiky-eared',
   'pikachu-rock-star',
   'pikachu-belle',
   'pikachu-pop-star',
