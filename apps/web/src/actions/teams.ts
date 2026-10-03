@@ -38,7 +38,12 @@ const createTeamSchema = z.object({
 export type ActionResult = { readonly ok: true } | { readonly ok: false; readonly message: string }
 
 function failure(error: unknown): ActionResult {
-  const message = error instanceof Error ? error.message : 'Something went wrong.'
+  const message =
+    error instanceof z.ZodError
+      ? 'Please check your input and try again.'
+      : error instanceof Error
+        ? error.message
+        : 'Something went wrong.'
   return { ok: false, message }
 }
 

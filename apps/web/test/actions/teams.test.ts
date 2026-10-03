@@ -142,7 +142,7 @@ describe.skipIf(noDatabase)('team actions', () => {
     it('refuses an id that is not a uuid before it reaches the database', async () => {
       await signedIn()
       const result = await actions.renameTeamAction('not-a-uuid', 'Name')
-      expect(result.ok).toBe(false)
+      expect(result).toEqual({ ok: false, message: 'Please check your input and try again.' })
     })
   })
 
