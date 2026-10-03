@@ -1,13 +1,48 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event.pull_request.draft }}
+  cancel-in-progress: true
 
 jobs:
-  check:
+  # A branch behind its base passes this gate with a notice and skips the test
+  # jobs: a stale branch is not a failure, and updating it is the author's call.
+  gate:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      run: ${{ steps.base.outputs.run }}
+    steps:
+      - id: base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # A failed lookup runs CI rather than skipping it.
+          behind=$(gh api "repos/$REPO/compare/$BASE...$HEAD_SHA" --jq .behind_by) || behind=0
+          if [ "$behind" = "0" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::This branch is $behind commits behind $BASE. Update it to run CI."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  check:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
