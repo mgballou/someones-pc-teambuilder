@@ -17,5 +17,25 @@ services:
       timeout: 5s
       retries: 10
 
+  # The browser suite's own database. `pnpm test:e2e` starts it, seeds it and
+  # removes it; the data lives in memory, so nothing outlasts the run.
+  db-e2e:
+    image: postgres:17-alpine
+    container_name: someones-pc-db-e2e
+    profiles: ['e2e']
+    environment:
+      POSTGRES_USER: spc
+      POSTGRES_PASSWORD: spc
+      POSTGRES_DB: someones_pc_e2e
+    ports:
+      - '5434:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U spc -d someones_pc_e2e']
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
 volumes:
   spc-pgdata:

@@ -1,13 +1,48 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event.pull_request.draft }}
+  cancel-in-progress: true
 
 jobs:
-  check:
+  # A branch behind its base passes this gate with a notice and skips the test
+  # jobs: a stale branch is not a failure, and updating it is the author's call.
+  gate:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      run: ${{ steps.base.outputs.run }}
+    steps:
+      - id: base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # A failed lookup runs CI rather than skipping it.
+          behind=$(gh api "repos/$REPO/compare/$BASE...$HEAD_SHA" --jq .behind_by) || behind=0
+          if [ "$behind" = "0" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::This branch is $behind commits behind $BASE. Update it to run CI."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  check:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -48,3 +83,49 @@ jobs:
       - run: pnpm db:push
       - run: pnpm db:seed
       - run: pnpm build
+
+  e2e:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # The suite's own database, named so the guard in `apps/web/e2e/database.ts`
+    # lets the suite write to it. `pnpm test:e2e` pushes and seeds it.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: spc
+          POSTGRES_PASSWORD: spc
+          POSTGRES_DB: someones_pc_e2e
+        ports: ['5434:5432']
+        options: >-
+          --health-cmd "pg_isready -U spc -d someones_pc_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      E2E_DATABASE_URL: postgresql://spc:spc@localhost:5434/someones_pc_e2e
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @spc/web exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: apps/web/test-results/
+          retention-days: 7
