@@ -1,13 +1,42 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  check:
+  # Fails, rather than skips, a PR behind its base: a run whose jobs were all
+  # skipped concludes success, which reads as a pass.
+  gate:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Require the branch to be current with its base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          behind=$(gh api "repos/$REPO/compare/$BASE...$HEAD_SHA" --jq .behind_by)
+          if [ "$behind" != "0" ]; then
+            echo "::error::This branch is $behind commits behind $BASE. Update it to run CI."
+            exit 1
+          fi
+
+  check:
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -50,7 +79,9 @@ jobs:
       - run: pnpm build
 
   e2e:
+    needs: gate
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     # The suite's own database, named so the guard in `apps/web/e2e/database.ts`
     # lets the suite write to it. `pnpm test:e2e` pushes and seeds it.
