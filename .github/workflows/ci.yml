@@ -8,12 +8,14 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Cancel a superseded run on a pull request, never a run on main.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   gate:
     if: github.event_name == 'push' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
     outputs:
@@ -27,7 +29,8 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          behind=$(gh api "repos/${{ github.repository }}/compare/${{ github.base_ref }}...${{ github.event.pull_request.head.sha }}" --jq .behind_by)
+          # A failed lookup runs CI rather than failing the gate.
+          behind=$(gh api "repos/${{ github.repository }}/compare/${{ github.base_ref }}...${{ github.event.pull_request.head.sha }}" --jq .behind_by) || behind=0
           if [ "$behind" = "0" ]; then echo "run=true" >> "$GITHUB_OUTPUT"
           else echo "::notice::This branch is $behind commits behind ${{ github.base_ref }}. Update it to run CI."; echo "run=false" >> "$GITHUB_OUTPUT"; fi
 
@@ -35,6 +38,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     services:
       postgres:

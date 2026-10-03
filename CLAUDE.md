@@ -239,6 +239,7 @@ This app makes claims about a competitive game. Several are approximations, and 
 - Run `pnpm check` before every commit.
 - PR descriptions follow the format in the global `CLAUDE.md`.
 
+<!-- prettier-ignore-start -->
 <!-- block:begin -->
 
 ## Agents
@@ -273,3 +274,4 @@ Matthew reads. Claude and Codex both reach Linear through its MCP.
   Linear.
 
 <!-- block:end -->
+<!-- prettier-ignore-end -->

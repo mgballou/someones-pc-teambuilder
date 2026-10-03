@@ -1,3 +1,4 @@
+<!-- prettier-ignore-start -->
 <!-- block:begin -->
 
 ## Agents
@@ -32,3 +33,4 @@ Matthew reads. Claude and Codex both reach Linear through its MCP.
   Linear.
 
 <!-- block:end -->
+<!-- prettier-ignore-end -->
