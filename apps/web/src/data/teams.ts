@@ -1,8 +1,8 @@
 import 'server-only'
 
 import { and, asc, eq, isNull, max } from 'drizzle-orm'
-import type { PokemonSet, SetId, Team, TeamId } from '@spc/core'
-import { cloneSet } from '@spc/core'
+import type { FormatId, PokemonSet, SetId, Team, TeamId } from '@spc/core'
+import { cloneSet, currentFormatId, formatId } from '@spc/core'
 import { db } from '../db/client'
 import { pokemonSets, teams } from '../db/schema'
 import { toDomainSet, toDomainTeam, toRowValues } from './mappers'
@@ -50,6 +50,16 @@ export async function getTeam(userId: string, teamId: TeamId): Promise<Team | nu
     with: { members: true },
   })
   return row === undefined ? null : toDomainTeam({ team: row, members: row.members })
+}
+
+/** The format a team is saved under, which decides how anything added to it is read. */
+export async function teamFormat(userId: string, teamId: TeamId): Promise<FormatId> {
+  const row = await db.query.teams.findFirst({
+    where: and(eq(teams.id, teamId), eq(teams.userId, userId)),
+    columns: { formatId: true },
+  })
+  if (row === undefined) throw NotAuthorized.team(teamId)
+  return currentFormatId(formatId(row.formatId))
 }
 
 async function assertOwnsTeam(userId: string, teamId: TeamId): Promise<void> {

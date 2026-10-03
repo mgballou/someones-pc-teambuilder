@@ -16,15 +16,15 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
   beforeEach(() => resetRequest())
   afterAll(() => people.removeAll())
 
-  async function myTeam(species: readonly string[] = []) {
+  async function myTeam(species: readonly string[] = [], formatId = 'gen9-ou') {
     const person = await people.create()
     await signIn(person.id)
-    return seedTeam({ userId: person.id, species })
+    return seedTeam({ userId: person.id, species, formatId })
   }
 
   it('reports how many sets it imported and no problems', async () => {
     const team = await myTeam()
-    expect(await importPasteAction(team.id, 'gen9-ou', TWO_SETS)).toEqual({
+    expect(await importPasteAction(team.id, TWO_SETS)).toEqual({
       imported: 2,
       problems: [],
     })
@@ -32,7 +32,7 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
 
   it('writes each set after the members already there, in paste order', async () => {
     const team = await myTeam(['amoonguss'])
-    await importPasteAction(team.id, 'gen9-ou', TWO_SETS)
+    await importPasteAction(team.id, TWO_SETS)
     const members = await membersOf(team.id)
     expect(members.map((row) => [row.species, row.position])).toEqual([
       ['amoonguss', 0],
@@ -43,7 +43,7 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
 
   it('writes what the paste says about each set', async () => {
     const team = await myTeam()
-    await importPasteAction(team.id, 'gen9-ou', TWO_SETS)
+    await importPasteAction(team.id, TWO_SETS)
     const [garchomp] = await membersOf(team.id)
 
     expect(garchomp?.item).toBe('choice-scarf')
@@ -52,15 +52,15 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
     expect(garchomp?.moves).toEqual(['earthquake', 'outrage', 'stone-edge', 'fire-fang'])
   })
 
-  it("gives a set with no level line the format's level", async () => {
-    const team = await myTeam()
-    await importPasteAction(team.id, 'vgc-reg-h', TWO_SETS)
+  it("gives a set with no level line the team's format level", async () => {
+    const team = await myTeam([], 'vgc-reg-h')
+    await importPasteAction(team.id, TWO_SETS)
     expect((await membersOf(team.id)).map((row) => row.level)).toEqual([50, 50])
   })
 
   it('imports the readable part of a set with one bad move and names the move', async () => {
     const team = await myTeam()
-    const result = await importPasteAction(team.id, 'gen9-ou', ONE_BAD_MOVE)
+    const result = await importPasteAction(team.id, ONE_BAD_MOVE)
     const [pikachu] = await membersOf(team.id)
 
     expect(result).toEqual({
@@ -72,14 +72,14 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
 
   it('writes nothing for a paste with no species it can read', async () => {
     const team = await myTeam()
-    const result = await importPasteAction(team.id, 'gen9-ou', NOTHING_READABLE)
+    const result = await importPasteAction(team.id, NOTHING_READABLE)
     expect(result.imported).toBe(0)
     expect(await membersOf(team.id)).toHaveLength(0)
   })
 
   it('revalidates the team', async () => {
     const team = await myTeam()
-    await importPasteAction(team.id, 'gen9-ou', TWO_SETS)
+    await importPasteAction(team.id, TWO_SETS)
     expect(revalidatedPaths()).toEqual([`/teams/${team.id}`])
   })
 
@@ -88,17 +88,22 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
     const team = await seedTeam({ userId: owner.id })
     await signIn((await people.create()).id)
 
-    await expect(importPasteAction(team.id, 'gen9-ou', TWO_SETS)).rejects.toThrow(
+    await expect(importPasteAction(team.id, TWO_SETS)).rejects.toThrow(
       `Not allowed to act on team ${team.id}.`,
     )
     expect(await membersOf(team.id)).toHaveLength(0)
   })
 
+  it('refuses a team id that is not a uuid before it reaches the database', async () => {
+    await signIn((await people.create()).id)
+    await expect(importPasteAction('not-a-uuid', TWO_SETS)).rejects.toThrow(
+      'Not allowed to act on team not-a-uuid.',
+    )
+  })
+
   it('refuses a signed-out call', async () => {
     const owner = await people.create()
     const team = await seedTeam({ userId: owner.id })
-    await expect(importPasteAction(team.id, 'gen9-ou', TWO_SETS)).rejects.toThrow(
-      'No active session.',
-    )
+    await expect(importPasteAction(team.id, TWO_SETS)).rejects.toThrow('No active session.')
   })
 })

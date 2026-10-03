@@ -51,11 +51,11 @@ describe.skipIf(noDatabase)('GET /teams/[teamId]/export', () => {
   it('exports an imported paste so that importing it again changes nothing', async () => {
     const person = await signedIn()
     const first = await seedTeam({ userId: person.id })
-    await importPasteAction(first.id, 'gen9-ou', TWO_SETS)
+    await importPasteAction(first.id, TWO_SETS)
     const once = await (await exportOf(first.id)).text()
 
     const second = await seedTeam({ userId: person.id })
-    await importPasteAction(second.id, 'gen9-ou', once)
+    await importPasteAction(second.id, once)
     const twice = await (await exportOf(second.id)).text()
 
     expect(twice).toBe(once)
