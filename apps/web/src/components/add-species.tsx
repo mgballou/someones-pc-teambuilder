@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import Image from 'next/image'
+import { defaultLevelFor, type Format } from '@spc/core'
 import { addSpeciesAction } from '../actions/teams'
 import { spriteUrl } from '../lib/sprites'
 import { Button } from './button'
@@ -19,7 +20,13 @@ type Match = {
  * only exists once you have asked for it. Searchable and keyboard-first.
  * ui-sensibility.md §2.6, §10.
  */
-export function AddSpecies({ teamId }: { readonly teamId: string }) {
+export function AddSpecies({
+  teamId,
+  format,
+}: {
+  readonly teamId: string
+  readonly format: Format
+}) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [matches, setMatches] = useState<readonly Match[]>([])
@@ -70,7 +77,7 @@ export function AddSpecies({ teamId }: { readonly teamId: string }) {
               disabled={pending}
               onClick={() =>
                 start(async () => {
-                  await addSpeciesAction(teamId, match.id, 50)
+                  await addSpeciesAction(teamId, match.id, defaultLevelFor(format))
                   setOpen(false)
                   setQuery('')
                 })
