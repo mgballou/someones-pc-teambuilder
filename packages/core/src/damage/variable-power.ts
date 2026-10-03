@@ -47,12 +47,12 @@ function powerByWeightRatio(attackerWeightKg: number, defenderWeightKg: number):
 
 /** Electro Ball, by how many times faster the user is. */
 function powerBySpeedRatio(attackerSpeed: number, defenderSpeed: number): number {
-  if (defenderSpeed <= 0) return 150
+  if (defenderSpeed <= 0) return 40
   const ratio = attackerSpeed / defenderSpeed
   if (ratio >= 4) return 150
   if (ratio >= 3) return 120
   if (ratio >= 2) return 80
-  if (ratio > 1) return 60
+  if (ratio >= 1) return 60
   return 40
 }
 
