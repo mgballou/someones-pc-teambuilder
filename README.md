@@ -107,6 +107,8 @@ pnpm ingest         # rebuild the dataset from PokéAPI
 
 ## Technical skeleton
 
+For a contributor's route through the app and packages, see the [architecture map](docs/ARCHITECTURE.md).
+
 A pnpm workspace, TypeScript throughout, strict plus `noUncheckedIndexedAccess` and
 `exactOptionalPropertyTypes`.
 
