@@ -4,9 +4,10 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import type { SetId, TeamId } from '@spc/core'
-import { newSet, speciesId } from '@spc/core'
+import { formatId, newSet, speciesId } from '@spc/core'
 import { requireUser } from '../auth/session'
 import * as repo from '../data/teams'
+import { dex } from '../lib/dex'
 
 /**
  * Server actions are thin shells.
@@ -19,9 +20,19 @@ import * as repo from '../data/teams'
 const teamIdSchema = z.uuid()
 const setIdSchema = z.uuid()
 
+/**
+ * A format id the dataset knows. A team saved under any other id opens
+ * nowhere: every panel looks its format up first and answers 404 without one.
+ */
+const formatIdSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .refine((id) => dex().format(formatId(id)) !== undefined, 'No format with that id.')
+
 const createTeamSchema = z.object({
   name: z.string().trim().min(1, 'Name the team.').max(80),
-  formatId: z.string().trim().min(1),
+  formatId: formatIdSchema,
 })
 
 export type ActionResult = { readonly ok: true } | { readonly ok: false; readonly message: string }
@@ -65,7 +76,7 @@ export async function setTeamFormatAction(teamId: string, formatId: string): Pro
     await repo.updateTeam({
       userId: user.id,
       teamId: teamIdSchema.parse(teamId) as TeamId,
-      formatId: z.string().trim().min(1).parse(formatId),
+      formatId: formatIdSchema.parse(formatId),
       now: new Date(),
     })
     revalidatePath(`/teams/${teamId}`)
