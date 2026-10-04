@@ -29,9 +29,12 @@ describe('runIngest', () => {
     expect(loadDataset(dataDir).species).toHaveLength(4)
   })
 
-  it('reports progress for each stage of the walk', () => {
-    expect(output).toContain('pokemon-species      4 / 4')
-  })
+  it.each(['abilities', 'moves', 'items', 'pokemon-species', 'pokemon'])(
+    'reports progress for the %s stage of the walk',
+    (stage) => {
+      expect(output).toMatch(new RegExp(`\\r${stage.padEnd(16)}\\s+\\d+ / \\d+`))
+    },
+  )
 
   it('reports the elapsed time from the clock it was given', () => {
     expect(output).toContain(`Wrote ${dataDir} in 3s`)
