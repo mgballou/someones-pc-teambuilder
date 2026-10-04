@@ -32,13 +32,27 @@ const cases: readonly (readonly [ParseProblem, string])[] = [
   [{ ...at, kind: 'malformed-line' }, 'Line not understood'],
 ]
 
+const kinds: Record<ParseProblem['kind'], true> = {
+  'unknown-species': true,
+  'unknown-move': true,
+  'unknown-item': true,
+  'unknown-ability': true,
+  'unknown-nature': true,
+  'unknown-tera-type': true,
+  'unknown-stat': true,
+  'ev-total-exceeded': true,
+  'too-many-moves': true,
+  'unsupported-field': true,
+  'malformed-line': true,
+}
+
 describe('describeProblem', () => {
   it.each(cases)('describes %o', (problem, text) => {
     expect(describeProblem(problem)).toBe(text)
   })
 
   it('covers every kind of problem', () => {
-    expect(new Set(cases.map(([problem]) => problem.kind)).size).toBe(11)
+    expect(new Set(cases.map(([problem]) => problem.kind))).toEqual(new Set(Object.keys(kinds)))
   })
 
   it.each(cases)('writes no exclamation mark for %o', (problem) => {
