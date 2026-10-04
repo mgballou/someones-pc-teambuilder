@@ -35,8 +35,4 @@ Core tests are in `packages/core/test/`, dex tests in `packages/dex/test/`, web 
 `apps/web/test/`, and browser tests in `apps/web/e2e/`. Workspace documentation checks are in
 `test/`.
 
-- Start the app and its local services: `pnpm setup`, then `pnpm dev`.
-- Run unit tests: `pnpm test`.
-- Run typecheck, lint and unit tests together: `pnpm check`.
-- Run browser tests: `pnpm test:e2e`.
-- Rebuild the committed dex dataset: `pnpm ingest`.
+For the commands, see [README §Commands](../README.md#commands).
