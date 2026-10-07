@@ -76,7 +76,7 @@ of them. If any of the copy above was opaque, this is the decoder ring.
 ## Run it
 
 ```bash
-pnpm setup          # install, start postgres, push the schema, seed a demo account
+pnpm run setup      # install, start postgres, push the schema, seed a demo account
 pnpm dev            # http://localhost:3000
 ```
 
