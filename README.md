@@ -78,7 +78,7 @@ of them. If any of the copy above was opaque, this is the decoder ring.
 You need Node.js 22 or later, pnpm 11.18.0, and Docker running for Postgres.
 
 ```bash
-pnpm setup          # install, start postgres, push the schema, seed a demo account
+pnpm run setup      # install, start postgres, push the schema, seed a demo account
 pnpm dev            # http://localhost:3000
 ```
 
