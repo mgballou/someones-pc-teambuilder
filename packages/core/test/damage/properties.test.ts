@@ -29,7 +29,10 @@ function resultFor({ attacker, defender, move }: Trial) {
   })
 }
 
-describe('every matchup in the fixture', () => {
+// Each test here walks more than a thousand matchups, and the determinism test
+// walks them twice, so the group needs more than vitest's five-second default
+// on a busy machine.
+describe('every matchup in the fixture', { timeout: 30_000 }, () => {
   it('covers more than a thousand combinations', () => {
     expect(TRIALS.length).toBeGreaterThan(1000)
   })
