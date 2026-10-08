@@ -139,10 +139,22 @@ describe.skipIf(noDatabase)('team actions', () => {
       expect((await teamRow(team.id))?.name).toBe('Theirs')
     })
 
+    it('answers a blank name with a sentence and keeps the old one', async () => {
+      const person = await signedIn()
+      const team = await seedTeam({ userId: person.id, name: 'Rain' })
+      expect(await actions.renameTeamAction(team.id, '   ')).toEqual({
+        ok: false,
+        message: 'Name the team.',
+      })
+      expect((await teamRow(team.id))?.name).toBe('Rain')
+    })
+
     it('refuses an id that is not a uuid before it reaches the database', async () => {
       await signedIn()
-      const result = await actions.renameTeamAction('not-a-uuid', 'Name')
-      expect(result.ok).toBe(false)
+      expect(await actions.renameTeamAction('not-a-uuid', 'Name')).toEqual({
+        ok: false,
+        message: 'Invalid UUID',
+      })
     })
   })
 
@@ -158,7 +170,7 @@ describe.skipIf(noDatabase)('team actions', () => {
       const person = await signedIn()
       const team = await seedTeam({ userId: person.id, formatId: 'gen9-ou' })
       const result = await actions.setTeamFormatAction(team.id, 'gen1-nonsense')
-      expect(result.ok).toBe(false)
+      expect(result).toEqual({ ok: false, message: 'No format with that id.' })
       expect((await teamRow(team.id))?.formatId).toBe('gen9-ou')
     })
 
