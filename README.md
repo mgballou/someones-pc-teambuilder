@@ -55,28 +55,30 @@ Teams import and export as Showdown pastes, which is how the ecosystem already s
 Competitive Pokémon has its own terms, and most of the app's domain model is a direct translation
 of them. If any of the copy above was opaque, this is the decoder ring.
 
-| Term               | What it means to a player                                                                                                                 | What models it                                     |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| **Set**            | One configured Pokémon: species, ability, item, nature, four moves, a stat spread. The unit of team-building.                             | `PokemonSet` — `core/src/set.ts`                   |
-| **EVs / IVs**      | The two stat budgets. 508 EVs to distribute, 252 to any one stat; IVs are fixed per Pokémon, 0–31.                                        | `StatSpread` — `core/src/stats.ts`                 |
-| **Nature**         | A ±10% trade between two stats. Adamant buys Attack with Special Attack.                                                                  | `Nature`, `natureMultiplier` — `core/src/stats.ts` |
-| **Format**         | The ruleset you play under: team size, level, legal species, banned moves, clauses. VGC calls these regulations, Smogon calls them tiers. | `Format` — `core/src/format.ts`                    |
-| **Clause**         | A rule about the team rather than about a species — no two of the same Pokémon, no two of the same item.                                  | `Clause` — `core/src/format.ts`                    |
-| **STAB**           | Same-Type Attack Bonus. A move matching the user's own type deals 1.5×.                                                                   | `core/src/damage/stab.ts`                          |
-| **Tera**           | Generation 9's gimmick: change a Pokémon's type mid-battle, which reshapes both its STAB and what it resists.                             | `core/src/damage/stab.ts`, five cases              |
-| **Roll**           | Damage is randomized across sixteen outcomes, 85%–100%. "Low roll" and "high roll" mean the ends of that range.                           | `DamageResult.rolls` — `core/src/damage/`          |
-| **2HKO**           | Knocks the target out in two hits. Results are quoted this way, along with how many of the sixteen rolls manage it.                       | `core/src/damage/ko.ts`                            |
-| **Spread move**    | Hits more than one opponent, and takes a 0.75× penalty for it. Only matters in doubles.                                                   | `isSpreadMove` — `core/src/move.ts`                |
-| **Speed tier**     | The ordered list of how fast everything is. Winning a tie decides who moves first, so builders tune to specific numbers.                  | `core/src/analysis/speed.ts`                       |
-| **Coverage**       | Which types the team can hit hard, and which types can hit the team hard.                                                                 | `core/src/analysis/coverage.ts`                    |
-| **Showdown paste** | The plain-text format Pokémon Showdown uses to write out a team. The way this ecosystem already shares them.                              | `core/src/showdown/`                               |
+| Term               | What it means to a player                                                                                                                 | What models it                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **Set**            | One configured Pokémon: species, ability, item, nature, four moves, a stat spread. The unit of team-building.                             | `PokemonSet` — `packages/core/src/set.ts`                   |
+| **EVs / IVs**      | The two stat budgets. 508 EVs to distribute, 252 to any one stat; IVs are fixed per Pokémon, 0–31.                                        | `StatSpread` — `packages/core/src/stats.ts`                 |
+| **Nature**         | A ±10% trade between two stats. Adamant buys Attack with Special Attack.                                                                  | `Nature`, `natureMultiplier` — `packages/core/src/stats.ts` |
+| **Format**         | The ruleset you play under: team size, level, legal species, banned moves, clauses. VGC calls these regulations, Smogon calls them tiers. | `Format` — `packages/core/src/format.ts`                    |
+| **Clause**         | A rule about the team rather than about a species — no two of the same Pokémon, no two of the same item.                                  | `Clause` — `packages/core/src/format.ts`                    |
+| **STAB**           | Same-Type Attack Bonus. A move matching the user's own type deals 1.5×.                                                                   | `packages/core/src/damage/stab.ts`                          |
+| **Tera**           | Generation 9's gimmick: change a Pokémon's type mid-battle, which reshapes both its STAB and what it resists.                             | `packages/core/src/damage/stab.ts`, five cases              |
+| **Roll**           | Damage is randomized across sixteen outcomes, 85%–100%. "Low roll" and "high roll" mean the ends of that range.                           | `DamageResult.rolls` — `packages/core/src/damage/`          |
+| **2HKO**           | Knocks the target out in two hits. Results are quoted this way, along with how many of the sixteen rolls manage it.                       | `packages/core/src/damage/ko.ts`                            |
+| **Spread move**    | Hits more than one opponent, and takes a 0.75× penalty for it. Only matters in doubles.                                                   | `isSpreadMove` — `packages/core/src/move.ts`                |
+| **Speed tier**     | The ordered list of how fast everything is. Winning a tie decides who moves first, so builders tune to specific numbers.                  | `packages/core/src/analysis/speed.ts`                       |
+| **Coverage**       | Which types the team can hit hard, and which types can hit the team hard.                                                                 | `packages/core/src/analysis/coverage.ts`                    |
+| **Showdown paste** | The plain-text format Pokémon Showdown uses to write out a team. The way this ecosystem already shares them.                              | `packages/core/src/showdown/`                               |
 
 ---
 
 ## Run it
 
+You need Node.js 22 or later, pnpm 11.18.0, and Docker running for Postgres.
+
 ```bash
-pnpm setup          # install, start postgres, push the schema, seed a demo account
+pnpm run setup      # install, start postgres, push the schema, seed a demo account
 pnpm dev            # http://localhost:3000
 ```
 
@@ -135,7 +137,7 @@ And the calculator cannot roll dice, so it returns all sixteen rolls and lets th
 which is what a player wants to read anyway.
 
 **`core` declares the data it needs and never learns where it comes from.** `Dex` is an interface
-in `core/src/dex.ts`. `@spc/dex` implements it against the built dataset, the test suite
+in `packages/core/src/dex.ts`. `@spc/dex` implements it against the built dataset, the test suite
 implements it against a hand-built fixture, and the browser implements it against the few
 records the current calculation touches. That inversion is why the calculator is testable without
 loading a thousand forms.
