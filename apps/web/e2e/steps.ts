@@ -48,3 +48,13 @@ export async function addPokemon(page: Page, species: string): Promise<void> {
   await page.getByRole('button', { name: species, exact: true }).click()
   await expect(page.getByRole('article', { name: new RegExp(`: ${species}$`) })).toBeVisible()
 }
+
+export type TeamPanel = 'Damage' | 'Speed' | 'Coverage' | 'Legality'
+
+/** From the Teams page, into one of the demo account's seeded teams and on to a panel. */
+export async function openPanel(page: Page, team: string, panel: TeamPanel): Promise<void> {
+  await page.getByRole('link', { name: new RegExp(team) }).click()
+  await expect(page.getByRole('heading', { name: team, level: 1 })).toBeVisible()
+  await page.getByRole('link', { name: new RegExp(`^${panel}`) }).click()
+  await expect(page).toHaveURL(new RegExp(`/${panel.toLowerCase()}$`))
+}
