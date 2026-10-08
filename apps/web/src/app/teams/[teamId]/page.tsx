@@ -46,7 +46,7 @@ export default async function BuildPage({
 
       <div className="flex flex-col gap-4">
         <Panel title="Import" subtitle="Showdown paste">
-          <PasteImport teamId={team.id} formatId={format.id} />
+          <PasteImport teamId={team.id} />
         </Panel>
 
         <Panel title="Export">

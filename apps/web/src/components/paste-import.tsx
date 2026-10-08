@@ -4,13 +4,7 @@ import { useState, useTransition } from 'react'
 import { importPasteAction, type ImportResult } from '../actions/import'
 import { Button } from './button'
 
-export function PasteImport({
-  teamId,
-  formatId,
-}: {
-  readonly teamId: string
-  readonly formatId: string
-}) {
+export function PasteImport({ teamId }: { readonly teamId: string }) {
   const [paste, setPaste] = useState('')
   const [result, setResult] = useState<ImportResult | null>(null)
   const [pending, start] = useTransition()
@@ -32,7 +26,7 @@ export function PasteImport({
         disabled={pending || paste.trim().length === 0}
         onClick={() =>
           start(async () => {
-            const outcome = await importPasteAction(teamId, formatId, paste)
+            const outcome = await importPasteAction(teamId, paste)
             setResult(outcome)
             if (outcome.imported > 0) setPaste('')
           })
