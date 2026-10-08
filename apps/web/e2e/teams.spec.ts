@@ -1,11 +1,15 @@
 import { expect, test } from '@playwright/test'
-import { createTeam, signIn, signUpFresh } from './steps'
+import { createTeam, DEMO_STATE, openTeams, signUpFresh } from './steps'
 
-test('the seeded teams list with their member counts', async ({ page }) => {
-  await signIn(page)
+test.describe('signed in once', () => {
+  test.use({ storageState: DEMO_STATE })
 
-  await expect(page.getByRole('link', { name: /Reg G Miraidon/ })).toContainText('6 of 6')
-  await expect(page.getByRole('link', { name: /OU Balance/ })).toContainText('6 of 6')
+  test('the seeded teams list with their member counts', async ({ page }) => {
+    await openTeams(page)
+
+    await expect(page.getByRole('link', { name: /Reg G Miraidon/ })).toContainText('6 of 6')
+    await expect(page.getByRole('link', { name: /OU Balance/ })).toContainText('6 of 6')
+  })
 })
 
 test('an account with no teams is offered its first one', async ({ page }) => {
