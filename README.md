@@ -116,6 +116,8 @@ yourself, as CI does. Playwright's browser installs once with
 
 ## Technical skeleton
 
+For a contributor's route through the app and packages, see the [architecture map](docs/ARCHITECTURE.md).
+
 A pnpm workspace, TypeScript throughout, strict plus `noUncheckedIndexedAccess` and
 `exactOptionalPropertyTypes`.
 
