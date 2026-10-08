@@ -1,11 +1,18 @@
 import { defineConfig, devices } from '@playwright/test'
+import { disposableUrl, E2E_DATABASE_URL } from './e2e/database'
 
 /**
- * `SPC_BASE_URL` points the suite at an already-running server, which is how
- * it runs when port 3000 is taken. Unset, it starts its own on 3000.
+ * The suite starts its own server, on its own port, against the database
+ * `pnpm test:e2e` prepared, and never borrows a server that is already
+ * running: one on 3000 is a developer's, reading the developer's data.
+ *
+ * It is a production build rather than `next dev` because Next allows one dev
+ * server per directory, and the developer's may be the one running.
  */
-const baseURL = process.env.SPC_BASE_URL ?? 'http://localhost:3000'
-const external = process.env.SPC_BASE_URL !== undefined
+
+const PORT = 3100
+const baseURL = `http://localhost:${PORT}`
+const databaseUrl = disposableUrl(process.env.DATABASE_URL ?? E2E_DATABASE_URL)
 
 export default defineConfig({
   testDir: './e2e',
@@ -15,14 +22,11 @@ export default defineConfig({
   reporter: 'list',
   use: { baseURL, trace: 'on-first-retry' },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  ...(external
-    ? {}
-    : {
-        webServer: {
-          command: 'pnpm dev',
-          url: baseURL,
-          reuseExistingServer: process.env.CI === undefined,
-          timeout: 120_000,
-        },
-      }),
+  webServer: {
+    command: `next build && next start --port ${PORT}`,
+    url: baseURL,
+    reuseExistingServer: false,
+    timeout: 300_000,
+    env: { DATABASE_URL: databaseUrl },
+  },
 })
