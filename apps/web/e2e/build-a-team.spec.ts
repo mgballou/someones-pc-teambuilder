@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { DEMO_STATE, openTeams, signIn } from './steps'
+import { addPokemon, createTeam, DEMO_STATE, openTeams, signUpFresh } from './steps'
 
 /**
  * The path a person actually walks: sign in, open a team, read the analysis,
- * duplicate a set. Runs against the seeded demo account.
+ * duplicate a set. The read-only tests use the seeded demo account; the
+ * duplicate test signs up its own, so it never writes to the demo teams.
  */
 
 test.describe('signed in once', () => {
@@ -75,11 +76,11 @@ test.describe('signed in once', () => {
 })
 
 test('a set duplicates in place', async ({ page }) => {
-  await signIn(page)
-  await page.getByRole('link', { name: /Reg H Rain/ }).click()
+  await signUpFresh(page)
+  await createTeam(page, 'Rain')
+  await addPokemon(page, 'Garchomp')
 
   const cards = page.getByRole('article')
-  await expect(cards.first()).toBeVisible()
   const before = await cards.count()
 
   await cards.first().getByRole('button', { name: 'Duplicate this set' }).click()
