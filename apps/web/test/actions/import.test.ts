@@ -94,7 +94,7 @@ describe.skipIf(noDatabase)('importPasteAction', () => {
     expect(await membersOf(team.id)).toHaveLength(0)
   })
 
-  it('refuses a team id that is not a uuid before it reaches the database', async () => {
+  it('refuses a team id that is not a uuid before looking up the team', async () => {
     await signIn((await people.create()).id)
     await expect(importPasteAction('not-a-uuid', TWO_SETS)).rejects.toThrow(
       'Not allowed to act on team not-a-uuid.',
