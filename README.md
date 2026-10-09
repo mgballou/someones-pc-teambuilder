@@ -82,7 +82,7 @@ pnpm run setup      # install, start postgres, push the schema, seed a demo acco
 pnpm dev            # http://localhost:3000
 ```
 
-`pnpm setup` needs Docker running: it starts Postgres on port 5433 and waits for it. If
+`pnpm run setup` needs Docker running: it starts Postgres on port 5433 and waits for it. If
 `db:push` cannot connect, it says so in one line naming the host and port rather than failing
 partway through. It seeds an account with three real teams in it:
 
