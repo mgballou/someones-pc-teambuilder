@@ -76,6 +76,12 @@ of them. If any of the copy above was opaque, this is the decoder ring.
 ## Run it
 
 You need Node.js 22 or later, pnpm 11.18.0, and Docker running for Postgres.
+If pnpm is not installed, enable Corepack and activate the version this workspace uses:
+
+```bash
+corepack enable
+corepack prepare pnpm@11.18.0 --activate
+```
 
 ```bash
 pnpm run setup      # install, start postgres, push the schema, seed a demo account
