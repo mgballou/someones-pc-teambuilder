@@ -28,8 +28,6 @@ export const resourceListSchema = z.object({
   results: z.array(namedResource),
 })
 
-export type ResourceList = z.infer<typeof resourceListSchema>
-
 // ---------------------------------------------------------------------------
 // /pokemon/{name} — one *form*. This is what becomes a `Species`.
 // ---------------------------------------------------------------------------
@@ -106,7 +104,7 @@ export const POKEAPI_MOVE_TARGETS = [
 
 export type PokeApiMoveTarget = (typeof POKEAPI_MOVE_TARGETS)[number]
 
-export const MOVE_DAMAGE_CLASSES = ['physical', 'special', 'status'] as const
+const MOVE_DAMAGE_CLASSES = ['physical', 'special', 'status'] as const
 
 /**
  * `meta` is `null` for every move introduced in generation IX — PokéAPI has
@@ -122,8 +120,6 @@ const moveMetaSchema = z.object({
   min_hits: z.number().nullable(),
   max_hits: z.number().nullable(),
 })
-
-export type MoveMeta = z.infer<typeof moveMetaSchema>
 
 const effectEntrySchema = z.object({
   short_effect: z.string(),

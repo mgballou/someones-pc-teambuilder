@@ -143,7 +143,7 @@ export async function ingest(
 }
 
 /** Species name to the species it evolves from, for the ones that have one. */
-export function preEvolutionsFrom(
+function preEvolutionsFrom(
   responses: readonly PokemonSpeciesResponse[],
 ): ReadonlyMap<string, string> {
   const parents = new Map<string, string>()

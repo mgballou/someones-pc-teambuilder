@@ -11,7 +11,7 @@
  * move that drains nothing, hits once and crits normally needs no entry.
  */
 
-export type CuratedMoveMeta = {
+type CuratedMoveMeta = {
   /** Fraction of damage dealt recovered. */
   readonly drain?: number
   /** Fraction of damage dealt taken back. */

@@ -27,7 +27,7 @@ import {
 import { NON_EVOLVING_FORMS, NO_TERASTAL_FORMS } from './curated/species-quirks'
 import { generationNumber, statKey, titleCase } from './text'
 
-export type NormalizeSpeciesInput = {
+type NormalizeSpeciesInput = {
   readonly pokemon: PokemonResponse
   readonly species: PokemonSpeciesResponse
   /**

@@ -83,7 +83,7 @@ export const RESIST_BERRY_ITEMS: Readonly<Record<string, PokemonType>> = {
   'yache-berry': 'ice',
 }
 
-export type MegaStone = {
+type MegaStone = {
   /** The `pokemon` name that may hold the stone. */
   readonly holder: string
   /** The `pokemon` name it becomes. */
@@ -195,7 +195,7 @@ export const MEGA_STONES: Readonly<Record<string, MegaStone>> = {
   zygardite: { holder: 'zygarde-complete', into: 'zygarde-mega' },
 }
 
-export type SignatureItem = {
+type SignatureItem = {
   readonly note: string
   /** `pokemon` names the item is locked to. */
   readonly holders: readonly string[]
@@ -295,7 +295,7 @@ export const FORM_BOUND_ITEMS: Readonly<Record<string, readonly string[]>> = {
  * and not a signature item becomes `{ kind: 'unmodelled' }` and stays in the
  * dataset. Nothing is ever dropped.
  */
-export type CuratedEffect =
+type CuratedEffect =
   | { readonly kind: 'choice'; readonly stat: 'atk' | 'spa' | 'spe' }
   | { readonly kind: 'life-orb' }
   | { readonly kind: 'expert-belt' }
